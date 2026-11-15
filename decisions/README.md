@@ -1,0 +1,31 @@
+# Decisions
+
+Architecture decision records, one file each, after the form of TOPAK's `decisions/`. They were drafted on
+2026.11.15 from [PLAN.md](../PLAN.md) and
+[the founding session record](../derived/tla-kit-founding-session-2026.11.15.md), and **all of them are
+Proposed**. The custodian chose the idea, the name and the spike. Every other choice was the assistant's, or is a
+recommendation the plan lists as owed. Nothing here is accepted until the custodian accepts it.
+
+Once a record is accepted it is not edited. A change is a History row, or a new record that supersedes it.
+
+Each record has a **Chosen by** line (the custodian, the assistant, or owed) and a **State** line (built in the
+spike, or planned for a phase of `PLAN.md`).
+
+| Record | Title | Chosen by | State | Status |
+|---|---|---|---|---|
+| [ADR-0001](ADR-0001.md) | One image of the TLA+ tool family, cited by digest, with two ways in | Custodian (the idea); assistant (the form) | Built in part | Proposed |
+| [ADR-0002](ADR-0002.md) | Every tool is held to a digest, and every result names the image's digest | Assistant | Built in part | Proposed |
+| [ADR-0003](ADR-0003.md) | The base is Ubuntu 24.04 with Temurin JRE 25, on Linux x86_64 only | Assistant (forced by glibc) | Built | Proposed |
+| [ADR-0004](ADR-0004.md) | The image speaks through the variables the projects already read | Assistant | Built | Proposed |
+| [ADR-0005](ADR-0005.md) | One prover build per image, from a copy of its tarball kept here | Assistant | Planned, Phase 1 | Proposed |
+| [ADR-0006](ADR-0006.md) | The MCP server has no way of its own to write a results file | Assistant | Planned, Phases 3 and 4 | Proposed |
+| [ADR-0007](ADR-0007.md) | The skill is the source of the method; its scripts are vendored here at a named commit | Owed (D2) | Planned, Phase 3 | Proposed |
+| [ADR-0008](ADR-0008.md) | The MCP server is Python over stdio, inside the image, confined to the mounted project | Assistant | Planned, Phases 3 and 5 | Proposed |
+| [ADR-0009](ADR-0009.md) | The proof tools follow marco6/tlapm-mcp's design, with named changes, and do not depend on it | Assistant | Planned, Phase 4 | Proposed |
+| [ADR-0010](ADR-0010.md) | The image is published at `ghcr.io/scottcochran/tla-kit`, public, from a tag | Owed (D3) | Planned, Phase 1 | Proposed |
+| [ADR-0011](ADR-0011.md) | This repository is licensed Apache-2.0 | Owed (D4) | Planned, before publishing | Proposed |
+| [ADR-0012](ADR-0012.md) | One base image; large optional tools as variants by tag, each added with a check that uses it | Owed (D5) | Planned, Phase 6 | Proposed |
+
+**Not recorded here.** `PLAN.md`'s D1, whether TOPAK moves `tools/TLAPS-PIN` to the image's Linux prover, is
+TOPAK's decision and is made there. So is the same question for gov-tla. ADR-0005 says what tla-kit provides
+either way.

@@ -42,6 +42,9 @@ TOPAK is the first project it has to serve and gov-tla the second. Nothing in th
 
 ## Decisions owed
 
+Drafted as records in [decisions/](decisions/): D2 is ADR-0007, D3 ADR-0010, D4 ADR-0011 and D5 ADR-0012. D1 is
+TOPAK's and has no record here.
+
 | | Decision | Recommendation | Blocks |
 |---|---|---|---|
 | D1 | Does TOPAK move `tools/TLAPS-PIN` to the image's Linux prover? TOPAK's decision, made there. | Yes: it is the only route to proofs rerun in CI, and the newer build rejects the two unsound cases. It means regenerating 34 proof results files, and the records that cite the two cases need a look. | Phase 2 as evidence |

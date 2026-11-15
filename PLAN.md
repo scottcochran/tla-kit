@@ -57,7 +57,7 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 | D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it, accepted 2026.11.15. | Nothing now |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
 | D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | A design to follow, with named changes, and no dependency on it. | Phase 4 |
-| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, Z3, Zenon, LS4)? | Check each licence before anything is redistributed. The result is the image's notice of bundled tools (ADR-0011 item 4). | Phase 1c: the kept tarball, the SBOM and a public image all wait on it |
+| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Conditions 2 and 3 are Phase 1c work, before anything is published |
 
 ### Records to accept, and when
 
@@ -125,7 +125,9 @@ written down.
   copies it (ADR-0013 item 7).
 - The pinned TLAPS tarball kept as a release asset here, so the image can be rebuilt after upstream has moved the
   tag. Build from the copy; compare with upstream as a separate, reporting check (the analogue of TOPAK's
-  `sources.yml`). It waits on D7.
+  `sources.yml`). The release holds `licenses/` and the source of Poly/ML, GMP and `libsha1` beside it (D7).
+- Before the first publish, settle which GMP release and which `libsha1` licence the tarball carries, from
+  Isabelle2025's `polyml-5.9.1` and `sha1` components (D7 condition 3).
 - The weekly check: a new jar, a change to what the `tlapm` tag serves, a new digest behind the base's tag, and
   a vulnerability scan with a pinned scanner (Trivy is the proposal). It reports in one issue and moves nothing
   (ADR-0013 items 4 and 5).
@@ -223,7 +225,7 @@ Each is optional, pinned like the rest, and added only with a check that uses it
 ## Risks
 
 - **The prover tag moves.** Three builds in six weeks across the three projects. Phase 1c's copy of the tarball
-  is the answer, and it waits on D7. Until then a rebuild can fail on the checksum by design.
+  is the answer. D7 allows it, on its conditions. Until then a rebuild can fail on the checksum by design.
 - **A newer prover changes what proves.** It did, for the defect modules. Every prover move needs the full
   proof run and the defect run before a pin moves.
 - **Rebuilds rely on upstreams that no record keeps.** Only the prover's tarball will have a kept copy. The base
@@ -232,8 +234,9 @@ Each is optional, pinned like the rest, and added only with a check that uses it
   rather than an unstated one.
 - **The gate on ADR-0005, 0013 and 0014 is working output.** Phase 1b checks the model in an unpublished image.
   Until 1c regenerates the results in a published one, the acceptance rests on a run that cannot be cited.
-- **Emulation on Apple Silicon** is unmeasured. If it is slow, local proof work stays on the native binary
-  until the arm64 build exists, and "the same locally and in CI" holds for CI and Linux only.
+- **Emulation on Apple Silicon** was measured once, in Phase 1a: TOPAK's full proof run under emulation took
+  6 min 43 s on a 12-CPU Mac, against 539 s natively on a 4-CPU x86_64 machine at the spike. That is one machine
+  and not a ratio, but it is not the slowdown feared. The arm64 build (Phase 6) is for parity, not speed.
 - **Two copies of the method.** Vendored scripts can drift from the skill. D2's digest check is the guard.
 - **Process for one custodian.** ADR-0013 to ADR-0016 add an inventory, a weekly issue, a scan, a list of
   projects with a log, attestations and two TLA+ modules. If that is more than one person can keep, the records

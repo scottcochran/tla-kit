@@ -29,5 +29,6 @@ downloads and contains the TLA+ tools (tla2tools.jar), the TLAPS proof
 manager and its backends (Isabelle, Poly/ML, Z3, Zenon, LS4), and an
 Ubuntu base with a Java runtime and the packages the image adds to it
 (python3, perl, git); each is under its own licence. The image's own
-notice will list them once their licences have been checked
-(decisions/ADR-0005.md).
+notice, licenses/THIRD-PARTY.md, lists each part with its licence, the
+path of its licence text in the image, and its source. The licence
+texts in licenses/ are their authors', not tla-kit's.

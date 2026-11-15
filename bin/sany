@@ -1,0 +1,3 @@
+#!/bin/sh
+# SANY, the TLA+ parser and semantic checker.
+exec java -cp "${TLA_JAR:-/opt/tla/tla2tools.jar}" tla2sany.SANY "$@"

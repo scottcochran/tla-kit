@@ -1,0 +1,12 @@
+#!/bin/sh
+# What is in this image: every tool with the digest a results file would cite.
+jar="${TLA_JAR:-/opt/tla/tla2tools.jar}"
+tlapm="${TLAPM:-/opt/tlaps/bin/tlapm}"
+echo "platform  $(uname -s) $(uname -m), $(. /etc/os-release && echo "$PRETTY_NAME")"
+echo "java      $(java -version 2>&1 | head -1)"
+echo "python    $(python3 --version 2>&1)"
+echo "checker   $jar sha256 $(sha256sum "$jar" | cut -d' ' -f1)"
+echo "tlc       $(java -cp "$jar" tlc2.TLC 2>&1 | grep -m1 "TLC2 Version")"
+echo "prover    $tlapm sha256 $(sha256sum "$tlapm" | cut -d' ' -f1)"
+echo "tlapm     $("$tlapm" --version 2>&1 | tail -1)"
+"$tlapm" --config 2>/dev/null | grep -E ' version == ' | sed 's/^/backend   /'

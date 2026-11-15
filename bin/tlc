@@ -1,0 +1,3 @@
+#!/bin/sh
+# TLC, the model checker, from the image's pinned tla2tools.jar.
+exec java -XX:+UseParallelGC -cp "${TLA_JAR:-/opt/tla/tla2tools.jar}" tlc2.TLC "$@"

@@ -25,6 +25,8 @@ spike, or planned for a phase of `PLAN.md`).
 | [ADR-0010](ADR-0010.md) | The image is published at `ghcr.io/scottcochran/tla-kit`, public, from a tag | Owed (D3) | Planned, Phase 1 | Proposed |
 | [ADR-0011](ADR-0011.md) | Code is licensed Apache-2.0 and documentation CC BY 4.0, as in TOPAK | Custodian (D4) | Built | Proposed |
 | [ADR-0012](ADR-0012.md) | One base image; large optional tools as variants by tag, each added with a check that uses it | Owed (D5) | Planned, Phase 6 | Proposed |
+| [ADR-0013](ADR-0013.md) | Every pin moves by one rule: one pull request, evidence that fits what the pin can change | Assistant | Planned, Phase 1 | Proposed |
+| [ADR-0014](ADR-0014.md) | Every pull request is built and tested; a release is an immutable tag, attested, and never deleted | Assistant | Planned, Phases 1 and 2 | Proposed |
 
 **Not recorded here.** `PLAN.md`'s D1, whether TOPAK moves `tools/TLAPS-PIN` to the image's Linux prover, is
 TOPAK's decision and is made there. So is the same question for gov-tla. ADR-0005 says what tla-kit provides

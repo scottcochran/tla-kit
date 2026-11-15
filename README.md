@@ -61,6 +61,7 @@ copied inside the container. Nothing was written to TOPAK and no results file wa
 | The skill's setup check | `setup_check.py --proofs`, in an empty project, `TLAPM_UNPINNED=1` | Ready for model checking and proofs: all 11 fixture rows as expected; the fixture's 19 obligations proved; its flipped hypothesis fails as required |
 | TOPAK's jar pin | `tools/check-pins.sh` | In step with `tools/TLA-PIN` |
 | TOPAK's proofs | `spike/prove-all.sh /work/spec` | 34 of 34 proof modules proved; 13,622 obligations; every module's count equals its committed results file; 539 s in all, `Mesh` the slowest at 152 s |
+| TOPAK's prover-defect reproductions | `spec/defects/defects-run.sh`, `TLAPM_UNPINNED=1` | Differs from the committed record: 13 lemmas the record expects to prove (12 by SMT, 1 by LS4) fail under this prover build; TLC still finds all 8 statements false; the certified step cannot run without cvc5 and ethos |
 | TOPAK's TLC results | `tools/check-results.sh` on the `pr` tier | All 14 modules regenerated and compared with their committed results files: 490 rows, 0 differences; 3,390 s run one after another (CI runs them as a matrix), `Release` the slowest at 913 s |
 
 The committed proof results were made by `tlapm` 7824dab on arm64-darwin. This run used ff40755 on Linux
@@ -75,6 +76,8 @@ Not tried: certified proof runs (`spec/proof-cert.sh`), the image under emulatio
 TLC results (tier `manual`, about 70 minutes), and any GitHub Actions run.
 
 ## Not built yet
+
+[PLAN.md](PLAN.md) is the development plan. In short:
 
 - The MCP server: the skill's scripts as tools (`tlc_run`, `tlc_rows`, `proof_results`, `flip_test`,
   `proof_sync`), exploration tools (parse, symbols, evaluate, coverage, state graph), and proof tools on

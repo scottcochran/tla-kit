@@ -87,3 +87,9 @@ decision records drafted from both, all Proposed. In short:
 - cvc5 and ethos for certified runs; Apalache; the TLA+ community modules.
 - A published image, a CI workflow that builds it, and a base image pinned by digest.
 - A Linux arm64 build of `tlapm` from source.
+
+## License
+
+Code and tooling are Apache-2.0 ([LICENSE](LICENSE)); documentation is CC BY 4.0
+([LICENSE-DOCS](LICENSE-DOCS)). See [NOTICE](NOTICE) for how the split applies. The tools inside the image keep
+their own licences.

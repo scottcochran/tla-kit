@@ -65,6 +65,10 @@ COPY --from=fetch /fetch/tla2tools.jar /opt/tla/tla2tools.jar
 COPY --from=fetch /fetch/tlaps /opt/tlaps
 COPY bin/ /usr/local/bin/
 COPY vendor/writing-tla-specs-and-proofs/ /opt/tla-kit/skill/
+# tla-kit's licences, and the notice of the third-party software in the image with the licence texts the TLAPS
+# tarball leaves out (ADR-0011 item 4; licenses/THIRD-PARTY.md).
+COPY LICENSE LICENSE-DOCS NOTICE /opt/tla-kit/
+COPY licenses/ /opt/tla-kit/licenses/
 # What the image was built with, for tla-kit-info and the self-test. PINS.json replaces it in Phase 1c (ADR-0013).
 RUN printf '%s %s\n' \
       base_image "${BASE_IMAGE}" apt_snapshot "${APT_SNAPSHOT}" \

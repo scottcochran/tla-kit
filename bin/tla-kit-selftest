@@ -8,6 +8,8 @@ One line per check, `ok` or `FAIL`, with the seconds it took:
   pins     the jar and the tlapm binary have the sha256 of the build arguments (/opt/tla-kit/build-args), and
            every vendored file of the skill has the sha256 its VENDOR-PIN names
   env      TLA_JAR and TLAPM name those files, and the tlapm on PATH is the same binary (ADR-0004)
+  notices  every licence text the image's notice of third-party software names exists, and every jar it names
+           holds a License.txt (/opt/tla-kit/licenses/THIRD-PARTY.md, ADR-0011 item 4)
   sany     the sany wrapper parses the skill's fixture module, and reports an error in a module that has one
   pcal     the pcal wrapper translates a small PlusCal algorithm, and sany parses the result
   tlc      the tlc wrapper checks the fixture at Limit = 3: no error, 4 distinct states
@@ -25,6 +27,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import zipfile
 
 # SANY exits 0 on a semantic error, so its output is read, not its exit status.
 SANY_ERROR = re.compile(r"\*\*\* ?(Errors?|Parse Error|Abort)|^Fatal errors|^Semantic errors:", re.M)
@@ -108,6 +111,32 @@ def check_env():
     report("env", start, not problems, "; ".join(problems) or f"TLA_JAR={JAR}, TLAPM={TLAPM}, tlapm on PATH")
 
 
+def check_notices():
+    start = time.time()
+    notice = "/opt/tla-kit/licenses/THIRD-PARTY.md"
+    problems, paths = [], []
+    if not os.path.isfile(notice):
+        problems.append(f"no {notice}")
+    else:
+        with open(notice, encoding="utf-8") as f:
+            for line in f:
+                cells = line.split("|")
+                if len(cells) >= 7 and not set(cells[4].strip()) <= set("-") and cells[4].strip() != "Licence text in the image":
+                    paths += re.findall(r"`(/[^`]+)`", cells[4])
+        paths += ["/opt/tla-kit/LICENSE", "/opt/tla-kit/LICENSE-DOCS", "/opt/tla-kit/NOTICE"]
+        for p in paths:
+            if not os.path.exists(p):
+                problems.append(f"{p} is missing")
+            elif p.endswith(".jar"):
+                try:
+                    if "License.txt" not in zipfile.ZipFile(p).namelist():
+                        problems.append(f"{p} holds no License.txt")
+                except (OSError, zipfile.BadZipFile) as e:
+                    problems.append(f"{p}: {e}")
+    report("notices", start, not problems and len(paths) > 3, "; ".join(problems) or
+           f"{len(paths)} licence texts named by the notice and tla-kit's own, all present")
+
+
 def check_wrappers(tmp):
     for f in ("Counter.tla", "Counter_proof.tla"):
         shutil.copy(os.path.join(FIXTURE, f), tmp)
@@ -161,6 +190,7 @@ def check_setup(tmp, args):
 def main():
     args = check_pins()
     check_env()
+    check_notices()
     tmp = tempfile.mkdtemp(prefix="tla-kit-selftest_")
     try:
         check_wrappers(tmp)

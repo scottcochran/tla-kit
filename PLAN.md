@@ -62,13 +62,13 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 ### Records to accept, and when
 
 This is the order in which the phases need the records. The Phase 1a and 1b rows were accepted on 2026.11.15,
-and every other record is Proposed.
+and so were ADR-0005, 0013 and 0014. Every other record is Proposed.
 
 | Before | Accept | Why then |
 |---|---|---|
 | Phase 1a | ADR-0001, 0002, 0003, 0004, 0011; ADR-0007 (D2) | The first five are mostly built. ADR-0007 is pulled forward from Phase 3 (D2). All six accepted 2026.11.15. |
 | Phase 1b | ADR-0015 | Its scope, so that `spec/PinLifecycle.tla` can be written. Accepted 2026.11.15. |
-| Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
+| Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15; ADR-0010 is still Proposed. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
 | Phase 3 | ADR-0006, 0008 | |
 | Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0016 waits on ADR-0009 item 5's comparison of `tlapm` with `tlapm_lsp`. |
 | Phase 6 | ADR-0012 (D5) | |

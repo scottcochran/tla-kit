@@ -125,7 +125,7 @@ TLC results (tier `manual`, about 70 minutes), and any GitHub Actions run.
 
 [PLAN.md](PLAN.md) is the development plan, and [derived/](derived/) holds dated, frozen records: the session
 that produced the spike, with the raw output of its runs, and the licence check of the bundled tools. [decisions/](decisions/) holds the architecture
-decision records drafted from both: ADR-0001 to ADR-0004, ADR-0007, ADR-0011 and ADR-0015 accepted, the rest Proposed. In short:
+decision records drafted from both: ADR-0001 to ADR-0005, ADR-0007, ADR-0011 and ADR-0013 to ADR-0015 accepted, the rest Proposed. In short:
 
 - The MCP server: the skill's scripts as tools (`tlc_run`, `tlc_rows`, `proof_results`, `flip_test`,
   `proof_sync`), exploration tools (parse, symbols, evaluate, coverage, state graph), and proof tools on

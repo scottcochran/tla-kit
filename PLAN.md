@@ -50,7 +50,7 @@ TOPAK's and has no record here.
 | D1 | Does TOPAK move `tools/TLAPS-PIN` to the image's Linux prover? TOPAK's decision, made there. | Yes: it is the only route to proofs rerun in CI, and the newer build rejects the two unsound cases. It means regenerating 34 proof results files, and the records that cite the two cases need a look. | Phase 2 as evidence |
 | D2 | Where do the skill's scripts live for the server to call? | Vendor them here at a named TOPAK commit, checked by digest in CI. The skill stays usable without Docker. | Phase 3 |
 | D3 | Registry and visibility for the image. | `ghcr.io/scottcochran/tla-kit`, public. | Phase 1 |
-| D4 | Licence for this repository. There is none yet. | Apache-2.0, as TOPAK's code. | Publishing |
+| D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. | Nothing now |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
 
 ## Phases

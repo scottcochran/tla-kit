@@ -67,7 +67,8 @@ the commit itself.
 ## Limits
 
 - **Linux x86_64 only.** Upstream publishes no Linux arm64 build of `tlapm`. On Apple Silicon the image runs
-  under emulation (see the Phase 1a checks below).
+  under emulation. On one 12-CPU Mac that was not slow: TOPAK's full proof run took under 7 minutes (the Phase 1a
+  checks below).
 - **Base must be Ubuntu 24.04 or newer.** The `tlapm` binary needs glibc 2.38; Debian 12 and Ubuntu 22.04 are
   too old.
 - **Not yet reproducible bit for bit.** The base and the packages are pinned, but file times in the layers come
@@ -90,6 +91,7 @@ emulation.
 | `tla-kit-selftest` | All seven checks ok in 28 s. The skill's setup check takes 23 s of it: all 11 fixture rows as expected, the fixture's 19 obligations proved, and its flipped hypothesis failing as required. The prover is held to its pin, with no `TLAPM_UNPINNED` override. |
 | The self-test can fail | It fails with `TLAPM=/bin/true` (pins, env, setup), with a vendored script changed (pins), and with a licence text removed (notices). |
 | Writing to a mounted project | A macOS bind mount: the results file is the host user's. A volume owned by uid 1001: the default uid 1000 is refused, as Linux permissions require; with `--user 1001:1001` the TLC results and a proof results file are written, owned by 1001. |
+| TOPAK's proofs under emulation | `spike/prove-all.sh` over TOPAK's `spec/` at `0ad9f88` (taken with `git archive`, mounted read-only): 34 of 34 proof modules proved, 13,622 obligations, every count equal to its committed results file. 6 min 43 s on 12 CPUs, `Mesh` the slowest at 103 s. The spike's native run took 539 s on 4 CPUs (`Mesh` 152 s); the machines differ, so this is not a ratio for emulation. |
 | `vendor/check.py --upstream` | 11 files match `VENDOR-PIN` and TOPAK at `0ad9f88`. It fails on a changed file and on an extra one. |
 
 ## Spike results, 2026.11.15

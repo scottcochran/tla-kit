@@ -232,8 +232,9 @@ Each is optional, pinned like the rest, and added only with a check that uses it
   rather than an unstated one.
 - **The gate on ADR-0005, 0013 and 0014 is working output.** Phase 1b checks the model in an unpublished image.
   Until 1c regenerates the results in a published one, the acceptance rests on a run that cannot be cited.
-- **Emulation on Apple Silicon** is unmeasured. If it is slow, local proof work stays on the native binary
-  until the arm64 build exists, and "the same locally and in CI" holds for CI and Linux only.
+- **Emulation on Apple Silicon** was measured once, in Phase 1a: TOPAK's full proof run under emulation took
+  6 min 43 s on a 12-CPU Mac, against 539 s natively on a 4-CPU x86_64 machine at the spike. That is one machine
+  and not a ratio, but it is not the slowdown feared. The arm64 build (Phase 6) is for parity, not speed.
 - **Two copies of the method.** Vendored scripts can drift from the skill. D2's digest check is the guard.
 - **Process for one custodian.** ADR-0013 to ADR-0016 add an inventory, a weekly issue, a scan, a list of
   projects with a log, attestations and two TLA+ modules. If that is more than one person can keep, the records

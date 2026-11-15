@@ -1,7 +1,7 @@
 # Development plan
 
-Written 2026.11.15, after the spike the README records. It is a plan, not a record: nothing below is built
-unless the README says so.
+Written 2026.11.15, after the spike the README records, and updated the same day for ADR-0013 to ADR-0016. It is a
+plan, not a record: nothing below is built unless the README says so.
 
 ## Goal
 
@@ -24,6 +24,10 @@ TOPAK is the first project it has to serve and gov-tla the second. Nothing in th
 4. **One prover build per image.** A project that moves to a new image moves its pin, knowingly.
 5. **Borrow before building.** The proof tools follow the design of
    [marco6/tlapm-mcp](https://github.com/marco6/tlapm-mcp) (MIT) where it fits.
+6. **Every pin moves by one rule.** One pull request per pin, with evidence that fits what the pin can change
+   (ADR-0013).
+7. **A released digest is never deleted.** A citation in a project's history has to resolve, whatever the
+   project pins today (ADR-0014 item 5).
 
 ## What the spike settled
 
@@ -42,16 +46,31 @@ TOPAK is the first project it has to serve and gov-tla the second. Nothing in th
 
 ## Decisions owed
 
-Drafted as records in [decisions/](decisions/): D2 is ADR-0007, D3 ADR-0010, D4 ADR-0011 and D5 ADR-0012. D1 is
-TOPAK's and has no record here.
+Drafted as records in [decisions/](decisions/): D2 is ADR-0007, D3 ADR-0010, D4 ADR-0011, D5 ADR-0012 and D6
+ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome goes into ADR-0005 and ADR-0011.
 
 | | Decision | Recommendation | Blocks |
 |---|---|---|---|
-| D1 | Does TOPAK move `tools/TLAPS-PIN` to the image's Linux prover? TOPAK's decision, made there. | Yes: it is the only route to proofs rerun in CI, and the newer build rejects the two unsound cases. It means regenerating 34 proof results files, and the records that cite the two cases need a look. | Phase 2 as evidence |
-| D2 | Where do the skill's scripts live for the server to call? | Vendor them here at a named TOPAK commit, checked by digest in CI. The skill stays usable without Docker. | Phase 3 |
-| D3 | Registry and visibility for the image. | `ghcr.io/scottcochran/tla-kit`, public. | Phase 1 |
-| D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. | Nothing now |
+| D1 | Does TOPAK move `tools/TLAPS-PIN` to the image's Linux prover? TOPAK's decision, made there. gov-tla faces the same question in its own repository. | Yes: it is the only route to proofs rerun in CI, and the newer build rejects the two unsound cases. It means regenerating 34 proof results files, and the records that cite the two cases need a look. | Phase 2 as evidence |
+| D2 | Where do the skill's scripts live for the server to call? | Vendor them here at a named TOPAK commit, checked by digest in CI. The skill stays usable without Docker. | Phase 1a. It was Phase 3, but Phase 1b's results come from the skill's generator (ADR-0015 items 1 and 8). |
+| D3 | Registry and visibility for the image. | `ghcr.io/scottcochran/tla-kit`, public. | Phase 1c |
+| D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it and is still Proposed. | ADR-0010, so Phase 1c |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
+| D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | A design to follow, with named changes, and no dependency on it. | Phase 4 |
+| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, Z3, Zenon, LS4)? | Check each licence before anything is redistributed. The result is the image's notice of bundled tools (ADR-0011 item 4). | Phase 1c: the kept tarball, the SBOM and a public image all wait on it |
+
+### Records to accept, and when
+
+Every record in `decisions/` is Proposed. This is the order in which the phases need them.
+
+| Before | Accept | Why then |
+|---|---|---|
+| Phase 1a | ADR-0001, 0002, 0003, 0004, 0011; ADR-0007 (D2) | The first five are mostly built. ADR-0007 is pulled forward from Phase 3 (D2). |
+| Phase 1b | ADR-0015 | Its scope, so that `spec/PinLifecycle.tla` can be written. |
+| Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0010 item 5 ("while any project's pin names them") is amended to match ADR-0014 item 5 ("always") before either is accepted. |
+| Phase 3 | ADR-0006, 0008 | |
+| Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0016 waits on ADR-0009 item 5's comparison of `tlapm` with `tlapm_lsp`. |
+| Phase 6 | ADR-0012 (D5) | |
 
 ## Phases
 
@@ -59,18 +78,69 @@ Each phase ends with a check that can fail. Later phases do not start on an earl
 
 ### Phase 1: an image that can be cited
 
-- Build with plain `docker build .` on a stock machine and in GitHub Actions. The spike built on a derived
-  base through a mirror, so the default path is untested.
+Phase 1 has three parts. The image comes first, then the model of the pin and release process, then the workflows
+and the first release. ADR-0015 puts the model before the workflows, so that the records it covers are checked
+before anything is built on them.
+
+#### 1a: the image
+
+- Build with plain `docker build .` on a stock machine. The spike built on a derived base through a mirror, so
+  the default path is untested.
 - Pin the base image by digest. Look at Ubuntu's snapshot archive to fix the `apt` packages by date.
-- Keep the pinned TLAPS tarball as a release asset here, after checking the licences of what it bundles, so
-  the image can be rebuilt when upstream has moved the tag. Build from the copy; compare with upstream as a
-  separate, reporting check (the analogue of TOPAK's `sources.yml`).
-- Run as a non-root user, so files written to a mounted project are not owned by root.
-- A self-test in the image: a fixture module and proof, a row list, a flip test. `tla-kit-info` as JSON.
-- A workflow that builds, runs the self-test, publishes on a tag, and records the digest in the release.
+- Run as a non-root user, so files written to a mounted project are not owned by root. Check mounts owned by
+  another uid, on Linux and on Docker Desktop.
+- A self-test in the image: a fixture module and proof, a row list, a flip test. It exercises `TLA_JAR` and
+  `TLAPM` (ADR-0004). `tla-kit-info` as JSON.
+- Vendor the skill's scripts at a named TOPAK commit, with a pin file holding each file's sha256 (D2).
+- Check the licences of what the TLAPS tarball bundles (D7).
+
+**Done when** the default build passes on a stock machine, the self-test passes in it, and D7's result is
+written down.
+
+#### 1b: the pin and release process, in TLA+
+
+- Write `spec/PinLifecycle.tla` as ADR-0015 describes: a row for the records as written, expected to violate the
+  properties behind its four gaps, and one row per fix, expected to pass.
+- Check it with TLC in a 1a image, and make its results with the vendored generator. That image's digest is not
+  published, so the results are working output, not evidence (ADR-0002 items 5 and 7). They are regenerated in
+  the first published image in 1c.
+- Make each fix in the record it belongs to, by a History row: probably ADR-0005 item 2 (when the kept copy is
+  uploaded), ADR-0013 (what `Durable` names, and log entries that name their value) and ADR-0014 item 1 (a pull
+  request tested against the `main` it merges into). Then accept ADR-0005, 0013 and 0014.
+- ADR-0015 says the module is checked "in the image", before Phase 1's workflows. Since no published image exists
+  before 1c, ADR-0015 is amended to say so.
+
+**Done when** every row has its expected outcome and ADR-0005, 0013 and 0014 are accepted.
+
+#### 1c: workflows and the first release
+
+- Pull request CI, as ADR-0014 item 1 says: the default build and every variant, the self-test, the vendored
+  scripts' digest check, and the evidence for a pin move. Pushes nothing. `main` protected, its history never
+  rewritten.
+- The `PinLifecycle` rows regenerated on every pull request that changes `spec/` or `decisions/`, and compared
+  with the committed file (ADR-0015 item 8).
+- The inventory `PINS.json` and its four checks: it agrees with the `Dockerfile`, it is in the image at
+  `/opt/tla-kit/PINS.json` and checked by the self-test, the README's table is generated from it, and the release
+  copies it (ADR-0013 item 7).
+- The pinned TLAPS tarball kept as a release asset here, so the image can be rebuilt after upstream has moved the
+  tag. Build from the copy; compare with upstream as a separate, reporting check (the analogue of TOPAK's
+  `sources.yml`). It waits on D7.
+- The weekly check: a new jar, a change to what the `tlapm` tag serves, a new digest behind the base's tag, and
+  a vulnerability scan with a pinned scanner (Trivy is the proposal). It reports in one issue and moves nothing
+  (ADR-0013 items 4 and 5).
+- `CONSUMERS.md`, naming TOPAK and gov-tla and the file in each that will hold its tla-kit pin (ADR-0014 item 6).
+- Releases: `vMAJOR.MINOR.PATCH` tags, protected and never moved; `0.x` until Phase 2 is done. Only the
+  custodian pushes them.
+- A release workflow that builds from the tag, runs the self-test, publishes, and records in the release what
+  ADR-0014 item 3 lists. Build-provenance and SBOM attestations. Least-privilege permissions, every Action pinned
+  by commit sha, Dependabot for the Actions only.
+- `SOURCE_DATE_EPOCH` set to the commit's time, and the OCI labels for created, revision and source, with no
+  version label (ADR-0014 item 8). Build one commit twice, on two runners, and compare the digests. If they
+  differ, record why. The attestation is then the only check of a digest.
 - Repeat the spike's TOPAK checks from the published image.
 
-**Done when** a published digest reproduces the README's spike table.
+**Done when** a published digest reproduces the README's spike table, `gh attestation verify` passes on it, and
+the `PinLifecycle` results regenerated in it match the committed file.
 
 ### Phase 2: the image in the projects' CI
 
@@ -80,13 +150,14 @@ Changes in TOPAK and gov-tla, each made in its own repository and asked for ther
   the skill's scripts read (`binary_sha256`, where `tools/TLAPS-PIN` has `binary_sha256_16`).
 - gov-tla: the same two jobs. Its pinned prover (c8ddc44) is no longer served, so it faces D1 as well.
 - Before D1 the proofs job reports counts only. After it, the results files are regenerated in the image.
+- Each project's tla-kit pin is recorded in `CONSUMERS.md`'s log (ADR-0014 item 6).
 
-**Done when** a pull request in TOPAK shows its proofs rerun in CI.
+**Done when** a pull request in TOPAK shows its proofs rerun in CI. The next release can then be `1.0`.
 
 ### Phase 3: the MCP server, model checking
 
-A Python server over stdio, started as `tla-kit mcp`, so it can import the skill's `tla_common.py`. Paths are
-confined to the mounted project. The image gains the MCP SDK, pinned by hash.
+A Python server over stdio, started as `tla-kit mcp`, so it can import the skill's `tla_common.py`, vendored in
+Phase 1a. Paths are confined to the mounted project. The image gains the MCP SDK, pinned by hash.
 
 | Tool | Does | Writes a results file |
 |---|---|---|
@@ -105,6 +176,14 @@ an MCP client test in CI drives every tool against the fixture.
 
 ### Phase 4: the MCP server, proofs
 
+In this order: the comparison, the tests of `tlapm`, the module, then the tools.
+
+- Compare driving `tlapm` per request with driving `tlapm_lsp`, which already resolves a cursor position to its
+  obligations (ADR-0009 item 5). The choice decides which processes exist.
+- Test three assumptions about `tlapm` in the image: whether two processes can share a cache directory, whether
+  every backend stays in `tlapm`'s process group, and what a kill leaves in the cache (ADR-0016 item 6).
+- Write `spec/ProveRequests.tla` for the chosen option, before the tool's code: a row for a naive design, one for
+  the chosen design, and one with a backend that leaves the process group (ADR-0016).
 - `proof_check`: parse and count obligations without backends (`tlapm --summary`).
 - `prove`: one step, a line range, or a theorem by name, resolved to lines by the server. It reads `tlapm`'s
   Toolbox protocol, not log text, and returns only the unresolved obligations, each with its text, the backends
@@ -113,10 +192,13 @@ an MCP client test in CI drives every tool against the fixture.
 - A cache directory the server owns, never beside the module; the whole process group killed on cancel or
   timeout; threads, timeout stretch and Isabelle checking of Zenon's proofs as options.
 - `proof_results`, `flip_test` and `proof_sync`: the skill's scripts, as tools.
-- Compare with driving `tlapm_lsp`, which already resolves a cursor position to its obligations.
+- For each invariant of `ProveRequests` that a test can exercise, a test that tries to break it: two concurrent
+  `prove` calls on one module, a cancel during a run, a timeout while backends run, a cancel after the response
+  (ADR-0016 item 7).
 
-**Done when** an agent using only these tools repairs a deliberately broken step in the fixture, and
-`proof_results` through the server writes the file the script writes.
+**Done when** an agent using only these tools repairs a deliberately broken step in the fixture,
+`proof_results` through the server writes the file the script writes, every `ProveRequests` row has its expected
+outcome, and the tests of ADR-0016 item 7 pass.
 
 ### Phase 5: pairing with the skill
 
@@ -139,12 +221,21 @@ Each is optional, pinned like the rest, and added only with a check that uses it
 
 ## Risks
 
-- **The prover tag moves.** Three builds in six weeks across the three projects. Phase 1's copy of the tarball
-  is the answer; until then a rebuild can fail on the checksum by design.
+- **The prover tag moves.** Three builds in six weeks across the three projects. Phase 1c's copy of the tarball
+  is the answer, and it waits on D7. Until then a rebuild can fail on the checksum by design.
 - **A newer prover changes what proves.** It did, for the defect modules. Every prover move needs the full
   proof run and the defect run before a pin moves.
+- **Rebuilds rely on upstreams that no record keeps.** Only the prover's tarball will have a kept copy. The base
+  image comes from Docker Hub, which refused the spike's pull (HTTP 429), the `apt` packages from Ubuntu's
+  snapshot archive, and the jar from GitHub's releases. ADR-0015's `Durable` makes this a stated assumption
+  rather than an unstated one.
+- **The gate on ADR-0005, 0013 and 0014 is working output.** Phase 1b checks the model in an unpublished image.
+  Until 1c regenerates the results in a published one, the acceptance rests on a run that cannot be cited.
 - **Emulation on Apple Silicon** is unmeasured. If it is slow, local proof work stays on the native binary
   until the arm64 build exists, and "the same locally and in CI" holds for CI and Linux only.
 - **Two copies of the method.** Vendored scripts can drift from the skill. D2's digest check is the guard.
+- **Process for one custodian.** ADR-0013 to ADR-0016 add an inventory, a weekly issue, a scan, a list of
+  projects with a log, attestations and two TLA+ modules. If that is more than one person can keep, the records
+  change by new records. The practice does not drift away from them unrecorded.
 - **Scope.** The MCP layer is the smaller gain; CI-checked proofs (Phases 1 and 2) come first and stand
   without it.

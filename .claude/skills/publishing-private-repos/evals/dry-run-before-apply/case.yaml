@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: dry-run-before-apply
+expected_outcome: |
+  Run against an existing public test repository with squash merges on, issues on, one ruleset named "legacy" and
+  secret scanning enabled. The settings are compared with the baseline and a dry run is shown; nothing is changed.

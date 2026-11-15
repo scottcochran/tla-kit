@@ -1,6 +1,10 @@
 .git
+.claude
+.github
 spike
 README.md
 PLAN.md
+SECURITY.md
 derived
 decisions
+vendor/check.py

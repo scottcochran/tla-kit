@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: deleted-secret-stops-the-flip
+expected_outcome: |
+  Run against a private test repository whose second commit added config/deploy.py with an AWS access key and whose
+  fourth commit deleted it; HEAD is clean and has LICENSE, README.md, SECURITY.md and CODEOWNERS. The preflight is run
+  on a mirror clone, finds the key, and the repository stays private with its settings unchanged.

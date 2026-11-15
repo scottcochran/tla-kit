@@ -73,9 +73,11 @@ the commit itself.
   too old.
 - **Not yet reproducible bit for bit.** The base and the packages are pinned, but file times in the layers come
   from the build. `SOURCE_DATE_EPOCH` and a two-build comparison are Phase 1c (ADR-0014 item 8).
-- **Not for redistribution yet.** Whether tla-kit may redistribute the TLAPS tarball's contents is `PLAN.md` D7,
-  and it is not decided. [`derived/tla-kit-licence-check-2026.11.15.md`](derived/tla-kit-licence-check-2026.11.15.md)
-  has the findings and a recommendation.
+- **Not published yet.** `PLAN.md` D7, settled 2026.11.15, allows the image and the TLAPS tarball's contents to
+  be redistributed on three conditions
+  ([`derived/tla-kit-licence-check-2026.11.15.md`](derived/tla-kit-licence-check-2026.11.15.md) §5). The image
+  meets the first, carrying the notices. The other two come with the release process in Phase 1c: the copyleft
+  parts' source beside the kept tarball, and the GMP release and `libsha1`'s licence settled.
 - **No certified proof runs yet.** cvc5 and ethos, which TOPAK's `spec/proof-cert.sh` needs, are not in the
   image.
 

@@ -7,7 +7,8 @@ skill.
 
 **Status: Phase 1a of [PLAN.md](PLAN.md).** The image builds with a plain `docker build .`, from a base pinned by
 digest and packages pinned by date. It runs as a non-root user, carries the skill's scripts and a self-test, and
-says what it holds. There is no MCP server yet, no CI, and the image is not published.
+says what it holds. Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), is written and checked: all
+49 rows as expected, as working output. There is no MCP server yet, no CI, and the image is not published.
 
 ## What is in the image
 

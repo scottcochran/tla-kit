@@ -1,0 +1,69 @@
+# Rows for tlc_rows.py: name mut spec kind property expected [KEY=value ...]
+# module: PinLifecycle
+# title: PinLifecycle.tla - the pin and release process of ADR-0005, ADR-0013 and ADR-0014 (ADR-0015)
+# expected: Mut = "none", the records with ADR-0015's four fixes, HOLDS on every property and every action property.
+# expected: M_NOF1 to M_NOF4 each remove one fix and are COUNTEREXAMPLE on that fix's property only:
+# expected: EvidenceFitsRelease (gap 1), BuildsFromKept (gap 2), ReleasesRebuildable (gap 3), LogFiledRight (gap 4).
+# expected: M_ASWRITTEN, the records as they stand, is COUNTEREXAMPLE on all four. CitationsResolve, VersionFitsMove
+# expected: and the action properties HOLD as written too. Every witness is VIOLATED under none. UpstreamReported
+# expected: HOLDS under SpecLive, under none and as written, and is COUNTEREXAMPLE under Spec, which has no
+# expected: fairness; NoBehaviour is COUNTEREXAMPLE under SpecLive, so the fair spec has a behaviour.
+
+# The records with the four fixes.
+n-none-evidence     none         Spec      INVARIANT  EvidenceFitsRelease    HOLDS
+n-none-kept         none         Spec      INVARIANT  BuildsFromKept         HOLDS
+n-none-rebuild      none         Spec      INVARIANT  ReleasesRebuildable    HOLDS
+n-none-log          none         Spec      INVARIANT  LogFiledRight          HOLDS
+n-none-citations    none         Spec      INVARIANT  CitationsResolve       HOLDS
+n-none-version      none         Spec      INVARIANT  VersionFitsMove        HOLDS
+n-none-safe         none         Spec      INVARIANT  Safe                   HOLDS
+n-none-tags         none         Spec      PROPERTY   TagsDoNotMove          HOLDS
+n-none-logonly      none         Spec      PROPERTY   LogAppendOnly          HOLDS
+n-none-onemove      none         Spec      PROPERTY   OneMovePerPR           HOLDS
+
+# Each fix removed: its property breaks, and only that one.
+m-nof1-evidence     M_NOF1       Spec      INVARIANT  EvidenceFitsRelease    COUNTEREXAMPLE
+m-nof1-kept         M_NOF1       Spec      INVARIANT  BuildsFromKept         HOLDS
+m-nof1-rebuild      M_NOF1       Spec      INVARIANT  ReleasesRebuildable    HOLDS
+m-nof1-log          M_NOF1       Spec      INVARIANT  LogFiledRight          HOLDS
+m-nof2-evidence     M_NOF2       Spec      INVARIANT  EvidenceFitsRelease    HOLDS
+m-nof2-kept         M_NOF2       Spec      INVARIANT  BuildsFromKept         COUNTEREXAMPLE
+m-nof2-rebuild      M_NOF2       Spec      INVARIANT  ReleasesRebuildable    HOLDS
+m-nof2-log          M_NOF2       Spec      INVARIANT  LogFiledRight          HOLDS
+m-nof3-evidence     M_NOF3       Spec      INVARIANT  EvidenceFitsRelease    HOLDS
+m-nof3-kept         M_NOF3       Spec      INVARIANT  BuildsFromKept         HOLDS
+m-nof3-rebuild      M_NOF3       Spec      INVARIANT  ReleasesRebuildable    COUNTEREXAMPLE
+m-nof3-log          M_NOF3       Spec      INVARIANT  LogFiledRight          HOLDS
+m-nof4-evidence     M_NOF4       Spec      INVARIANT  EvidenceFitsRelease    HOLDS
+m-nof4-kept         M_NOF4       Spec      INVARIANT  BuildsFromKept         HOLDS
+m-nof4-rebuild      M_NOF4       Spec      INVARIANT  ReleasesRebuildable    HOLDS
+m-nof4-log          M_NOF4       Spec      INVARIANT  LogFiledRight          COUNTEREXAMPLE
+
+# The records as they stand: all four gaps show, and nothing else breaks.
+m-aswritten-evidence  M_ASWRITTEN  Spec    INVARIANT  EvidenceFitsRelease    COUNTEREXAMPLE
+m-aswritten-kept      M_ASWRITTEN  Spec    INVARIANT  BuildsFromKept         COUNTEREXAMPLE
+m-aswritten-rebuild   M_ASWRITTEN  Spec    INVARIANT  ReleasesRebuildable    COUNTEREXAMPLE
+m-aswritten-log       M_ASWRITTEN  Spec    INVARIANT  LogFiledRight          COUNTEREXAMPLE
+m-aswritten-types     M_ASWRITTEN  Spec    INVARIANT  TypeOK                 HOLDS
+m-aswritten-citations M_ASWRITTEN  Spec    INVARIANT  CitationsResolve       HOLDS
+m-aswritten-version   M_ASWRITTEN  Spec    INVARIANT  VersionFitsMove        HOLDS
+m-aswritten-tags      M_ASWRITTEN  Spec    PROPERTY   TagsDoNotMove          HOLDS
+m-aswritten-logonly   M_ASWRITTEN  Spec    PROPERTY   LogAppendOnly          HOLDS
+m-aswritten-onemove   M_ASWRITTEN  Spec    PROPERTY   OneMovePerPR           HOLDS
+
+# Witnesses, under none: the states the properties speak of are reachable.
+w-two-open          none         Spec      INVARIANT  NeverTwoOpen           COUNTEREXAMPLE
+w-both-merged       none         Spec      INVARIANT  NeverBothMerged        COUNTEREXAMPLE
+w-prover-moved      none         Spec      INVARIANT  NeverProverMoved       COUNTEREXAMPLE
+w-two-releases      none         Spec      INVARIANT  NeverTwoReleases       COUNTEREXAMPLE
+w-major             none         Spec      INVARIANT  NeverMajor             COUNTEREXAMPLE
+w-upstream-gone     none         Spec      INVARIANT  NeverUpstreamGone      COUNTEREXAMPLE
+w-logged            none         Spec      INVARIANT  NeverLogged            COUNTEREXAMPLE
+w-pinned            none         Spec      INVARIANT  NeverPinned            COUNTEREXAMPLE
+w-withdrawn         none         Spec      INVARIANT  NeverRegistryWithdrawn COUNTEREXAMPLE
+
+# Liveness: the weekly check reports what upstream stopped serving, under its fairness.
+l-none-reported     none         SpecLive  PROPERTY   UpstreamReported       HOLDS
+l-aswritten-reported M_ASWRITTEN SpecLive  PROPERTY   UpstreamReported       HOLDS
+l-nofair-reported   none         Spec      PROPERTY   UpstreamReported       COUNTEREXAMPLE
+l-none-behaviour    none         SpecLive  PROPERTY   NoBehaviour            COUNTEREXAMPLE

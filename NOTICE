@@ -4,10 +4,11 @@ Copyright 2026 William Scott Cochran
 This repository is dual-licensed by content type.
 
 Source code and tooling -- including the Dockerfile, .dockerignore,
-the wrappers in bin/, the shell scripts in spike/, and, when they
-exist, the MCP server, its tests and CI workflows, with their
-configuration files -- are licensed under the Apache License,
-Version 2.0. See LICENSE.
+the wrappers in bin/, the shell scripts in spike/, the repository's
+configuration (.github/, and the files under .claude/ that are not
+Markdown), and, when they exist, the MCP server, its tests and CI
+workflows, with their configuration files -- are licensed under the
+Apache License, Version 2.0. See LICENSE.
 
 Documentation -- including Markdown (.md) prose, the development
 plan, decision records (decisions/), the session records in derived/
@@ -18,13 +19,15 @@ License (CC BY 4.0). See LICENSE-DOCS.
   SPDX-License-Identifier: Apache-2.0      (code)
   SPDX-License-Identifier: CC-BY-4.0       (documentation)
 
-Scripts vendored from TOPAK keep the licence they have there, and
-their source commit is recorded beside them.
+Material taken from TOPAK -- vendored scripts, skills adopted under
+.claude/skills/, and configuration derived from TOPAK's -- keeps the
+licence it has there, and its source commit is recorded beside it.
 
-Third-party software is not part of this repository and is not
-covered by either license. The container image built from the
-Dockerfile downloads and contains the TLA+ tools (tla2tools.jar), the
-TLAPS proof manager and its backends (Isabelle, Poly/ML, Z3, Zenon,
-LS4), and an Ubuntu base with a Java runtime; each is under its own
-licence. The image's own notice will list them once their licences
-have been checked (decisions/ADR-0005.md).
+Third-party software is not part of this repository and is not covered
+by either license. The container image built from the Dockerfile
+downloads and contains the TLA+ tools (tla2tools.jar), the TLAPS proof
+manager and its backends (Isabelle, Poly/ML, Z3, Zenon, LS4), and an
+Ubuntu base with a Java runtime and the packages the image adds to it
+(python3, perl, git); each is under its own licence. The image's own
+notice will list them once their licences have been checked
+(decisions/ADR-0005.md).

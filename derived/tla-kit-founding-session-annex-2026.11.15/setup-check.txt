@@ -1,0 +1,8 @@
+python   ok      3.12.3
+java     ok      openjdk version "25.0.5" 2026-10-20 LTS
+project  ok      proj: modules in ., results in ., root /tmp/proj
+checker  ok      /opt/tla/tla2tools.jar v1.7.4 sha256 936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88, as pinned by the skill's default TLC-PIN
+tlc      ok      TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802): all 11 fixture rows as expected
+prover   WARN    /opt/tlaps/bin/tlapm is sha256 6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2, and the project has no tools/TLAPS-PIN (--write-pins records this binary); TLAPM_UNPINNED is set, and results files will say so
+tlapm    ok      the fixture's proof: All 19 obligations proved; with its hypothesis flipped it fails, as required
+setup: ready for model checking and proofs

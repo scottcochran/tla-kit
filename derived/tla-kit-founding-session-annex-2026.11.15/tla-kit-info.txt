@@ -1,0 +1,12 @@
+platform  Linux x86_64, Ubuntu 24.04.5 LTS
+java      openjdk version "25.0.5" 2026-10-20 LTS
+python    Python 3.12.3
+checker   /opt/tla/tla2tools.jar sha256 936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
+tlc       TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)
+prover    /opt/tlaps/bin/tlapm sha256 6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2
+tlapm     ff40755
+backend   Isabelle version == "Isabelle2025"
+backend   zenon version == "zenon version 0.8.4 [a268] 2017-11-14"
+backend   Z3 version == "Z3 version 4.8.9 - 64 bit"
+backend   SMT version == "Z3 version 4.8.9 - 64 bit"
+backend   LS4 version == "unknown"

@@ -77,7 +77,8 @@ TLC results (tier `manual`, about 70 minutes), and any GitHub Actions run.
 
 ## Not built yet
 
-[PLAN.md](PLAN.md) is the development plan. In short:
+[PLAN.md](PLAN.md) is the development plan, and [derived/](derived/) holds the dated record of the session
+that produced the spike, with the raw output of its runs. In short:
 
 - The MCP server: the skill's scripts as tools (`tlc_run`, `tlc_rows`, `proof_results`, `flip_test`,
   `proof_sync`), exploration tools (parse, symbols, evaluate, coverage, state graph), and proof tools on

@@ -1,0 +1,9 @@
+BreakGlass_A1: regenerated in 716s against BreakGlass_A1-results-2026.10.05.txt (generator exit 0)
+BreakGlass_A1-results-2026.10.05.txt: 8 rows compared, 0 differences
+NonComposition_A1: regenerated in 12s against NonComposition_A1-results-2026.10.05.txt (generator exit 0)
+NonComposition_A1-results-2026.10.05.txt: 14 rows compared, 0 differences
+RunConfinement: regenerated in 12s against RunConfinement-results-2026.10.02.txt (generator exit 0)
+RunConfinement-results-2026.10.02.txt: 13 rows compared, 0 differences
+Workflow: regenerated in 195s against Workflow-results-2026.10.08.txt (generator exit 0)
+Workflow-results-2026.10.08.txt: 33 rows compared, 0 differences
+exit 0

@@ -1,0 +1,23 @@
+tools/tla2tools.jar  pinned 936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
+                     found  936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
+in step with tools/TLA-PIN
+Alone: regenerated in 49s against Alone-results-2026.11.10.txt (generator exit 0)
+Alone-results-2026.11.10.txt: 47 rows compared, 0 differences
+Coupling_live: regenerated in 92s against Coupling_live-results-2026.10.07.txt (generator exit 0)
+Coupling_live-results-2026.10.07.txt: 69 rows compared, 0 differences
+Emergency_live: regenerated in 70s against Emergency_live-results-2026.10.07.txt (generator exit 0)
+Emergency_live-results-2026.10.07.txt: 32 rows compared, 0 differences
+Federation: regenerated in 398s against Federation-results-2026.11.10.txt (generator exit 0)
+Federation-results-2026.11.10.txt: 41 rows compared, 0 differences
+Intent: regenerated in 148s against Intent-results-2026.11.10.txt (generator exit 0)
+Intent-results-2026.11.10.txt: 35 rows compared, 0 differences
+Membership: regenerated in 367s against Membership-results-2026.11.10.txt (generator exit 0)
+Membership-results-2026.11.10.txt: 28 rows compared, 0 differences
+Outstanding: regenerated in 154s against Outstanding-results-2026.11.10.txt (generator exit 0)
+Outstanding-results-2026.11.10.txt: 40 rows compared, 0 differences
+Peer: regenerated in 39s against Peer-results-2026.11.10.txt (generator exit 0)
+Peer-results-2026.11.10.txt: 25 rows compared, 0 differences
+PlaneClock: regenerated in 225s against PlaneClock-results-2026.11.10.txt (generator exit 0)
+PlaneClock-results-2026.11.10.txt: 38 rows compared, 0 differences
+Release: regenerated in 913s against Release-results-2026.11.10.txt (generator exit 0)
+Release-results-2026.11.10.txt: 67 rows compared, 0 differences

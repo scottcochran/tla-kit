@@ -6,7 +6,7 @@ results files.
 
 | Module | What it specifies | Record | Rows | Results |
 |---|---|---|---|---|
-| [`PinLifecycle.tla`](PinLifecycle.tla) | The pin and release process of ADR-0005, ADR-0013 and ADR-0014: upstream, the custodian, CI, the release workflow, the weekly check, the registry and a project, each acting at its own time | [ADR-0015](../decisions/ADR-0015.md) | [`PinLifecycle-rows.txt`](PinLifecycle-rows.txt) | [`PinLifecycle-results-2026.11.15.txt`](PinLifecycle-results-2026.11.15.txt): 49 rows, all as expected |
+| [`PinLifecycle.tla`](PinLifecycle.tla) | The pin and release process of ADR-0005, ADR-0013 and ADR-0014: upstream, the custodian, CI, the release workflow, the weekly check, the registry and a project, each acting at its own time | [ADR-0015](../decisions/ADR-0015.md) | [`PinLifecycle-rows.txt`](PinLifecycle-rows.txt) | [`PinLifecycle-results-2026.11.15b.txt`](PinLifecycle-results-2026.11.15b.txt): 50 rows, all as expected. The first file of the day, [`…-2026.11.15.txt`](PinLifecycle-results-2026.11.15.txt), is of the module before the fixes were written into the records, and stays as it was |
 
 ## PinLifecycle
 
@@ -22,7 +22,12 @@ its own property and no other, and as written all four gaps show.
 | 3. Rebuilding relies on sources no record keeps | `ReleasesRebuildable` | A release is made, and then upstream stops serving the base or the jar value it holds. |
 | 4. A log entry that does not name its value | `LogFiledRight` | Upstream stops serving prover 1, and the weekly check opens a served-state pull request. Then the prover move merges, and the entry is filed under prover 2. |
 
-At these constants the model has 11,622 distinct states with every fix, and 272,854 as written.
+At these constants the model has 12,460 distinct states with every fix, and 272,854 as written.
+
+Each fix is now written in its record: F1 in ADR-0014 item 1, F2 in ADR-0005 item 2, F3 in ADR-0013 item 8, and
+F4 in ADR-0013 item 7. Writing F4 changed the model to match: an entry names its value, and a served-state pull
+request whose value is no longer current is closed with nothing filed. The witness `NeverDropped` shows that this
+happens.
 
 **These results are working output.** They were made in an image built locally from this repository at `24956e0`
 (image `sha256:0b2f6719…b4f6`). That digest was not published by the release workflow, so it is not to be cited

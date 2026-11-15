@@ -33,13 +33,15 @@
      M_NOF3  F3 removed: no upstream is named as keeping what it serves, so the base's and the jar's upstreams
              may stop serving too. (With F3 only the prover's upstream may.)  ReleasesRebuildable (gap 3)
      M_NOF4  F4 removed: a served-state log entry is filed under its pin's value at the merge, not the value it
-             is about.                                                        LogFiledRight (gap 4)
+             is about. With F4 the entry names its value, and when that value is no longer the pin's current
+             one, nothing is filed (ADR-0013 item 7).                         LogFiledRight (gap 4)
      M_ASWRITTEN  the records as they stand, with none of the four fixes. This is the one mutation that removes
              more than one guard: ADR-0015 item 5 asks for a row of the records as written, and that row is
              four removals at once. It must break all four properties.
    The fixes are F1 to F4 of ADR-0015 item 5: a pull request tested against the main it merges into; the kept
    copy uploaded before the pull request that names it; Durable naming Docker Hub, Ubuntu's snapshot archive and
-   GitHub's releases; a log entry that names its value.
+   GitHub's releases; a log entry that names its value. Each is now written in its record: F1 in ADR-0014 item 1,
+   F2 in ADR-0005 item 2, F3 in ADR-0013 item 8, F4 in ADR-0013 item 7.
 
    Properties:
      EvidenceFitsRelease   every release's evidence was run on the image it publishes             gap 1
@@ -60,7 +62,8 @@
    serving is eventually reported (UpstreamReported).
 
    Witnesses, each to be VIOLATED under none: NeverTwoOpen, NeverBothMerged, NeverProverMoved, NeverTwoReleases,
-   NeverMajor, NeverUpstreamGone, NeverLogged, NeverPinned, NeverRegistryWithdrawn.
+   NeverMajor, NeverUpstreamGone, NeverLogged, NeverPinned, NeverRegistryWithdrawn, NeverDropped (F4's closing of a
+   served-state pull request whose value is no longer current happens).
 
    Without F2, CI that finds no kept copy of a prover value builds it from upstream: the Dockerfile has no copy to
    build from, and BuildsFromKept records that the build used another source. *)
@@ -97,9 +100,11 @@ VARIABLES gone,        \* pins whose value 1 upstream no longer serves
           withdrawn,   \* images withdrawn from the registry, each with a record
           pinned,      \* every image the project has pinned
           logPR,       \* the open served-state pull request, if any
-          log          \* the served-state log entries filed
+          log,         \* the served-state log entries filed
+          dropped      \* a served-state pull request was closed with nothing filed, its value no longer current
 
-vars == <<gone, reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log>>
+vars == <<gone, reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log,
+          dropped>>
 
 NoPR  == [status |-> "none", pin |-> "prover", tested |-> FALSE, on |-> Start]
 NoLog == [open |-> FALSE, pin |-> "prover", observed |-> 1]
@@ -123,6 +128,7 @@ TypeOK ==
   /\ pinned \subseteq Images
   /\ logPR \in LogPRRec
   /\ log \subseteq LogRec
+  /\ dropped \in BOOLEAN
 
 Served(p, v) == v = 2 \/ p \notin gone
 \* A value can be built when upstream serves it, or, for the prover, when it is kept here.
@@ -148,13 +154,14 @@ Init ==
   /\ pinned = {}
   /\ logPR = NoLog
   /\ log = {}
+  /\ dropped = FALSE
 
 (* ---- upstream: ADR-0005 Context; ADR-0013 item 4 ---- *)
 StopServing(p) ==
   /\ p \notin gone
   /\ p \notin DurablePins
   /\ gone' = gone \cup {p}
-  /\ UNCHANGED <<reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log>>
+  /\ UNCHANGED <<reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 (* ---- the custodian: ADR-0005 item 2; ADR-0013 item 2; ADR-0014 items 1 and 2 ---- *)
 \* F2: the kept copy is uploaded before the pull request that names it. Without F2, a copy is kept only when a
@@ -163,7 +170,7 @@ KeepCopy ==
   /\ F2
   /\ 2 \notin kept
   /\ kept' = kept \cup {2}
-  /\ UNCHANGED <<gone, reported, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log>>
+  /\ UNCHANGED <<gone, reported, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 OpenPR(i, p) ==
   /\ prs[i].status = "none"
@@ -171,7 +178,7 @@ OpenPR(i, p) ==
   /\ \A j \in Ids : prs[j].status = "open" => prs[j].pin # p
   /\ (F2 /\ p = "prover") => 2 \in kept
   /\ prs' = [prs EXCEPT ![i] = [status |-> "open", pin |-> p, tested |-> FALSE, on |-> Start]]
-  /\ UNCHANGED <<gone, reported, kept, main, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log>>
+  /\ UNCHANGED <<gone, reported, kept, main, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 \* CI builds the candidate, main as it is now with the pull request's move, and runs its evidence on it. It may
 \* run again on a later main. Without a kept copy of a prover value, it builds that value from upstream.
@@ -182,7 +189,7 @@ CI(i) ==
   /\ Buildable(cand)
   /\ prs' = [prs EXCEPT ![i].tested = TRUE, ![i].on = cand]
   /\ fromUpstream' = (fromUpstream \/ cand["prover"] \notin kept)
-  /\ UNCHANGED <<gone, reported, kept, main, evidence, releases, registry, withdrawn, pinned, logPR, log>>
+  /\ UNCHANGED <<gone, reported, kept, main, evidence, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 \* main merges only on a pass (ADR-0014 item 1). F1: the pass was against main as it is now.
 Merge(i) ==
@@ -192,7 +199,7 @@ Merge(i) ==
   /\ main' = Moved(main, prs[i].pin)
   /\ evidence' = prs[i].on
   /\ prs' = [prs EXCEPT ![i].status = "merged"]
-  /\ UNCHANGED <<gone, reported, kept, fromUpstream, releases, registry, withdrawn, pinned, logPR, log>>
+  /\ UNCHANGED <<gone, reported, kept, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 (* ---- the release workflow: ADR-0005 item 2; ADR-0014 items 2 to 4 ---- *)
 \* A tag on main: build main, publish it, record the evidence of what was merged, attach the kept tarball.
@@ -206,20 +213,20 @@ Release ==
                                    kind |-> IF releases = << >> THEN "initial"
                                             ELSE KindOf(releases[Len(releases)].image, main)])
   /\ registry' = registry \cup {main}
-  /\ UNCHANGED <<gone, reported, main, prs, evidence, withdrawn, pinned, logPR, log>>
+  /\ UNCHANGED <<gone, reported, main, prs, evidence, withdrawn, pinned, logPR, log, dropped>>
 
 (* ---- the registry and the project: ADR-0014 items 5 and 6 ---- *)
 Withdraw(d) ==
   /\ d \in registry
   /\ registry' = registry \ {d}
   /\ withdrawn' = withdrawn \cup {d}
-  /\ UNCHANGED <<gone, reported, kept, main, prs, evidence, fromUpstream, releases, pinned, logPR, log>>
+  /\ UNCHANGED <<gone, reported, kept, main, prs, evidence, fromUpstream, releases, pinned, logPR, log, dropped>>
 
 ProjectPins(d) ==
   /\ d \in registry
   /\ d \notin pinned
   /\ pinned' = pinned \cup {d}
-  /\ UNCHANGED <<gone, reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, logPR, log>>
+  /\ UNCHANGED <<gone, reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, logPR, log, dropped>>
 
 (* ---- the weekly check: ADR-0013 items 4 and 7 ---- *)
 \* It reports what upstream stopped serving. When that is a pin's current value, it also opens a served-state
@@ -229,14 +236,18 @@ Observe(p) ==
   /\ main[p] = 1 => ~logPR.open
   /\ reported' = reported \cup {p}
   /\ logPR' = IF main[p] = 1 THEN [open |-> TRUE, pin |-> p, observed |-> 1] ELSE logPR
-  /\ UNCHANGED <<gone, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, log>>
+  /\ UNCHANGED <<gone, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, log, dropped>>
 
 \* Without F4, the entry is filed under its pin's value at the merge (ADR-0013 item 7 starts a new log when a pin
-\* moves). F4: the entry names the value it is about.
+\* moves). F4: the entry names the value it is about, and when the pin has moved past that value the pull request
+\* is closed with nothing filed.
 MergeLog ==
   /\ logPR.open
-  /\ log' = log \cup {[pin |-> logPR.pin, val |-> IF F4 THEN logPR.observed ELSE main[logPR.pin],
-                       observed |-> logPR.observed]}
+  /\ log' = IF ~F4 THEN log \cup {[pin |-> logPR.pin, val |-> main[logPR.pin], observed |-> logPR.observed]}
+            ELSE IF main[logPR.pin] = logPR.observed
+                 THEN log \cup {[pin |-> logPR.pin, val |-> logPR.observed, observed |-> logPR.observed]}
+                 ELSE log
+  /\ dropped' = (dropped \/ (F4 /\ main[logPR.pin] # logPR.observed))
   /\ logPR' = NoLog
   /\ UNCHANGED <<gone, reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned>>
 
@@ -281,4 +292,5 @@ NeverUpstreamGone == gone = {}
 NeverLogged == log = {}
 NeverPinned == pinned = {}
 NeverRegistryWithdrawn == withdrawn = {}
+NeverDropped == ~dropped
 =============================================================================

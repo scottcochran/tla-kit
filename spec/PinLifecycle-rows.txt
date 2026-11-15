@@ -61,6 +61,7 @@ w-upstream-gone     none         Spec      INVARIANT  NeverUpstreamGone      COU
 w-logged            none         Spec      INVARIANT  NeverLogged            COUNTEREXAMPLE
 w-pinned            none         Spec      INVARIANT  NeverPinned            COUNTEREXAMPLE
 w-withdrawn         none         Spec      INVARIANT  NeverRegistryWithdrawn COUNTEREXAMPLE
+w-dropped           none         Spec      INVARIANT  NeverDropped           COUNTEREXAMPLE
 
 # Liveness: the weekly check reports what upstream stopped serving, under its fairness.
 l-none-reported     none         SpecLive  PROPERTY   UpstreamReported       HOLDS

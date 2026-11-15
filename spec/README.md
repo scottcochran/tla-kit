@@ -1,0 +1,50 @@
+# spec
+
+tla-kit's own TLA+ specifications, checked in its own image with the vendored scripts of the
+`writing-tla-specs-and-proofs` skill. The layout follows the skill's: each module beside its row list and its dated
+results files.
+
+| Module | What it specifies | Record | Rows | Results |
+|---|---|---|---|---|
+| [`PinLifecycle.tla`](PinLifecycle.tla) | The pin and release process of ADR-0005, ADR-0013 and ADR-0014: upstream, the custodian, CI, the release workflow, the weekly check, the registry and a project, each acting at its own time | [ADR-0015](../decisions/ADR-0015.md) | [`PinLifecycle-rows.txt`](PinLifecycle-rows.txt) | [`PinLifecycle-results-2026.11.15b.txt`](PinLifecycle-results-2026.11.15b.txt): 50 rows, all as expected. The first file of the day, [`…-2026.11.15.txt`](PinLifecycle-results-2026.11.15.txt), is of the module before the fixes were written into the records, and stays as it was |
+
+## PinLifecycle
+
+`Mut = "none"` is the records with ADR-0015's four fixes. `M_NOF1` to `M_NOF4` each remove one fix. `M_ASWRITTEN`
+is the records as they stand. It is the one mutation that removes more than one guard, because ADR-0015 item 5
+asks for a row of the records as written. With every fix in force, every property holds. Each fix removed breaks
+its own property and no other, and as written all four gaps show.
+
+| Gap | Property | The counterexample, as TLC finds it |
+|---|---|---|
+| 1. Evidence for an image never released | `EvidenceFitsRelease` | Two pull requests, moving the jar and the base, each pass CI against the same `main`. Both merge, and the release publishes an image that neither run of evidence saw. |
+| 2. A prover move with no kept copy | `BuildsFromKept` | A pull request moves the prover. CI builds the new value before any release has kept a copy of it, so it takes the value from upstream. |
+| 3. Rebuilding relies on sources no record keeps | `ReleasesRebuildable` | A release is made, and then upstream stops serving the base or the jar value it holds. |
+| 4. A log entry that does not name its value | `LogFiledRight` | Upstream stops serving prover 1, and the weekly check opens a served-state pull request. Then the prover move merges, and the entry is filed under prover 2. |
+
+At these constants the model has 12,460 distinct states with every fix, and 272,854 as written.
+
+Each fix is now written in its record: F1 in ADR-0014 item 1, F2 in ADR-0005 item 2, F3 in ADR-0013 item 8, and
+F4 in ADR-0013 item 7. Writing F4 changed the model to match: an entry names its value, and a served-state pull
+request whose value is no longer current is closed with nothing filed. The witness `NeverDropped` shows that this
+happens.
+
+**These results are working output.** They were made in an image built locally from this repository at `24956e0`
+(image `sha256:0b2f6719…b4f6`). That digest was not published by the release workflow, so it is not to be cited
+(ADR-0002 items 5 and 7). ADR-0015 item 1 has them regenerated in the first published image, and CI compares them
+from Phase 1c on (item 8).
+
+To regenerate, from the repository root, with an image built from it:
+
+```sh
+docker run --rm -v "$PWD:/work" -e TLA_PROJECT=tla-kit tla-kit:dev \
+  sh -c 'python3 $TLA_KIT_SKILL/scripts/tlc_rows.py spec/PinLifecycle-rows.txt -j 3'
+```
+
+The generator writes `PinLifecycle-results-<date>.txt` only when every row is as expected. It never overwrites a
+results file: a rerun that matches says it reproduced the file byte for byte. A single row, with its trace:
+
+```sh
+docker run --rm -v "$PWD:/work" tla-kit:dev sh -c \
+  'cd spec && python3 $TLA_KIT_SKILL/scripts/tlc_run.py PinLifecycle M_NOF1 EvidenceFitsRelease --expect COUNTEREXAMPLE --trace'
+```

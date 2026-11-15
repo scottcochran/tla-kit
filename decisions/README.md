@@ -27,6 +27,8 @@ spike, or planned for a phase of `PLAN.md`).
 | [ADR-0012](ADR-0012.md) | One base image; large optional tools as variants by tag, each added with a check that uses it | Owed (D5) | Planned, Phase 6 | Proposed |
 | [ADR-0013](ADR-0013.md) | Every pin moves by one rule: one pull request, evidence that fits what the pin can change | Assistant | Planned, Phase 1 | Proposed |
 | [ADR-0014](ADR-0014.md) | Every pull request is built and tested; a release is an immutable tag, attested, and never deleted | Assistant | Planned, Phases 1 and 2 | Proposed |
+| [ADR-0015](ADR-0015.md) | The pin and release process is specified in TLA+, and checked by TLC before the records it covers are accepted | Custodian (that it is written); assistant (its scope) | Planned, before Phase 1's workflows | Proposed |
+| [ADR-0016](ADR-0016.md) | The `prove` tool's requests, processes and cache are specified in TLA+ before the tool is built | Custodian (that it is written); assistant (its scope) | Planned, Phase 4 | Proposed |
 
 **Not recorded here.** `PLAN.md`'s D1, whether TOPAK moves `tools/TLAPS-PIN` to the image's Linux prover, is
 TOPAK's decision and is made there. So is the same question for gov-tla. ADR-0005 says what tla-kit provides

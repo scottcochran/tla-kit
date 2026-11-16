@@ -8,3 +8,5 @@ SECURITY.md
 derived
 decisions
 vendor/check.py
+tools
+build

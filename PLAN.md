@@ -53,22 +53,23 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 |---|---|---|---|
 | D1 | Does TOPAK move `tools/TLAPS-PIN` to the image's Linux prover? TOPAK's decision, made there. gov-tla faces the same question in its own repository. | Yes: it is the only route to proofs rerun in CI, and the newer build rejects the two unsound cases. It means regenerating 34 proof results files, and the records that cite the two cases need a look. | Phase 2 as evidence |
 | D2 | Where do the skill's scripts live for the server to call? | Chosen 2026.11.15: vendor them here at a named TOPAK commit, checked by digest in CI. The skill stays usable without Docker. ADR-0007 records it, accepted 2026.11.15. | Nothing now. The vendoring is Phase 1a work, because Phase 1b's results come from the skill's generator (ADR-0015 items 1 and 8). |
-| D3 | Registry and visibility for the image. | `ghcr.io/scottcochran/tla-kit`, public. | Phase 1c |
+| D3 | Registry and visibility for the image. | Chosen 2026.11.16: `ghcr.io/scottcochran/tla-kit`, public, published from a tag. ADR-0010 records it, accepted 2026.11.16. | Nothing now |
 | D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it, accepted 2026.11.15. | Nothing now |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
 | D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | A design to follow, with named changes, and no dependency on it. | Phase 4 |
-| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Conditions 2 and 3 are Phase 1c work, before anything is published |
+| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release is assembled by `tools/keep-tlapm.sh` and is made before anything is published |
 
 ### Records to accept, and when
 
 This is the order in which the phases need the records. The Phase 1a and 1b rows were accepted on 2026.11.15,
-and so were ADR-0005, 0013 and 0014. Every other record is Proposed.
+and so were ADR-0005, 0013 and 0014. ADR-0010 was accepted on 2026.11.16. Every other record is
+Proposed.
 
 | Before | Accept | Why then |
 |---|---|---|
 | Phase 1a | ADR-0001, 0002, 0003, 0004, 0011; ADR-0007 (D2) | The first five are mostly built. ADR-0007 is pulled forward from Phase 3 (D2). All six accepted 2026.11.15. |
 | Phase 1b | ADR-0015 | Its scope, so that `spec/PinLifecycle.tla` can be written. Accepted 2026.11.15. |
-| Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15; ADR-0010 is still Proposed. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
+| Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15, and ADR-0010 2026.11.16. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
 | Phase 3 | ADR-0006, 0008 | |
 | Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0016 waits on ADR-0009 item 5's comparison of `tlapm` with `tlapm_lsp`. |
 | Phase 6 | ADR-0012 (D5) | |
@@ -144,6 +145,24 @@ written down.
 
 **Done when** a published digest reproduces the README's spike table, `gh attestation verify` passes on it, and
 the `PinLifecycle` results regenerated in it match the committed file.
+
+**State on 2026.11.16 (branch `phase1c`).** Built and checked on one machine:
+- `PINS.json` and its checks;
+- the image built from the kept tarball and carrying `PINS.json`;
+- `SOURCE_DATE_EPOCH` and the labels, with two builds of one commit giving one digest;
+- D7 condition 3;
+- the `PinLifecycle` comparison.
+
+Written and not yet run: the CI, evidence, weekly and release workflows, Dependabot, and `CONSUMERS.md`.
+Left for the custodian:
+- making the `tlapm-ff40755` release (`tools/keep-tlapm.sh --create`);
+- making the repository public, which the attestations need;
+- pushing the branch, so CI runs;
+- turning on the required-checks ruleset once CI passes on `main`;
+- the first `v0.1.0` tag;
+- repeating the spike's TOPAK checks from the published image.
+
+gov-tla has no evidence run, and no token to read it.
 
 ### Phase 2: the image in the projects' CI
 

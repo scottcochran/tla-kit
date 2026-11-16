@@ -1,0 +1,196 @@
+{
+  "about": "The inventory of what the image is meant to hold (ADR-0013 item 7). tools/pins.py checks it against the Dockerfile and writes the README's table from it. The image carries it at /opt/tla-kit/PINS.json, and tla-kit-selftest checks every installed digest against it. A value changes only by a pin move (ADR-0013 item 2). A served log is added to and never edited.",
+  "not_pins": {
+    "SOURCE_DATE_EPOCH": "the commit's time, set by CI and the release workflow (ADR-0014 item 8)",
+    "TLA_KIT_REVISION": "the commit, for the OCI revision label (ADR-0014 item 8)",
+    "TLA_KIT_CREATED": "the commit's time in RFC 3339, for the OCI created label (ADR-0014 item 8)"
+  },
+  "pins": [
+    {
+      "tool": "tla2tools.jar",
+      "kind": "checker",
+      "version": "v1.7.4",
+      "describes": "TLC, SANY and the PlusCal translator (TLC2 2.19, rev 5a47802)",
+      "set_by": {
+        "TLA2TOOLS_VERSION": "v1.7.4",
+        "TLA2TOOLS_SHA256": "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88"
+      },
+      "upstream": "https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar",
+      "kept_copy": null,
+      "download_sha256": "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88",
+      "installed": {
+        "/opt/tla/tla2tools.jar": "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88"
+      },
+      "pinned": {
+        "date": "2026.11.15",
+        "by": "commit 770daf2"
+      },
+      "served": [
+        {
+          "from": "2026.11.15",
+          "sha256": "936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88",
+          "upstream": true
+        }
+      ]
+    },
+    {
+      "tool": "tlapm",
+      "kind": "checker",
+      "version": "1.6.0-pre at ff40755",
+      "describes": "The TLAPS proof manager, from the rolling `1.6.0-pre` tag as served on 2026.11.15, with its backends: Z3 4.8.9, Zenon 0.8.4 [a268], Isabelle2025 (Isabelle/TLA+ heap) on Poly/ML 5.9.1, LS4 1.0, and a second TLA+ tools jar (`d8fb231`) that `tlapm` uses",
+      "set_by": {
+        "TLAPM_TAG": "1.6.0-pre",
+        "TLAPM_SHA256": "99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc",
+        "TLAPM_BINARY_SHA256": "6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2",
+        "TLAPM_URL": "https://github.com/scottcochran/tla-kit/releases/download/tlapm-ff40755/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz"
+      },
+      "upstream": "https://github.com/tlaplus/tlapm/releases/download/1.6.0-pre/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz",
+      "kept_release": "tlapm-ff40755",
+      "kept_copy": "https://github.com/scottcochran/tla-kit/releases/download/tlapm-ff40755/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz",
+      "download_sha256": "99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc",
+      "installed": {
+        "/opt/tlaps/bin/tlapm": "6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2",
+        "/opt/tlaps/bin/tlapm_lsp": "e9cd1355d5fac3ca364dfe60d88f7c2e8893d64dddde028917401581ce167b3d",
+        "/opt/tlaps/bin/translate": "fbcb8a422ed4a8d25f07700de7986c9b2748ff8812e4fafb6749232f0e49ba78",
+        "/opt/tlaps/doc/tlapm/LICENSE": "a6e4dd639b035596eed1764b6f6f33a610f1d449f5cb632138b9fde65d5e8826",
+        "/opt/tlaps/doc/tlapm/README.md": "162516f628fe3e86415bbe5bf11076d128c874e0f1ae337aff6418ed1c6c68a5",
+        "/opt/tlaps/lib/tlapm/META": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/etc/ISABELLE_IDENTIFIER": "3eab10280f4cf63dbca888a7de0715eba22b92194503faf1b595614631cb25a7",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/Options": "ebce30a88ab80db137f539487e83a623ad1aa63abf38e16a588ad5f86300cc56",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/Pure": "98e7fc218afb4c3047b8c8f66b77ceded884ed1c87b1110df4729e0c84b6e1cf",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/TLA+": "2aa02e2d4caede91c917eb4828825b722641fc4cc32b96762b6afba42c10173d",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libgmp.so.10": "0afb61ed94ddc86f27874cf86f2c93a782fef1890bc62e6f5f5bb9581e3c72ad",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libpolymain.a": "5066933ee4cd222f6ec9d916aac87f0c124a8e9687db451faf4305a4b926eaf4",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libpolymain.la": "a223924a5516f6c07070130e749b6e233d254563e7117815cdcf245a7526e272",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libpolyml.a": "9a29020aa2438ced3d41d5e658b38174f8c27707a8c4e616586a343d89d8de02",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libpolyml.la": "b6c875032d0477385696b2737c150f3112ae72de4952787c30de7ece7716cef1",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libsha1.so": "9bd74bee2dcb0248e0602e574fb27a65d6b099b513c8dff6323a8df92a0c697c",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/pkgconfig/polyml.pc": "7e06773761bb433cc10f9ef489209fafefe35f6e9a41e1a715a321d2364076d2",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/poly": "b64da72c014ea243e500bc881fa3050a997eb7a5e3e398961e56a54c064d3ff2",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/polyc": "4d173c9f21d33a3affa1dcca7c4977c7a78132c3a31426aa10f4a8708f5f37e1",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/polyimport": "8446955386acd3b0849cd3ee74b035c50b724be24593917d9b23752c9b98a239",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/polyml/modules/IntInfAsInt": "1e54fdbc2869ffe8bc16f67feccb56d3b7df44330607bce12f5e445f2c99a205",
+        "/opt/tlaps/lib/tlapm/backends/bin/ls4": "77c2ef25a03645f0a1b8f2286dc3fe9dc7ad777134086898803e12e0046e0f6c",
+        "/opt/tlaps/lib/tlapm/backends/bin/ptl_to_trp": "fbcb8a422ed4a8d25f07700de7986c9b2748ff8812e4fafb6749232f0e49ba78",
+        "/opt/tlaps/lib/tlapm/backends/bin/tla2tools.jar": "e1f11b75c4b5bc4478ba0ac5cb6ae28e40a01b0016bc33e0aa97da22dfdbcd7f",
+        "/opt/tlaps/lib/tlapm/backends/bin/z3": "4321b0c0db1574a1e90881d9e097f12b8753d0c3e78b21a0155c77005a631436",
+        "/opt/tlaps/lib/tlapm/backends/bin/zenon": "2aa214cb532c9e1b834ad9152ab33fcd6ff54614f1a6543893ff97655ff43096",
+        "/opt/tlaps/lib/tlapm/dune-package": "36bbd06d6fe4b6c7e1852a46de7466d39943b00f5d5fdb9e5a7ca314b4ae2bd6",
+        "/opt/tlaps/lib/tlapm/emacs/tla-mode/tla-mode.el": "7b5c611bff443174bb22cd27ee4f1cd3e537a42bbd4bbb6e487db4f3b74079db",
+        "/opt/tlaps/lib/tlapm/opam": "d615d2c37af027f59c2d816a7ea2d2647474d63decfcd19e2e90a09a7c428b00",
+        "/opt/tlaps/lib/tlapm/stdlib/Bags.tla": "b655ca5e4866f2c81caa43b18a02d0eaa3517784ebc0025259ae4901fd40b814",
+        "/opt/tlaps/lib/tlapm/stdlib/BagsTheorems.tla": "af67c8abfb23b0f3ee0d0fa6d0427948f268a14de1b9bb408e7acda23a1d1db4",
+        "/opt/tlaps/lib/tlapm/stdlib/BagsTheorems_proofs.tla": "749dcdc49aa7ac1717235c3d82b1f6cc1b389381a63033b40001db21174fba86",
+        "/opt/tlaps/lib/tlapm/stdlib/CommunityModules.jar": "f9ceeef40e8fa7a7944329802256ecedc18c81658fb4e55768b093e0bc617e28",
+        "/opt/tlaps/lib/tlapm/stdlib/FiniteSetTheorems.tla": "484bf0f9ab6a69ef45f7282f7f92dcf1e6ae139e44117b0d5a4427635818e773",
+        "/opt/tlaps/lib/tlapm/stdlib/FiniteSetTheorems_proofs.tla": "a0c71d0b98986784096f9f56b4395edb76dd013bf621d6fa0b9659c1cdbf80a6",
+        "/opt/tlaps/lib/tlapm/stdlib/FiniteSets.tla": "eca905df95c16fb12f0f205a38b429c216a11b5c8429d270af044f05600a6380",
+        "/opt/tlaps/lib/tlapm/stdlib/Folds.tla": "aa59063fd600bb640b2ae24dc85ef770277ef5bf7955092b76b8b471790086da",
+        "/opt/tlaps/lib/tlapm/stdlib/FunctionTheorems.tla": "f89871fb5b35d2fc54f583b12adb489dd6660be7aced67ab295fba0d4999c116",
+        "/opt/tlaps/lib/tlapm/stdlib/Functions.tla": "b54ff63b7c76c327525c17c188d5f9f5e53d92f3fd701f5e2ba54f0f54391063",
+        "/opt/tlaps/lib/tlapm/stdlib/NaturalsInduction.tla": "08f52420cdaaf11292ed366782b5ce5b596bb7cbe789526a1cfd8806dbf98624",
+        "/opt/tlaps/lib/tlapm/stdlib/NaturalsInduction_proofs.tla": "8b48da8d05a2eb61698c5cd512a25c07cfe64ad6295976a853b3697e9640cddb",
+        "/opt/tlaps/lib/tlapm/stdlib/RealTime.tla": "23078bd5961b783bb888cc5654a5c92ae6296fae4f426dc6e1f57a29109c52f0",
+        "/opt/tlaps/lib/tlapm/stdlib/SequenceTheorems.tla": "1fdbed9077bba9db329e499535be29f8d2e6fba3a2b338e364c3b0ec56596bf9",
+        "/opt/tlaps/lib/tlapm/stdlib/SequenceTheorems_proofs.tla": "8f30d6f458ac623df4db14c88ab758fcb2a97889e42427e67634dcfc61510b20",
+        "/opt/tlaps/lib/tlapm/stdlib/TLAPS.tla": "9afe54984062748a0568966434cc0945d682f8cd89fdbc38f73b5579751b0c55",
+        "/opt/tlaps/lib/tlapm/stdlib/WellFoundedInduction.tla": "6f2f274c2e987d1edcf004d8e37b053f1f82b912e66d6a51bae0af8012ddcbec",
+        "/opt/tlaps/lib/tlapm/stdlib/WellFoundedInduction_proofs.tla": "f3af7b047663143f50d33c2587ca96cfeb27d47a80f365701cc0f1f7f569584c"
+      },
+      "pinned": {
+        "date": "2026.11.15",
+        "by": "commit 770daf2"
+      },
+      "served": [
+        {
+          "from": "2026.11.15",
+          "sha256": "99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc",
+          "upstream": true
+        }
+      ]
+    },
+    {
+      "tool": "Temurin JRE",
+      "kind": "checker",
+      "version": "25 (25.0.5+8 in the pinned base)",
+      "describes": "The Java runtime TLC runs on: Temurin 25.0.5+8",
+      "set_by": {
+        "BASE_IMAGE": "eclipse-temurin:25-jre-noble@sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5"
+      },
+      "note": "The major version is the base image's tag. A move of the major is a checker move; a patch release that comes with a base refresh is a runtime move (ADR-0013 item 1).",
+      "pinned": {
+        "date": "2026.11.15",
+        "by": "pull request #4 (8b01d1c)"
+      }
+    },
+    {
+      "tool": "base",
+      "kind": "runtime",
+      "describes": "Ubuntu 24.04.5 with Temurin JRE 25 (amd64)",
+      "set_by": {
+        "BASE_IMAGE": "eclipse-temurin:25-jre-noble@sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5"
+      },
+      "upstream": "docker.io/library/eclipse-temurin",
+      "kept_copy": null,
+      "resolved": {
+        "tag": "eclipse-temurin:25-jre-noble",
+        "digest": "sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5",
+        "platform": "linux/amd64",
+        "date": "2026.11.15"
+      },
+      "pinned": {
+        "date": "2026.11.15",
+        "by": "pull request #4 (8b01d1c)"
+      },
+      "served": [
+        {
+          "from": "2026.11.15",
+          "sha256": "5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5",
+          "upstream": true
+        }
+      ]
+    },
+    {
+      "tool": "apt",
+      "kind": "runtime",
+      "describes": "Python 3.12.3, perl 5.38.2 (`shasum`), git 2.43.0, from Ubuntu's snapshot of 2026-11-15T00:00:00Z",
+      "set_by": {
+        "APT_SNAPSHOT": "20261115T000000Z"
+      },
+      "upstream": "https://snapshot.ubuntu.com/ubuntu/20261115T000000Z",
+      "kept_copy": null,
+      "packages": {
+        "git": "1:2.43.0-1ubuntu7.4",
+        "perl": "5.38.2-3.2ubuntu0.7",
+        "python3": "3.12.3-0ubuntu2.1"
+      },
+      "note": "Moves with the base, as one runtime refresh (ADR-0013 item 2). A snapshot has no single digest, so its served log names it by its date.",
+      "pinned": {
+        "date": "2026.11.15",
+        "by": "pull request #4 (8b01d1c)"
+      },
+      "served": [
+        {
+          "from": "2026.11.15",
+          "snapshot": "20261115T000000Z",
+          "upstream": true
+        }
+      ]
+    },
+    {
+      "tool": "writing-tla-specs-and-proofs scripts",
+      "kind": "method",
+      "version": "TOPAK 5ade81e",
+      "describes": "The skill's `scripts/` and `assets/selftest/`",
+      "set_by": {},
+      "vendor_pin": "vendor/writing-tla-specs-and-proofs/VENDOR-PIN",
+      "upstream": "https://github.com/scottcochran/TOPAK/tree/5ade81efcc50bd9dd4de555b208dc890d5746606/skills/writing-tla-specs-and-proofs/skills/writing-tla-specs-and-proofs",
+      "kept_copy": "vendor/writing-tla-specs-and-proofs/ in this repository (ADR-0007)",
+      "installed": "each file's sha256 is in the VENDOR-PIN, which the image carries at /opt/tla-kit/skill/VENDOR-PIN",
+      "pinned": {
+        "date": "2026.11.16",
+        "by": "pull request #7"
+      }
+    }
+  ]
+}

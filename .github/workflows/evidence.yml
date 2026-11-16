@@ -1,0 +1,164 @@
+# The evidence a pin move needs, run in the candidate image over the projects it serves (ADR-0013 item 3).
+# Called by ci.yml for a pull request that moves a pin, and runnable by hand. Each project is taken at its main
+# branch's commit at the time of the run, and the commit is named in the summary.
+#   checker (tla2tools.jar, Temurin JRE)  TOPAK's TLC results, every module of its `pr` tier regenerated and
+#                                         compared (tools/check-results.sh); the PinLifecycle rows run in ci.yml
+#   checker (tlapm)                       TOPAK's full proof run and its defect run (ADR-0005 item 4)
+#   runtime (base, apt)                   the self-test and setup check (ci.yml), TOPAK's pin check, and the full
+#                                         proof run, whose every count has to equal the committed one
+#   method                                the vendored scripts' check (ci.yml); the server's tests once it exists
+# gov-tla is listed in CONSUMERS.md, but it is private and this repository has no token to read it, so nothing of
+# it is run here; the summary says so.
+name: evidence
+
+on:
+  workflow_call:
+    inputs:
+      moved:
+        description: "The pins moved, as tools/pins.py moved prints them, separated by ';'"
+        type: string
+        required: true
+  workflow_dispatch:
+    inputs:
+      moved:
+        description: "The pins to gather evidence for, e.g. 'checker tla2tools.jar;checker tlapm;runtime base'"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+env:
+  TOPAK: scottcochran/TOPAK
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      jar: ${{ steps.kinds.outputs.jar }}
+      prover: ${{ steps.kinds.outputs.prover }}
+      runtime: ${{ steps.kinds.outputs.runtime }}
+      topak: ${{ steps.topak.outputs.commit }}
+      modules: ${{ steps.topak.outputs.modules }}
+    steps:
+      - id: kinds
+        env:
+          MOVED: ${{ inputs.moved }}
+        run: |
+          has() { grep -qE "$1" <<< "$MOVED" && echo true || echo false; }
+          echo "jar=$(has '(^|;)checker (tla2tools\.jar|Temurin JRE)')" | tee -a "$GITHUB_OUTPUT"
+          echo "prover=$(has '(^|;)checker tlapm')" | tee -a "$GITHUB_OUTPUT"
+          echo "runtime=$(has '(^|;)runtime ')" | tee -a "$GITHUB_OUTPUT"
+      - id: topak
+        run: |
+          commit=$(git ls-remote "https://github.com/$TOPAK" refs/heads/main | cut -f1)
+          git init -q topak && git -C topak fetch -q --depth 1 "https://github.com/$TOPAK" "$commit"
+          git -C topak checkout -q FETCH_HEAD
+          echo "commit=$commit" | tee -a "$GITHUB_OUTPUT"
+          echo "modules=$(topak/tools/check-results.sh --matrix pr)" | tee -a "$GITHUB_OUTPUT"
+          {
+            echo "## Evidence for: ${{ inputs.moved }}"
+            echo "TOPAK at \`$commit\`. gov-tla: not run (private, and no token to read it; CONSUMERS.md)."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch the kept prover tarball
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: tools/ci/fetch-kept.sh
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build the candidate image
+        run: |
+          tools/ci/build.sh --load -t tla-kit:candidate
+          docker save tla-kit:candidate | gzip -1 > "$RUNNER_TEMP/candidate.tar.gz"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: candidate-image
+          path: ${{ runner.temp }}/candidate.tar.gz
+          retention-days: 3
+
+  topak-tlc:
+    needs: [plan, image]
+    if: needs.plan.outputs.jar == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJSON(needs.plan.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.TOPAK }}
+          ref: ${{ needs.plan.outputs.topak }}
+          path: topak
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: candidate-image
+      - name: Regenerate ${{ matrix.module }} in the candidate image and compare
+        run: |
+          gunzip -c candidate.tar.gz | docker load
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/topak:/work" -e RESULTS_OUT=/tmp/fresh \
+            tla-kit:candidate tools/check-results.sh "${{ matrix.module }}"
+
+  topak-proofs:
+    needs: [plan, image]
+    if: needs.plan.outputs.prover == 'true' || needs.plan.outputs.runtime == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.TOPAK }}
+          ref: ${{ needs.plan.outputs.topak }}
+          path: topak
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: candidate-image
+      - name: Every proof module of TOPAK, its count compared with its committed results file
+        run: |
+          gunzip -c candidate.tar.gz | docker load
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/topak:/work:ro" -v "$PWD/spike:/spike:ro" \
+            tla-kit:candidate /spike/prove-all.sh /work/spec | tee prove-all.txt
+          { echo '### TOPAK proofs'; echo '```'; cat prove-all.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: TOPAK's pin check (runtime moves)
+        if: needs.plan.outputs.runtime == 'true'
+        run: docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/topak:/work:ro" tla-kit:candidate tools/check-pins.sh
+
+  topak-defects:
+    needs: [plan, image]
+    if: needs.plan.outputs.prover == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ env.TOPAK }}
+          ref: ${{ needs.plan.outputs.topak }}
+          path: topak
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: candidate-image
+      # The defect run is compared by a person with TOPAK's defect record: a prover move is expected to change it
+      # (ADR-0005's Context), and every difference has to be listed and explained in the pull request.
+      - name: TOPAK's defect run, for the pull request to explain
+        run: |
+          gunzip -c candidate.tar.gz | docker load
+          set +e
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD/topak:/src:ro" -e TLAPM_UNPINNED=1 tla-kit:candidate \
+            sh -c 'cp -r /src /tmp/topak && cd /tmp/topak && spec/defects/defects-run.sh' > defects.txt 2>&1
+          echo "exit $?" >> defects.txt
+          { echo '### TOPAK defect run'; echo '```'; tail -80 defects.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

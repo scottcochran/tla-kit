@@ -5,8 +5,10 @@
 
 One line per check, `ok` or `FAIL`, with the seconds it took:
 
-  pins     the jar and the tlapm binary have the sha256 of the build arguments (/opt/tla-kit/build-args), and
-           every vendored file of the skill has the sha256 its VENDOR-PIN names
+  pins     the jar and the tlapm binary have the sha256 of the build arguments (/opt/tla-kit/build-args); the
+           build arguments are the values the inventory gives them, and every file the inventory lists has its
+           sha256 (/opt/tla-kit/PINS.json, ADR-0013 item 7); every vendored file of the skill has the sha256 its
+           VENDOR-PIN names
   env      TLA_JAR and TLAPM name those files, and the tlapm on PATH is the same binary (ADR-0004)
   notices  every licence text the image's notice of third-party software names exists, and every jar it names
            holds a License.txt (/opt/tla-kit/licenses/THIRD-PARTY.md, ADR-0011 item 4)
@@ -20,6 +22,7 @@ One line per check, `ok` or `FAIL`, with the seconds it took:
 Exits non-zero if any check fails.
 """
 import hashlib
+import json
 import os
 import re
 import shutil
@@ -35,6 +38,11 @@ JAR = os.environ.get("TLA_JAR", "")
 TLAPM = os.environ.get("TLAPM", "")
 SKILL = os.environ.get("TLA_KIT_SKILL", "/opt/tla-kit/skill")
 FIXTURE = os.path.join(SKILL, "assets", "selftest")
+PINS = "/opt/tla-kit/PINS.json"
+# The build-args keys and the inventory's build arguments they record.
+RECORDED = {"base_image": "BASE_IMAGE", "apt_snapshot": "APT_SNAPSHOT", "tla2tools_version": "TLA2TOOLS_VERSION",
+            "tla2tools_sha256": "TLA2TOOLS_SHA256", "tlapm_tag": "TLAPM_TAG", "tlapm_tarball_sha256": "TLAPM_SHA256",
+            "tlapm_binary_sha256": "TLAPM_BINARY_SHA256"}
 failed = []
 
 PCAL = """---- MODULE Pcal ----
@@ -92,13 +100,33 @@ def check_pins():
         got = sha256(path) if os.path.isfile(path) else None
         if got != want:
             problems.append(f"{label} {path} is sha256 {got}, the build arguments say {want}")
+    listed = 0
+    try:
+        with open(PINS, encoding="utf-8") as f:
+            inventory = json.load(f)
+    except (OSError, ValueError) as e:
+        inventory = {"pins": []}
+        problems.append(f"no inventory: {e}")
+    set_by = {}
+    for p in inventory["pins"]:
+        set_by.update(p.get("set_by", {}))
+        if isinstance(p.get("installed"), dict):
+            for path, want in p["installed"].items():
+                listed += 1
+                got = sha256(path) if os.path.isfile(path) else None
+                if got != want:
+                    problems.append(f"{path} is sha256 {got}, PINS.json says {want}")
+    for key, arg in RECORDED.items():
+        if arg in set_by and args.get(key) != set_by[arg]:
+            problems.append(f"built with {arg}={args.get(key)}, PINS.json says {set_by[arg]}")
     pin, files = key_values(os.path.join(SKILL, "VENDOR-PIN"))
     for name, want in files.items():
         path = os.path.join(SKILL, name)
         if not os.path.isfile(path) or sha256(path) != want:
             problems.append(f"skill file {name} differs from VENDOR-PIN")
-    report("pins", start, not problems, "; ".join(problems) or
-           f"jar and tlapm as built; {len(files)} skill files as vendored from {pin.get('commit', '?')[:12]}")
+    report("pins", start, not problems and listed > 0, "; ".join(problems[:5]) or
+           f"jar and tlapm as built; built with the inventory's values, and its {listed} installed files as it "
+           f"lists them; {len(files)} skill files as vendored from {pin.get('commit', '?')[:12]}")
     return args
 
 

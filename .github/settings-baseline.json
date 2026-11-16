@@ -142,25 +142,13 @@
             "do_not_enforce_on_create": false,
             "required_status_checks": [
               {
-                "context": "check-refs"
+                "context": "records"
               },
               {
-                "context": "frozen-files"
+                "context": "image"
               },
               {
-                "context": "verify-manifests"
-              },
-              {
-                "context": "proof-sync"
-              },
-              {
-                "context": "lean-sync"
-              },
-              {
-                "context": "mechanism-tests"
-              },
-              {
-                "context": "DCO"
+                "context": "reproduce"
               }
             ]
           }
@@ -238,6 +226,24 @@
       "source": false,
       "here": true,
       "why": "ADR-0013 item 4: the weekly upstream check reports by opening or updating one issue in this repository. Security problems still go through private vulnerability reporting (SECURITY.md)."
+    },
+    {
+      "setting": "rulesets[main: required checks].required_status_checks",
+      "source": [
+        "check-refs",
+        "frozen-files",
+        "verify-manifests",
+        "proof-sync",
+        "lean-sync",
+        "mechanism-tests",
+        "DCO"
+      ],
+      "here": [
+        "records",
+        "image",
+        "reproduce"
+      ],
+      "why": "TOPAK's checks do not exist here. These are the jobs of .github/workflows/ci.yml (ADR-0014 item 1). The ruleset stays disabled, as in the source, until CI has passed on main; then it is turned on, and with strict_required_status_checks_policy a pull request merges only on a pass against the main it merges into (ADR-0015, gap 1)."
     }
   ]
 }

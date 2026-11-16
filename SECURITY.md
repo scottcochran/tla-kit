@@ -22,6 +22,6 @@ the prover.
 
 ## Supported versions
 
-Only the latest release is supported, now [`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0).
+Only the latest release is supported, now [`v0.2.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.2.0).
 Older releases stay available, and their digests keep resolving, but they get no fixes
 ([ADR-0014](decisions/ADR-0014.md), items 5 and 7).

@@ -24,7 +24,7 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0007](ADR-0007.md) | The skill is the source of the method; its scripts are vendored here at a named commit | Custodian (D2) | Built: vendored, and used by the server | Accepted · 2026.11.15 |
 | [ADR-0008](ADR-0008.md) | The MCP server is Python over stdio, inside the image, confined to the mounted project | Assistant; custodian (the standard library) | Built in part: items 1 to 5; item 6 is Phase 5 | Accepted · 2026.11.16 |
 | [ADR-0009](ADR-0009.md) | The proof tools follow marco6/tlapm-mcp's design, with named changes, and do not depend on it | Owed (D6) | Planned, Phase 4 | Proposed |
-| [ADR-0010](ADR-0010.md) | The image is published at `ghcr.io/scottcochran/tla-kit`, public, from a tag | Custodian (D3) | Built: `v0.1.0` published | Accepted · 2026.11.16 |
+| [ADR-0010](ADR-0010.md) | The image is published at `ghcr.io/scottcochran/tla-kit`, public, from a tag | Custodian (D3) | Built: `v0.1.0` and `v0.2.0` published | Accepted · 2026.11.16 |
 | [ADR-0011](ADR-0011.md) | Code is licensed Apache-2.0 and documentation CC BY 4.0, as in TOPAK | Custodian (D4) | Built | Accepted · 2026.11.15 |
 | [ADR-0012](ADR-0012.md) | One base image; large optional tools as variants by tag, each added with a check that uses it | Owed (D5) | Planned, Phase 6 | Proposed |
 | [ADR-0013](ADR-0013.md) | Every pin moves by one rule: one pull request, evidence that fits what the pin can change | Assistant | Built; the weekly check has not run yet | Accepted · 2026.11.15 |

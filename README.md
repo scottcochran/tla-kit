@@ -5,12 +5,15 @@ laptop and in CI, and an MCP server over those tools to pair with the
 [`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
 skill.
 
-**Status: Phases 1 and 3 of [PLAN.md](PLAN.md) are done.** The first release,
-[`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0), is published and attested:
+**Status: Phases 1 and 3 of [PLAN.md](PLAN.md) are done.** The latest release,
+[`v0.2.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.2.0), is published and attested:
 
 ```
-ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6
+ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d
 ```
+
+It adds the MCP server to the first release, [`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0)
+(`sha256:454328cd…50c6`), and moves no pin: the checker, the prover and the runtime are the same bytes in both.
 
 - **How it is built:** from a base pinned by digest, packages pinned by date, and a prover tarball kept in this
   repository. Every build of one commit gives one digest.
@@ -20,8 +23,7 @@ ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c
   workflow publishes from a tag.
 - **The model:** Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), reproduces
   in the published image.
-- **The MCP server:** Phase 3's model-checking tools are built and checked on `main` (below). No release holds them
-  yet; `v0.1.0` has none.
+- **The MCP server:** Phase 3's model-checking tools, `tla-kit mcp`, are in `v0.2.0` (below).
 - **What's next:** Phase 2, the projects' CI in the image, and Phase 4, the server's proof tools.
 
 ## What is in the image
@@ -58,8 +60,8 @@ listed in [`licenses/THIRD-PARTY.md`](licenses/THIRD-PARTY.md), which the image 
 A project cites the published image by its digest. The tag names the same image, for reading:
 
 ```sh
-docker pull ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6
-gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6 --repo scottcochran/tla-kit
+docker pull ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d
+gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d --repo scottcochran/tla-kit
 ```
 
 To build it here:
@@ -111,7 +113,8 @@ the commit itself.
 (ADR-0008). A client starts it in the image with the project mounted:
 
 ```sh
-docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" <image@digest> tla-kit mcp
+docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
+  ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d tla-kit mcp
 ```
 
 | Tool | Does |
@@ -132,7 +135,7 @@ output and keeps its scratch files outside the project (ADR-0006). A path outsid
 runs it on every pull request. `server/compare_topak.py` is Phase 3's "Done when": it compares each tool with the
 command it stands for on TOPAK's `Alone` and `Coupling`, every row of both, and CI runs it in the image when a change
 touches the server. Phase 3 is done: on 2026.11.16, in the image CI built for pull request #11, all 84
-comparisons over the nine tools were the same. No release holds the server yet.
+comparisons over the nine tools were the same. The server is in `v0.2.0` and later releases.
 
 ## Limits
 

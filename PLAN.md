@@ -212,7 +212,9 @@ Along the way:
   gained no package.
 - **The tools:** what each one is compared with is named in ADR-0008 item 5, since only `tlc_run` and `tlc_rows`
   wrap a script.
-- **Not in a release:** `v0.1.0` has no server. The next release would be a MINOR (ADR-0014 item 2).
+- **Released:** `v0.1.0` has no server. `v0.2.0`, a MINOR (ADR-0014 item 2) that moves no pin, was published on
+  2026.11.16 from `2bea23e` as `sha256:5554015f…1e5d`, the digest CI's two runners reproduced, with both
+  attestations verified.
 
 ### Phase 4: the MCP server, proofs
 

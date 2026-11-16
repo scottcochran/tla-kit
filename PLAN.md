@@ -1,7 +1,8 @@
 # Development plan
 
-Written 2026.11.15, after the spike the README records, and updated the same day for ADR-0013 to ADR-0016. It is a
-plan, not a record: nothing below is built unless the README says so.
+Written 2026.11.15, after the spike the README records, updated the same day for ADR-0013 to ADR-0016, and kept
+up to date since: Phase 1 is done (2026.11.16). It is a plan, not a record: nothing below is built unless the
+README says so.
 
 ## Goal
 
@@ -57,7 +58,7 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 | D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it, accepted 2026.11.15. | Nothing now |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
 | D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | A design to follow, with named changes, and no dependency on it. | Phase 4 |
-| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release is assembled by `tools/keep-tlapm.sh` and is made before anything is published |
+| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release, `tlapm-ff40755`, was made by `tools/keep-tlapm.sh` on 2026.11.15, before anything was published |
 
 ### Records to accept, and when
 
@@ -242,14 +243,16 @@ Each is optional, pinned like the rest, and added only with a check that uses it
 
 ## Risks
 
-- **The prover tag moves.** Three builds in six weeks across the three projects. Phase 1c's copy of the tarball
-  is the answer. D7 allows it, on its conditions. Until then a rebuild can fail on the checksum by design.
+- **The prover tag moves.** Three builds in six weeks across the three projects. The answer is the copy of the
+  tarball kept in release `tlapm-ff40755` since Phase 1c, which D7 allows on its conditions. CI and the release
+  build from it, so a moved tag no longer fails a rebuild. The weekly check reports the move.
 - **A newer prover changes what proves.** It did, for the defect modules. Every prover move needs the full
   proof run and the defect run before a pin moves.
-- **Rebuilds rely on upstreams that no record keeps.** Only the prover's tarball will have a kept copy. The base
+- **Rebuilds rely on upstreams that no record keeps.** Only the prover's tarball has a kept copy. The base
   image comes from Docker Hub, which refused the spike's pull (HTTP 429), the `apt` packages from Ubuntu's
   snapshot archive, and the jar from GitHub's releases. ADR-0015's `Durable` makes this a stated assumption
-  rather than an unstated one.
+  rather than an unstated one. On 2026.11.16 the snapshot archive answered 500, 502 and
+  503 for long enough that CI on one pull request failed twice at `apt-get`, with nothing wrong in the change.
 - **The gate on ADR-0005, 0013 and 0014 was working output.** Phase 1b checked the model in an unpublished
   image. Phase 1c regenerated the results in the published `v0.1.0` image and they reproduced byte for byte, so
   the acceptance now rests on a run that can be cited (2026.11.16).

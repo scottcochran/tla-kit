@@ -55,3 +55,30 @@ results file: a rerun that matches says it reproduced the file byte for byte. A 
 docker run --rm -v "$PWD:/work" tla-kit:dev sh -c \
   'cd spec && python3 $TLA_KIT_SKILL/scripts/tlc_run.py PinLifecycle M_NOF1 EvidenceFitsRelease --expect COUNTEREXAMPLE --trace'
 ```
+
+## Working on a spec natively
+
+For quick iteration, the skill's scripts run natively, outside the image, from the vendored copy. They need
+Python 3.9 and Java 11 or newer, as the setup check says. Fetch the pinned checker once, from the repository root:
+
+```sh
+python3 vendor/writing-tla-specs-and-proofs/scripts/setup_check.py --fetch-jar
+```
+
+It downloads `tla2tools.jar` v1.7.4 into `tools/`, refuses it unless its sha256 is the pinned one, and runs the
+skill's fixture rows. The jar is ignored by git and by the image's build. The scripts find it there, so `TLA_JAR`
+need not be set. Then, from `spec/`:
+
+```sh
+S=../vendor/writing-tla-specs-and-proofs/scripts
+python3 $S/tlc_run.py PinLifecycle M_NOF1 EvidenceFitsRelease --expect COUNTEREXAMPLE --trace   # one row, its trace
+python3 $S/tlc_rows.py PinLifecycle-rows.txt --only n-none-log,n-none-kept                        # some rows
+python3 $S/tlc_rows.py PinLifecycle-rows.txt -j 8 --dry-run                                        # every row
+```
+
+`--only` and `--dry-run` never write a results file. On an Apple Silicon Mac with 12 CPUs, one row takes a few
+seconds and every row about a minute, against several minutes in the image under emulation.
+
+A native run is working output: it is not made in a cited image (ADR-0002 item 7). The results file is made in
+the image, as above, and CI regenerates it there on every pull request that touches `spec/` or `decisions/`
+(ADR-0015 item 8).

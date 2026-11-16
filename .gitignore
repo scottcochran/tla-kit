@@ -1,2 +1,4 @@
 build/
 .DS_Store
+# The pinned checker for native runs, fetched by setup_check.py --fetch-jar (spec/README.md)
+tools/tla2tools.jar

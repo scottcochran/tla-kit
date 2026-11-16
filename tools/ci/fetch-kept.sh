@@ -4,8 +4,8 @@
 #   GH_TOKEN=<token> tools/ci/fetch-kept.sh
 #
 # The release is `kept_release` in PINS.json's tlapm entry. It is made before the pull request that pins the build
-# (ADR-0005 item 2), so a pull request that names a build with no kept copy fails here. While this repository is
-# private, the copy can be read only with a token, which is why CI takes it this way and not by the Dockerfile's URL.
+# (ADR-0005 item 2), so a pull request that names a build with no kept copy fails here, with a message that says
+# so. CI takes the copy this way, not by the Dockerfile's URL, so that the failure is that message.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 read -r release asset sha < <(python3 - <<'EOF'

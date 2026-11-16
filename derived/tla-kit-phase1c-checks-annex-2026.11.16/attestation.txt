@@ -1,0 +1,2 @@
+provenance https://slsa.dev/provenance/v1 https://github.com/scottcochran/tla-kit refs/tags/v0.1.0 bfeecc8f0bf9ea9446488a03ebd92ccb574c421a https://github.com/scottcochran/tla-kit/.github/workflows/release.yml@refs/tags/v0.1.0
+sbom https://spdx.dev/Document/v2.3 refs/tags/v0.1.0 bfeecc8f0bf9ea9446488a03ebd92ccb574c421a

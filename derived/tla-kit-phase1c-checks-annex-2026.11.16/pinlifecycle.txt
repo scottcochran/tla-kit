@@ -1,0 +1,56 @@
+pinlifecycle: regenerating under 2026.11.16, to compare with spec/PinLifecycle-results-2026.11.16.txt
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+n-none-kept | Mut=none | Spec | BuildsFromKept | HOLDS | 12460 distinct states | as expected
+n-none-evidence | Mut=none | Spec | EvidenceFitsRelease | HOLDS | 12460 distinct states | as expected
+n-none-rebuild | Mut=none | Spec | ReleasesRebuildable | HOLDS | 12460 distinct states | as expected
+n-none-log | Mut=none | Spec | LogFiledRight | HOLDS | 12460 distinct states | as expected
+n-none-citations | Mut=none | Spec | CitationsResolve | HOLDS | 12460 distinct states | as expected
+n-none-version | Mut=none | Spec | VersionFitsMove | HOLDS | 12460 distinct states | as expected
+n-none-tags | Mut=none | Spec | PROPERTY TagsDoNotMove | HOLDS | 12460 distinct states | as expected
+n-none-safe | Mut=none | Spec | Safe | HOLDS | 12460 distinct states | as expected
+m-nof1-evidence | Mut=M_NOF1 | Spec | EvidenceFitsRelease | COUNTEREXAMPLE | 1558 distinct states | as expected
+n-none-logonly | Mut=none | Spec | PROPERTY LogAppendOnly | HOLDS | 12460 distinct states | as expected
+n-none-onemove | Mut=none | Spec | PROPERTY OneMovePerPR | HOLDS | 12460 distinct states | as expected
+m-nof1-kept | Mut=M_NOF1 | Spec | BuildsFromKept | HOLDS | 17340 distinct states | as expected
+m-nof2-kept | Mut=M_NOF2 | Spec | BuildsFromKept | COUNTEREXAMPLE | 20 distinct states | as expected
+m-nof1-rebuild | Mut=M_NOF1 | Spec | ReleasesRebuildable | HOLDS | 17340 distinct states | as expected
+m-nof1-log | Mut=M_NOF1 | Spec | LogFiledRight | HOLDS | 17340 distinct states | as expected
+m-nof2-evidence | Mut=M_NOF2 | Spec | EvidenceFitsRelease | HOLDS | 9544 distinct states | as expected
+m-nof2-rebuild | Mut=M_NOF2 | Spec | ReleasesRebuildable | HOLDS | 9544 distinct states | as expected
+m-nof2-log | Mut=M_NOF2 | Spec | LogFiledRight | HOLDS | 9544 distinct states | as expected
+m-nof3-rebuild | Mut=M_NOF3 | Spec | ReleasesRebuildable | COUNTEREXAMPLE | 50 distinct states | as expected
+m-nof4-evidence | Mut=M_NOF4 | Spec | EvidenceFitsRelease | HOLDS | 12460 distinct states | as expected
+m-nof3-evidence | Mut=M_NOF3 | Spec | EvidenceFitsRelease | HOLDS | 243820 distinct states | as expected
+m-nof3-kept | Mut=M_NOF3 | Spec | BuildsFromKept | HOLDS | 243820 distinct states | as expected
+m-nof4-log | Mut=M_NOF4 | Spec | LogFiledRight | COUNTEREXAMPLE | 1013 distinct states | as expected
+m-nof4-kept | Mut=M_NOF4 | Spec | BuildsFromKept | HOLDS | 12460 distinct states | as expected
+m-nof3-log | Mut=M_NOF3 | Spec | LogFiledRight | HOLDS | 243820 distinct states | as expected
+m-nof4-rebuild | Mut=M_NOF4 | Spec | ReleasesRebuildable | HOLDS | 12460 distinct states | as expected
+m-aswritten-kept | Mut=M_ASWRITTEN | Spec | BuildsFromKept | COUNTEREXAMPLE | 39 distinct states | as expected
+m-aswritten-rebuild | Mut=M_ASWRITTEN | Spec | ReleasesRebuildable | COUNTEREXAMPLE | 55 distinct states | as expected
+m-aswritten-evidence | Mut=M_ASWRITTEN | Spec | EvidenceFitsRelease | COUNTEREXAMPLE | 5033 distinct states | as expected
+m-aswritten-log | Mut=M_ASWRITTEN | Spec | LogFiledRight | COUNTEREXAMPLE | 1790 distinct states | as expected
+m-aswritten-citations | Mut=M_ASWRITTEN | Spec | CitationsResolve | HOLDS | 272854 distinct states | as expected
+m-aswritten-types | Mut=M_ASWRITTEN | Spec | TypeOK | HOLDS | 272854 distinct states | as expected
+m-aswritten-version | Mut=M_ASWRITTEN | Spec | VersionFitsMove | HOLDS | 272854 distinct states | as expected
+m-aswritten-tags | Mut=M_ASWRITTEN | Spec | PROPERTY TagsDoNotMove | HOLDS | 272854 distinct states | as expected
+w-two-open | Mut=none | Spec | NeverTwoOpen | COUNTEREXAMPLE | 23 distinct states | as expected
+w-both-merged | Mut=none | Spec | NeverBothMerged | COUNTEREXAMPLE | 878 distinct states | as expected
+w-prover-moved | Mut=none | Spec | NeverProverMoved | COUNTEREXAMPLE | 178 distinct states | as expected
+w-two-releases | Mut=none | Spec | NeverTwoReleases | COUNTEREXAMPLE | 476 distinct states | as expected
+w-major | Mut=none | Spec | NeverMajor | COUNTEREXAMPLE | 476 distinct states | as expected
+m-aswritten-logonly | Mut=M_ASWRITTEN | Spec | PROPERTY LogAppendOnly | HOLDS | 272854 distinct states | as expected
+m-aswritten-onemove | Mut=M_ASWRITTEN | Spec | PROPERTY OneMovePerPR | HOLDS | 272854 distinct states | as expected
+w-upstream-gone | Mut=none | Spec | NeverUpstreamGone | COUNTEREXAMPLE | 2 distinct states | as expected
+w-logged | Mut=none | Spec | NeverLogged | COUNTEREXAMPLE | 60 distinct states | as expected
+w-pinned | Mut=none | Spec | NeverPinned | COUNTEREXAMPLE | 34 distinct states | as expected
+w-withdrawn | Mut=none | Spec | NeverRegistryWithdrawn | COUNTEREXAMPLE | 33 distinct states | as expected
+w-dropped | Mut=none | Spec | NeverDropped | COUNTEREXAMPLE | 1013 distinct states | as expected
+l-none-reported | Mut=none | SpecLive | PROPERTY UpstreamReported | HOLDS | 12460 distinct states | as expected
+l-nofair-reported | Mut=none | Spec | PROPERTY UpstreamReported | COUNTEREXAMPLE | count not recorded | as expected
+l-none-behaviour | Mut=none | SpecLive | PROPERTY NoBehaviour | COUNTEREXAMPLE | count not recorded | as expected
+l-aswritten-reported | Mut=M_ASWRITTEN | SpecLive | PROPERTY UpstreamReported | HOLDS | 272854 distinct states | as expected
+
+reproduced spec/PinLifecycle-results-2026.11.16.txt byte for byte
+50 rows: 50 as expected, 0 not, 0 ERROR
+pinlifecycle: every row as expected, and spec/PinLifecycle-results-2026.11.16.txt reproduced byte for byte

@@ -29,11 +29,12 @@ F4 in ADR-0013 item 7. Writing F4 changed the model to match: an entry names its
 request whose value is no longer current is closed with nothing filed. The witness `NeverDropped` shows that this
 happens.
 
-**These results are working output.** They were made in an image built locally from this repository on branch
-`vendor-skill-5ade81e`, with `tools/ci/build.sh`. That digest was not published by the release workflow, so it is not to be cited
-(ADR-0002 items 5 and 7). ADR-0015 item 1 has them regenerated in the first published image. CI compares them on every
-pull request that touches `spec/`, `decisions/` or `vendor/`, or moves a checker pin (`tools/ci/pinlifecycle.sh`,
-item 8).
+**These results are evidence.** They were first made in an image built locally, as working output. Then they
+were regenerated in the first published image, as ADR-0015 item 1 asks, and reproduced byte for byte:
+`ghcr.io/scottcochran/tla-kit@sha256:454328cd…50c6`, release `v0.1.0`, whose attestation verifies
+([`derived/tla-kit-phase1c-checks-2026.11.16.md`](../derived/tla-kit-phase1c-checks-2026.11.16.md)). CI compares
+them on every pull request that touches `spec/`, `decisions/` or `vendor/`, or moves a checker pin
+(`tools/ci/pinlifecycle.sh`, item 8).
 
 Why `…-2026.11.15b.txt` stopped reproducing: on two liveness rows the generator then printed a state count only
 when TLC's search had ended before it found the counterexample, and whether it ends first depends on the

@@ -1,7 +1,8 @@
 # Development plan
 
-Written 2026.11.15, after the spike the README records, and updated the same day for ADR-0013 to ADR-0016. It is a
-plan, not a record: nothing below is built unless the README says so.
+Written 2026.11.15, after the spike the README records, updated the same day for ADR-0013 to ADR-0016, and kept
+up to date since: Phase 1 is done (2026.11.16). It is a plan, not a record: nothing below is built unless the
+README says so.
 
 ## Goal
 
@@ -57,7 +58,7 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 | D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it, accepted 2026.11.15. | Nothing now |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
 | D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | A design to follow, with named changes, and no dependency on it. | Phase 4 |
-| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release is assembled by `tools/keep-tlapm.sh` and is made before anything is published |
+| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release, `tlapm-ff40755`, was made by `tools/keep-tlapm.sh` on 2026.11.15, before anything was published |
 
 ### Records to accept, and when
 
@@ -146,23 +147,22 @@ written down.
 **Done when** a published digest reproduces the README's spike table, `gh attestation verify` passes on it, and
 the `PinLifecycle` results regenerated in it match the committed file.
 
-**State on 2026.11.16 (branch `phase1c`).** Built and checked on one machine:
-- `PINS.json` and its checks;
-- the image built from the kept tarball and carrying `PINS.json`;
-- `SOURCE_DATE_EPOCH` and the labels, with two builds of one commit giving one digest;
-- D7 condition 3;
-- the `PinLifecycle` comparison.
+**Done 2026.11.16.** Release `v0.1.0` is
+`ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6`, built from
+`bfeecc8`. All three conditions hold for it
+([`derived/tla-kit-phase1c-checks-2026.11.16.md`](derived/tla-kit-phase1c-checks-2026.11.16.md)):
+1. **The spike table:** it reproduces the README's spike table against TOPAK at `0ad9f88`. The defect run's two
+   clock-dependent state counts differ, and its verdicts do not.
+2. **The attestations:** `gh attestation verify` passes for the provenance and the SBOM.
+3. **The `PinLifecycle` results:** regenerated in it, they reproduce the committed file byte for byte.
 
-Written and not yet run: the CI, evidence, weekly and release workflows, Dependabot, and `CONSUMERS.md`.
-Left for the custodian:
-- making the `tlapm-ff40755` release (`tools/keep-tlapm.sh --create`);
-- making the repository public, which the attestations need;
-- pushing the branch, so CI runs;
-- turning on the required-checks ruleset once CI passes on `main`;
-- the first `v0.1.0` tag;
-- repeating the spike's TOPAK checks from the published image.
-
-gov-tla has no evidence run, and no token to read it.
+Along the way:
+- **The model:** CI found that the skill's generator printed a state count that depends on the machine. It was
+  fixed in TOPAK first and then vendored (ADR-0007), and gov-tla's own generator was fixed too.
+- **The repository:** it was made public with the `publishing-private-repos` skill. Its five rulesets are active,
+  including the required checks.
+- **Still open:** gov-tla has no evidence run here, because tla-kit has no token to read it. The weekly check
+  has not run yet; it first runs on its Monday schedule.
 
 ### Phase 2: the image in the projects' CI
 
@@ -243,16 +243,19 @@ Each is optional, pinned like the rest, and added only with a check that uses it
 
 ## Risks
 
-- **The prover tag moves.** Three builds in six weeks across the three projects. Phase 1c's copy of the tarball
-  is the answer. D7 allows it, on its conditions. Until then a rebuild can fail on the checksum by design.
+- **The prover tag moves.** Three builds in six weeks across the three projects. The answer is the copy of the
+  tarball kept in release `tlapm-ff40755` since Phase 1c, which D7 allows on its conditions. CI and the release
+  build from it, so a moved tag no longer fails a rebuild. The weekly check reports the move.
 - **A newer prover changes what proves.** It did, for the defect modules. Every prover move needs the full
   proof run and the defect run before a pin moves.
-- **Rebuilds rely on upstreams that no record keeps.** Only the prover's tarball will have a kept copy. The base
+- **Rebuilds rely on upstreams that no record keeps.** Only the prover's tarball has a kept copy. The base
   image comes from Docker Hub, which refused the spike's pull (HTTP 429), the `apt` packages from Ubuntu's
   snapshot archive, and the jar from GitHub's releases. ADR-0015's `Durable` makes this a stated assumption
-  rather than an unstated one.
-- **The gate on ADR-0005, 0013 and 0014 is working output.** Phase 1b checks the model in an unpublished image.
-  Until 1c regenerates the results in a published one, the acceptance rests on a run that cannot be cited.
+  rather than an unstated one. On 2026.11.16 the snapshot archive answered 500, 502 and
+  503 for long enough that CI on one pull request failed twice at `apt-get`, with nothing wrong in the change.
+- **The gate on ADR-0005, 0013 and 0014 was working output.** Phase 1b checked the model in an unpublished
+  image. Phase 1c regenerated the results in the published `v0.1.0` image and they reproduced byte for byte, so
+  the acceptance now rests on a run that can be cited (2026.11.16).
 - **Emulation on Apple Silicon** was measured once, in Phase 1a: TOPAK's full proof run under emulation took
   6 min 43 s on a 12-CPU Mac, against 539 s natively on a 4-CPU x86_64 machine at the spike. That is one machine
   and not a ratio, but it is not the slowdown feared. The arm64 build (Phase 6) is for parity, not speed.

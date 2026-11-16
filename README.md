@@ -5,12 +5,22 @@ laptop and in CI, and (planned) an MCP server over those tools to pair with the
 [`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
 skill.
 
-**Status: Phase 1c of [PLAN.md](PLAN.md), in progress.** The image builds from a base pinned by digest, packages
-pinned by date, and a prover tarball kept in this repository. Two builds of one commit give one digest. It runs as
-a non-root user, carries the skill's scripts, a self-test and its inventory, [`PINS.json`](PINS.json), and says
-what it holds. Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), is checked:
-all 50 rows as expected. The workflows for CI, the weekly check and releases are written and have not run yet.
-There is no MCP server yet, and the image is not published.
+**Status: Phase 1 of [PLAN.md](PLAN.md) is done.** The first release,
+[`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0), is published and attested:
+
+```
+ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6
+```
+
+- **How it is built:** from a base pinned by digest, packages pinned by date, and a prover tarball kept in this
+  repository. Every build of one commit gives one digest.
+- **What it carries:** it runs as a non-root user, and carries the skill's scripts, a self-test and its inventory,
+  [`PINS.json`](PINS.json). It says what it holds.
+- **What CI does:** it builds and tests every pull request. A weekly check watches upstream, and a release
+  workflow publishes from a tag.
+- **The model:** Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), reproduces
+  in the published image.
+- **What's next:** Phase 2, the projects' CI in the image. There is no MCP server yet.
 
 ## What is in the image
 
@@ -43,6 +53,15 @@ listed in [`licenses/THIRD-PARTY.md`](licenses/THIRD-PARTY.md), which the image 
 
 ## Build and run
 
+A project cites the published image by its digest. The tag names the same image, for reading:
+
+```sh
+docker pull ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6
+gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6 --repo scottcochran/tla-kit
+```
+
+To build it here:
+
 ```sh
 docker build -t tla-kit:dev .
 docker run --rm tla-kit:dev                                      # what is inside
@@ -67,17 +86,15 @@ kept in this repository's release `tlapm-ff40755`, beside its licence notices an
 (ADR-0005 item 2). A new prover build is a decision: a release of its own first, then a pull request that moves
 `TLAPM_SHA256` and `PINS.json` together.
 
-**While this repository is private**, the kept copy cannot be downloaded without a token, and a plain
-`docker build .` fails on it. Take the tarball some other way, and pass it as the build context the `Dockerfile`
-names; its sha256 is still checked:
+To build it as CI and the release workflow do, fixed in time to the commit (ADR-0014 item 8):
 
 ```sh
-GH_TOKEN=$(gh auth token) tools/ci/fetch-kept.sh     # or put upstream's tarball at build/tlapm-tarball/tlapm.tar.gz
-tools/ci/build.sh --load -t tla-kit:dev              # as CI builds it: fixed in time to the commit
+tools/ci/fetch-kept.sh                     # the kept tarball into build/tlapm-tarball/, its sha256 checked
+tools/ci/build.sh --load -t tla-kit:dev    # SOURCE_DATE_EPOCH and the OCI labels from the checked-out commit
 ```
 
-`tools/ci/build.sh` sets `SOURCE_DATE_EPOCH` and the OCI labels from the checked-out commit, as CI and the release
-workflow do (ADR-0014 item 8).
+With `--output type=oci,dest=…,rewrite-timestamp=true` in place of `--load`, the digest is the one the release
+publishes for that commit.
 
 `BASE_IMAGE` is a build argument, for a registry mirror or a base with a private CA:
 `--build-arg BASE_IMAGE=public.ecr.aws/docker/library/eclipse-temurin:25-jre-noble@sha256:5b5a79b8…`. A digest
@@ -93,18 +110,31 @@ the commit itself.
   checks below).
 - **Base must be Ubuntu 24.04 or newer.** The `tlapm` binary needs glibc 2.38; Debian 12 and Ubuntu 22.04 are
   too old.
-- **Reproducible on one machine; not yet checked on two.** Built with `tools/ci/build.sh` and
-  `rewrite-timestamp=true`, two builds of one commit from nothing gave one digest on 2026.11.16, as did a third
-  that took the prover tarball from upstream's URL instead of the kept copy. CI repeats the check on two runners
-  (ADR-0014 item 8).
-- **Not published yet.** `PLAN.md` D7, settled 2026.11.15, allows the image and the TLAPS tarball's contents to
-  be redistributed on three conditions
-  ([`derived/tla-kit-licence-check-2026.11.15.md`](derived/tla-kit-licence-check-2026.11.15.md) §5). The image
-  carries the notices. The GMP release and `libsha1`'s licence are settled
-  ([`derived/tla-kit-copyleft-sources-2026.11.16.md`](derived/tla-kit-copyleft-sources-2026.11.16.md)), and
-  `tools/keep-tlapm.sh` assembles the kept release with their source. That release is not made yet.
+- **One release is supported:** the latest. Older ones stay available and get no fixes (ADR-0014 items 5 and 7).
+- **The scan covers the Ubuntu packages only.** Trivy reported no target for the Java runtime or the jars.
+- **The TLAPS tarball's contents are redistributed** on the three conditions of `PLAN.md` D7
+  ([`derived/tla-kit-licence-check-2026.11.15.md`](derived/tla-kit-licence-check-2026.11.15.md) §5):
+  - the image carries the notices;
+  - the release [`tlapm-ff40755`](https://github.com/scottcochran/tla-kit/releases/tag/tlapm-ff40755) keeps the
+    tarball beside them, with the source of Poly/ML, GMP and `libsha1`;
+  - the GMP release and `libsha1`'s licence are settled
+    ([`derived/tla-kit-copyleft-sources-2026.11.16.md`](derived/tla-kit-copyleft-sources-2026.11.16.md)).
 - **No certified proof runs yet.** cvc5 and ethos, which TOPAK's `spec/proof-cert.sh` needs, are not in the
   image.
+
+## Phase 1c checks, 2026.11.16
+
+These ran on the published digest, `sha256:454328cd…50c6`. The record, with the raw output of every run, is
+[`derived/tla-kit-phase1c-checks-2026.11.16.md`](derived/tla-kit-phase1c-checks-2026.11.16.md).
+
+| Check | Outcome |
+|---|---|
+| The release workflow, tag `v0.1.0` | Every step passed on its first run: build, self-test, publish, self-test of the pulled digest, SBOM, scan, both attestations, the release |
+| One digest from every build | CI's two runners on `main` at `bfeecc8`, and the release build, gave the same digest |
+| `gh attestation verify` | Passes for the build provenance and the SBOM, both signed for `release.yml` at `refs/tags/v0.1.0` |
+| `PinLifecycle` rows | All 50 as expected; `spec/PinLifecycle-results-2026.11.16.txt` reproduced byte for byte |
+| The spike's checks, against TOPAK at `0ad9f88` | All as in the spike table below. Setup check ready; jar pin in step; 34 of 34 proof modules, 13,622 obligations, every count equal to its committed results file; TLC results of the `pr` tier, 490 rows, 0 differences; the defect run differing from TOPAK's record, as in the spike, and from the spike's run only in two clock-dependent state counts. |
+| The vulnerability scan | 0 HIGH or CRITICAL in the Ubuntu packages |
 
 ## Phase 1a checks, 2026.11.15
 
@@ -142,20 +172,20 @@ TOPAK's `tools/TLAPS-PIN` still names the darwin binary.
 The spike image was built on a derived base that adds a private proxy certificate, from a registry mirror, so
 its digest is not one to cite.
 
-Not tried: certified proof runs (`spec/proof-cert.sh`), the image under emulation on Apple Silicon, the `Mesh`
-TLC results (tier `manual`, about 70 minutes), and any GitHub Actions run.
+Not tried in the spike: certified proof runs (`spec/proof-cert.sh`), the image under emulation on Apple Silicon,
+the `Mesh` TLC results (tier `manual`, about 70 minutes), and any GitHub Actions run. Phases 1a and 1c have since
+run the image under emulation and in GitHub Actions.
 
 ## Not built yet
 
 [PLAN.md](PLAN.md) is the development plan, and [derived/](derived/) holds dated, frozen records: the session
-that produced the spike, with the raw output of its runs, and the licence check of the bundled tools. [decisions/](decisions/) holds the architecture
-decision records drafted from both: ADR-0001 to ADR-0005, ADR-0007, ADR-0010, ADR-0011 and ADR-0013 to ADR-0015 accepted, the rest Proposed. In short:
+that produced the spike, with the raw output of its runs, the licence check of the bundled tools, the settling of
+their copyleft sources, and the checks of the first release. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0005, ADR-0007, ADR-0010, ADR-0011 and ADR-0013 to ADR-0015 accepted, the rest Proposed. In short:
 
 - The MCP server: the skill's scripts as tools (`tlc_run`, `tlc_rows`, `proof_results`, `flip_test`,
   `proof_sync`), exploration tools (parse, symbols, evaluate, coverage, state graph), and proof tools on
   `tlapm` (check a module, check one step, list failed obligations).
 - cvc5 and ethos for certified runs; Apalache; the TLA+ community modules.
-- A published image. The workflows that build, check and release it are written and have not run (Phase 1c).
 - A Linux arm64 build of `tlapm` from source.
 
 ## License

@@ -1,0 +1,56 @@
+== Alone
+Alone: regenerated in 104s against Alone-results-2026.11.10.txt (generator exit 0)
+Alone-results-2026.11.10.txt: 47 rows compared, 0 differences
+exit 0
+== BreakGlass_A1
+BreakGlass_A1: regenerated in 399s against BreakGlass_A1-results-2026.10.05.txt (generator exit 0)
+BreakGlass_A1-results-2026.10.05.txt: 8 rows compared, 0 differences
+exit 0
+== Coupling_live
+Coupling_live: regenerated in 177s against Coupling_live-results-2026.10.07.txt (generator exit 0)
+Coupling_live-results-2026.10.07.txt: 69 rows compared, 0 differences
+exit 0
+== Emergency_live
+Emergency_live: regenerated in 104s against Emergency_live-results-2026.10.07.txt (generator exit 0)
+Emergency_live-results-2026.10.07.txt: 32 rows compared, 0 differences
+exit 0
+== Federation
+Federation: regenerated in 409s against Federation-results-2026.11.10.txt (generator exit 0)
+Federation-results-2026.11.10.txt: 41 rows compared, 0 differences
+exit 0
+== Intent
+Intent: regenerated in 181s against Intent-results-2026.11.10.txt (generator exit 0)
+Intent-results-2026.11.10.txt: 35 rows compared, 0 differences
+exit 0
+== Membership
+Membership: regenerated in 345s against Membership-results-2026.11.10.txt (generator exit 0)
+Membership-results-2026.11.10.txt: 28 rows compared, 0 differences
+exit 0
+== NonComposition_A1
+NonComposition_A1: regenerated in 48s against NonComposition_A1-results-2026.10.05.txt (generator exit 0)
+NonComposition_A1-results-2026.10.05.txt: 14 rows compared, 0 differences
+exit 0
+== Outstanding
+Outstanding: regenerated in 181s against Outstanding-results-2026.11.10.txt (generator exit 0)
+Outstanding-results-2026.11.10.txt: 40 rows compared, 0 differences
+exit 0
+== Peer
+Peer: regenerated in 62s against Peer-results-2026.11.10.txt (generator exit 0)
+Peer-results-2026.11.10.txt: 25 rows compared, 0 differences
+exit 0
+== PlaneClock
+PlaneClock: regenerated in 309s against PlaneClock-results-2026.11.10.txt (generator exit 0)
+PlaneClock-results-2026.11.10.txt: 38 rows compared, 0 differences
+exit 0
+== Release
+Release: regenerated in 992s against Release-results-2026.11.10.txt (generator exit 0)
+Release-results-2026.11.10.txt: 67 rows compared, 0 differences
+exit 0
+== RunConfinement
+RunConfinement: regenerated in 38s against RunConfinement-results-2026.10.02.txt (generator exit 0)
+RunConfinement-results-2026.10.02.txt: 13 rows compared, 0 differences
+exit 0
+== Workflow
+Workflow: regenerated in 249s against Workflow-results-2026.10.08.txt (generator exit 0)
+Workflow-results-2026.10.08.txt: 33 rows compared, 0 differences
+exit 0

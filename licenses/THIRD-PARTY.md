@@ -4,7 +4,8 @@ The image built from this repository's `Dockerfile` contains the software below.
 and none of it is under tla-kit's licences (`NOTICE`). Each part keeps its own licence. This notice says which one,
 where its text is in the image, and where the part's source is. It is the image's notice of bundled tools
 (ADR-0011 item 4), and the outcome of the licence check of 2026.11.15
-(`derived/tla-kit-licence-check-2026.11.15.md` in the repository). It is not legal advice.
+(`derived/tla-kit-licence-check-2026.11.15.md` in the repository), with the GMP release and `libsha1`'s licence
+settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`). It is not legal advice.
 
 In the image, this file is `/opt/tla-kit/licenses/THIRD-PARTY.md`, beside the licence texts that the TLAPS tarball
 leaves out. `tla-kit-selftest` checks that every path in the "Licence text in the image" column exists, and that
@@ -38,9 +39,9 @@ lists Isabelle, Z3 and LS4, and says that Isabelle contains other software under
 | Z3 (`backends/bin/z3`) | 4.8.9 | MIT (Microsoft Corporation) | `/opt/tla-kit/licenses/z3-LICENSE.txt` | `https://github.com/Z3Prover/z3`, tag `z3-4.8.9` (upstream's `x64-ubuntu-16.04` binary) |
 | LS4 (`backends/bin/ls4`) | 1.0, with `tlapm`'s `deps/ls4/ls4.patch` | MIT, as MiniSat (Martin Suda; Niklas Eén, Niklas Sörensson) | `/opt/tla-kit/licenses/ls4-LICENSE.txt` | `https://github.com/quickbeam123/ls4`, tag `v1.0` |
 | Isabelle: the `Pure`, `TLA+` and `Options` heaps (`backends/Isabelle-install`) | Isabelle2025 | BSD-3-Clause (University of Cambridge, Technische Universität München, and contributors) | `/opt/tla-kit/licenses/isabelle-COPYRIGHT.txt` | `https://isabelle.in.tum.de/website-Isabelle2025/` |
-| Poly/ML: `poly`, `polyc`, `polyimport`, `libpolyml`, `libpolymain` (`backends/Isabelle-install/poly`) | 5.9.1, as packaged in Isabelle2025's `polyml-5.9.1` component | LGPL-2.1 | `/opt/tla-kit/licenses/polyml-COPYING.txt` | `https://github.com/polyml/polyml`, tag `v5.9.1` |
-| GMP: `libgmp.so.10` (`backends/Isabelle-install/poly`) | the GMP 6 series; the exact release was not determined | LGPL-3.0-or-later or GPL-2.0-or-later | `/usr/share/common-licenses/LGPL-3` and `/usr/share/common-licenses/GPL-2` | `https://gmplib.org`; bundled by Isabelle2025's `polyml-5.9.1` component |
-| `libsha1.so` (`backends/Isabelle-install/poly`) | as built by Isabelle's `sha1` component; the release was not determined | GPL, per polyml.org's description of the library; its exact version was not determined | `/usr/share/common-licenses/GPL-3` | GNU `sha1.c`, as Isabelle builds it: `https://isabelle.sketis.net/repos/sha1` |
+| Poly/ML: `poly`, `polyc`, `polyimport`, `libpolyml`, `libpolymain` (`backends/Isabelle-install/poly`) | 5.9.1, as packaged in Isabelle2025's `polyml-5.9.1` component | LGPL-2.1 | `/opt/tla-kit/licenses/polyml-COPYING.txt` | `https://github.com/polyml/polyml`, tag `v5.9.1`; `polyml-5.9.1-src.tar.gz`, in this repository's release `tlapm-ff40755` |
+| GMP: `libgmp.so.10` (`backends/Isabelle-install/poly`) | 6.1.2, as built for Isabelle2025's `polyml-5.9.1` component | LGPL-3.0-or-later or GPL-2.0-or-later | `/usr/share/common-licenses/LGPL-3` and `/usr/share/common-licenses/GPL-2` | `gmp-6.1.2.tar.xz`, in this repository's release `tlapm-ff40755`, and at `https://ftp.gnu.org/gnu/gmp/` |
+| `libsha1.so` (`backends/Isabelle-install/poly`) | GNU coreutils 8.4's `sha1.c`, as built for Isabelle2025's `polyml-5.9.1` component | GPL-3.0-or-later (Free Software Foundation) | `/usr/share/common-licenses/GPL-3` | `libsha1-src.tar.gz`, in this repository's release `tlapm-ff40755`: the component's `sha1/` directory |
 | A second TLA+ tools jar, used by `tlapm` (`backends/bin/tla2tools.jar`) | upstream build of 2026-11-06, `d8fb231`; not the image's checker | MIT, with the licences of the libraries it bundles inside it | `/opt/tlaps/lib/tlapm/backends/bin/tla2tools.jar` (`License.txt` and the other licence files inside the jar) | `https://github.com/tlaplus/tlaplus`, at `d8fb231` |
 
 ## tla-kit's own files in the image

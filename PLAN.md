@@ -63,7 +63,7 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 ### Records to accept, and when
 
 This is the order in which the phases need the records. The Phase 1a and 1b rows were accepted on 2026.11.15,
-and so were ADR-0005, 0013 and 0014. ADR-0010 was accepted on 2026.11.16. Every other record is
+and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006 and ADR-0008 were accepted on 2026.11.16. Every other record is
 Proposed.
 
 | Before | Accept | Why then |
@@ -71,7 +71,7 @@ Proposed.
 | Phase 1a | ADR-0001, 0002, 0003, 0004, 0011; ADR-0007 (D2) | The first five are mostly built. ADR-0007 is pulled forward from Phase 3 (D2). All six accepted 2026.11.15. |
 | Phase 1b | ADR-0015 | Its scope, so that `spec/PinLifecycle.tla` can be written. Accepted 2026.11.15. |
 | Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15, and ADR-0010 2026.11.16. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
-| Phase 3 | ADR-0006, 0008 | |
+| Phase 3 | ADR-0006, 0008 | Both accepted 2026.11.16. ADR-0008 item 1 was changed first to the standard library, at the custodian's choice. |
 | Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0016 waits on ADR-0009 item 5's comparison of `tlapm` with `tlapm_lsp`. |
 | Phase 6 | ADR-0012 (D5) | |
 
@@ -179,7 +179,8 @@ Changes in TOPAK and gov-tla, each made in its own repository and asked for ther
 ### Phase 3: the MCP server, model checking
 
 A Python server over stdio, started as `tla-kit mcp`, so it can import the skill's `tla_common.py`, vendored in
-Phase 1a. Paths are confined to the mounted project. The image gains the MCP SDK, pinned by hash.
+Phase 1a. Paths are confined to the mounted project. It speaks MCP with the standard library only, so the image
+gains no package for it (ADR-0008 item 1).
 
 | Tool | Does | Writes a results file |
 |---|---|---|

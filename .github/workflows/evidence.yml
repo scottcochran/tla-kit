@@ -7,8 +7,8 @@
 #   runtime (base, apt)                   the self-test and setup check (ci.yml), TOPAK's pin check, and the full
 #                                         proof run, whose every count has to equal the committed one
 #   method                                the vendored scripts' check (ci.yml); the server's tests once it exists
-# gov-tla is listed in CONSUMERS.md but is private and has no committed results files, so nothing of it is run
-# here; the summary says so.
+# gov-tla is listed in CONSUMERS.md, but it is private and this repository has no token to read it, so nothing of
+# it is run here; the summary says so.
 name: evidence
 
 on:
@@ -58,7 +58,7 @@ jobs:
           echo "modules=$(topak/tools/check-results.sh --matrix pr)" | tee -a "$GITHUB_OUTPUT"
           {
             echo "## Evidence for: ${{ inputs.moved }}"
-            echo "TOPAK at \`$commit\`. gov-tla: not run (private, and no committed results files; CONSUMERS.md)."
+            echo "TOPAK at \`$commit\`. gov-tla: not run (private, and no token to read it; CONSUMERS.md)."
           } >> "$GITHUB_STEP_SUMMARY"
 
   image:

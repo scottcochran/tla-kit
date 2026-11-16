@@ -13,7 +13,7 @@ this repository's releases.
 | Project | Pin file | Visibility | Evidence run here |
 |---|---|---|---|
 | [TOPAK](https://github.com/scottcochran/TOPAK) | `tools/TLA-KIT-PIN` | public | its TLC results (`tools/check-results.sh`, `pr` tier), its full proof run and its defect run |
-| [gov-tla](https://github.com/scottcochran/gov-tla) | `tools/TLA-KIT-PIN` | private | none yet: it has no committed results files, and this repository has no token to read it |
+| [gov-tla](https://github.com/scottcochran/gov-tla) | `tools/TLA-KIT-PIN` | private | none yet: this repository has no token to read it. Its evidence would be its TLC results (`scripts/tlc_rows.py` over `rows/`, compared with `results/`) and its proof runs (four proof modules) |
 
 Neither pin file exists yet. Phase 2 adds them, in each project and by its own decision (ADR-0005 item 5), and
 names the image by digest.

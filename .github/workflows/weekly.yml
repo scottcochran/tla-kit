@@ -1,0 +1,63 @@
+# The weekly check of upstream (ADR-0013 items 4 and 5). It reports by opening or updating one issue, labelled
+# weekly-check, and moves nothing: a move starts from the issue, as a pull request of its own, and no bot merges
+# one. Each run rewrites the issue's body with its report, and adds a dated comment linking the run.
+name: weekly
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: The current release's digest
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh release list --exclude-drafts --json tagName,isLatest -q '.[] | select(.isLatest) | .tagName' | head -1)
+          digest=""
+          if [ -n "$tag" ] && gh release download "$tag" --pattern DIGEST --dir "$RUNNER_TEMP" 2>/dev/null; then
+            digest=$(cat "$RUNNER_TEMP/DIGEST")
+          fi
+          echo "tag=$tag" | tee -a "$GITHUB_OUTPUT"
+          echo "digest=$digest" | tee -a "$GITHUB_OUTPUT"
+      - name: Vulnerability scan of the current release (ADR-0013 item 5)
+        if: steps.release.outputs.digest != ''
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ghcr.io/scottcochran/tla-kit@${{ steps.release.outputs.digest }}
+          format: table
+          output: ${{ runner.temp }}/scan.txt
+          severity: CRITICAL,HIGH
+          ignore-unfixed: false
+          exit-code: "0"
+      - name: Check upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 tools/weekly.py --scan "$RUNNER_TEMP/scan.txt" > "$RUNNER_TEMP/report.md"
+          printf '\nRun: %s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$RUNNER_TEMP/report.md"
+          cat "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Open or update the issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          n=$(gh issue list --state open --label weekly-check --json number -q '.[0].number')
+          if [ -z "$n" ]; then
+            gh label create weekly-check --color c5def5 --description "The weekly check of upstream (ADR-0013 item 4)" 2>/dev/null || true
+            gh issue create --title "Weekly check of upstream" --label weekly-check --body-file "$RUNNER_TEMP/report.md"
+          else
+            gh issue edit "$n" --body-file "$RUNNER_TEMP/report.md"
+            gh issue comment "$n" --body "Checked $(date -u +%Y.%m.%d): $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID. The body is this run's report."
+          fi

@@ -1,0 +1,112 @@
+# A release is a version tag, pushed by the custodian, and never moved or reused (ADR-0014 item 2). This workflow
+# builds the image from the tag, as CI builds it, runs the self-test, publishes it to the registry, pulls it back
+# by digest and runs the self-test again, attests it, and records in the GitHub release what a reader needs to
+# check a citation (ADR-0010 item 3, ADR-0014 items 3 and 4).
+#
+# The tag must be annotated, on main, and pushed by the custodian. Its message is the release's opening: the kind
+# of move (ADR-0013), its evidence, and one line saying what a project must regenerate if it adopts the release.
+# Attestations need this repository to be public, or a GitHub Enterprise Cloud plan.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/scottcochran/tla-kit
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: The tag is the custodian's, annotated, and on main
+        run: |
+          tag=${GITHUB_REF#refs/tags/}
+          [ "$GITHUB_ACTOR" = scottcochran ] || { echo "release: tags are pushed by the custodian only"; exit 1; }
+          [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "release: $tag is not vMAJOR.MINOR.PATCH"; exit 1; }
+          git fetch -q origin "refs/tags/$tag:refs/tags/$tag" --force
+          [ "$(git cat-file -t "refs/tags/$tag")" = tag ] || { echo "release: $tag is not annotated"; exit 1; }
+          [ -n "$(git tag -l --format='%(contents)' "$tag" | tr -d '[:space:]')" ] || { echo "release: $tag has no message"; exit 1; }
+          git merge-base --is-ancestor HEAD origin/main || { echo "release: $tag is not on main"; exit 1; }
+          echo "TAG=$tag" >> "$GITHUB_ENV"
+      - name: Fetch the kept prover tarball (ADR-0005 item 2)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: tools/ci/fetch-kept.sh
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build and self-test
+        run: |
+          tools/ci/build.sh --load -t tla-kit:release
+          docker run --rm tla-kit:release tla-kit-selftest
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - name: Publish
+        id: push
+        run: |
+          tools/ci/build.sh --metadata-file meta.json \
+            --output "type=image,name=$IMAGE:$TAG,push=true,rewrite-timestamp=true"
+          digest=$(python3 -c 'import json; print(json.load(open("meta.json"))["containerimage.digest"])')
+          echo "$digest" > DIGEST
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "published $IMAGE@$digest" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Pull the published digest and self-test it
+        run: |
+          docker pull "$IMAGE@${{ steps.push.outputs.digest }}"
+          docker run --rm "$IMAGE@${{ steps.push.outputs.digest }}" tla-kit-selftest
+          docker run --rm "$IMAGE@${{ steps.push.outputs.digest }}" tla-kit-info --json > tla-kit-info.json
+      - name: SBOM
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          image: ${{ env.IMAGE }}@${{ steps.push.outputs.digest }}
+          format: spdx-json
+          output-file: sbom.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+      - name: Vulnerability scan (ADR-0013 item 5)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE }}@${{ steps.push.outputs.digest }}
+          format: table
+          output: scan.txt
+          severity: CRITICAL,HIGH
+          exit-code: "0"
+      - name: Build-provenance attestation
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+      - name: SBOM attestation
+        uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e # v4.1.0
+        with:
+          subject-name: ${{ env.IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          sbom-path: sbom.spdx.json
+          push-to-registry: true
+      - name: The GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tools/ci/release-notes.sh "$TAG" "${{ steps.push.outputs.digest }}" tla-kit-info.json scan.txt > notes.md
+          gh release create "$TAG" --verify-tag --title "$TAG" --notes-file notes.md \
+            DIGEST PINS.json tla-kit-info.json sbom.spdx.json scan.txt

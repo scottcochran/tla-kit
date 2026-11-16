@@ -1,0 +1,130 @@
+# Every pull request is built and tested, and main merges only on a pass (ADR-0014 item 1). CI pushes nothing.
+#   records     the inventory against the Dockerfile and the README, and the vendored scripts against their pin
+#   image       the image built as the release builds it, from the kept prover tarball; its self-test; and the
+#               PinLifecycle rows when the change touches spec/ or decisions/ or moves a checker pin (ADR-0015 item 8)
+#   reproduce   the same commit built twice, on two runners, from nothing, and the two digests compared
+#               (ADR-0014 item 8)
+#   evidence    for a pull request that moves a pin, the runs ADR-0013 item 3 asks for (evidence.yml)
+# The job names are the required checks of the baseline's `main: required checks` ruleset.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      moved: ${{ steps.plan.outputs.moved }}
+      rows: ${{ steps.plan.outputs.rows }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: plan
+        run: |
+          tools/ci/plan.sh "${{ github.event_name }}" "${{ github.event.pull_request.base.sha }}" \
+            "${{ github.event.before }}" | tee -a "$GITHUB_OUTPUT"
+
+  records:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: PINS.json agrees with the Dockerfile (ADR-0013 item 7)
+        run: python3 tools/pins.py check
+      - name: The README's table is generated from PINS.json
+        run: python3 tools/pins.py readme --check
+      - name: The vendored scripts match their pin and the commit it names (ADR-0007)
+        run: |
+          source=$(awk '$1 == "source" {print $2}' vendor/writing-tla-specs-and-proofs/VENDOR-PIN)
+          commit=$(awk '$1 == "commit" {print $2}' vendor/writing-tla-specs-and-proofs/VENDOR-PIN)
+          git init -q "$RUNNER_TEMP/upstream"
+          git -C "$RUNNER_TEMP/upstream" fetch -q --depth 1 "$source" "$commit"
+          python3 vendor/check.py --upstream "$RUNNER_TEMP/upstream"
+
+  image:
+    needs: plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch the kept prover tarball (ADR-0005 item 2)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: tools/ci/fetch-kept.sh
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build
+        run: tools/ci/build.sh --load -t tla-kit:ci
+      - name: Self-test
+        run: docker run --rm tla-kit:ci tla-kit-selftest
+      - name: What the image holds
+        run: docker run --rm tla-kit:ci tla-kit-info | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: PinLifecycle rows, compared with the committed results file (ADR-0015 item 8)
+        if: needs.plan.outputs.rows == 'true'
+        run: tools/ci/pinlifecycle.sh tla-kit:ci 4
+
+  reproduce-build:
+    name: reproduce-build (${{ matrix.run }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        run: [1, 2]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch the kept prover tarball
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: tools/ci/fetch-kept.sh
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - name: Build from nothing
+        run: |
+          tools/ci/build.sh --no-cache --metadata-file meta.json \
+            --output "type=oci,dest=$RUNNER_TEMP/image.tar,rewrite-timestamp=true"
+          python3 -c 'import json; print(json.load(open("meta.json"))["containerimage.digest"])' > digest-${{ matrix.run }}.txt
+          cat digest-${{ matrix.run }}.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: digest-${{ matrix.run }}
+          path: digest-${{ matrix.run }}.txt
+
+  reproduce:
+    needs: reproduce-build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: digest-*
+          merge-multiple: true
+      - name: Two builds of one commit give one digest
+        run: |
+          a=$(cat digest-1.txt); b=$(cat digest-2.txt)
+          echo "build 1: $a"; echo "build 2: $b"
+          if [ "$a" = "$b" ]; then echo "reproduce: one digest, $a" | tee -a "$GITHUB_STEP_SUMMARY"
+          else echo "reproduce: the two builds differ; record why (ADR-0014 item 8)" | tee -a "$GITHUB_STEP_SUMMARY"; exit 1; fi
+
+  evidence:
+    needs: plan
+    if: needs.plan.outputs.moved != ''
+    uses: ./.github/workflows/evidence.yml
+    with:
+      moved: ${{ needs.plan.outputs.moved }}

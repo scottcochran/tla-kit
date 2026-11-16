@@ -1,0 +1,9 @@
+# Dependabot proposes moves of the Actions the workflows use, which are pinned by commit sha, and a person merges
+# them (ADR-0014 item 4). It is not used for the image's pins, which move by ADR-0013's rule and evidence.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5

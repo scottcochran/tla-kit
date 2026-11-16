@@ -1,7 +1,7 @@
 # tla-kit
 
 One container image of the TLA+ tool family, so that the checker and the prover are the same build on a
-laptop and in CI, and (planned) an MCP server over those tools to pair with the
+laptop and in CI, and an MCP server over those tools (in progress, Phase 3) to pair with the
 [`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
 skill.
 
@@ -20,7 +20,8 @@ ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c
   workflow publishes from a tag.
 - **The model:** Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), reproduces
   in the published image.
-- **What's next:** Phase 2, the projects' CI in the image. There is no MCP server yet.
+- **What's next:** Phase 2, the projects' CI in the image, and Phase 3, the MCP server for model checking, which
+  is in progress (below). Neither is in a release yet.
 
 ## What is in the image
 
@@ -103,6 +104,34 @@ built with other arguments is for working, not for citing (ADR-0002 item 7).
 `vendor/check.py` checks the vendored scripts against their pin, and with `--upstream <TOPAK checkout>` against
 the commit itself.
 
+## The MCP server (Phase 3, in progress)
+
+`tla-kit mcp` is an MCP server over stdio for the model-checking tools, written with Python's standard library only
+(ADR-0008). A client starts it in the image with the project mounted:
+
+```sh
+docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" <image@digest> tla-kit mcp
+```
+
+| Tool | Does |
+|---|---|
+| `info` | What the image holds, with the digests a results file would cite (`tla-kit-info --json`) |
+| `parse` | SANY on a module: its errors and warnings with their locations |
+| `symbols` | A module's constants, variables, definitions (arity, parameters, level), assumptions and theorems |
+| `evaluate` | A constant expression, through a scratch module; with a module, at its row list's constants |
+| `tlc_run` | One row, as the skill's `tlc_run.py`: the verdict, the count, and a counterexample as structured states |
+| `simulate` | A SIMULATE row: random behaviours to a depth, labelled as sampling |
+| `coverage` | TLC's per-action counts, naming the actions that never fire |
+| `state_graph` | The reachable graph of a small model as JSON |
+| `tlc_rows` | The skill's generator on a row list, as from the command line |
+
+Only `tlc_rows` writes into the project, and only the generator's results file. Every other tool returns working
+output and keeps its scratch files outside the project (ADR-0006). A path outside the mounted project is refused.
+`server/test_mcp.py` drives every tool over stdio against the skill's fixture, natively or against the image, and CI
+runs it on every pull request. `server/compare_topak.py` is Phase 3's "Done when": it compares each tool with the
+command it stands for on TOPAK's `Alone` and `Coupling`, every row of both, and CI runs it in the image when a change
+touches the server. No release holds the server yet.
+
 ## Limits
 
 - **Linux x86_64 only.** Upstream publishes no Linux arm64 build of `tlapm`. On Apple Silicon the image runs
@@ -182,9 +211,8 @@ run the image under emulation and in GitHub Actions.
 that produced the spike, with the raw output of its runs, the licence check of the bundled tools, the settling of
 their copyleft sources, and the checks of the first release. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0008, ADR-0010, ADR-0011 and ADR-0013 to ADR-0015 accepted, the rest Proposed. In short:
 
-- The MCP server: the skill's scripts as tools (`tlc_run`, `tlc_rows`, `proof_results`, `flip_test`,
-  `proof_sync`), exploration tools (parse, symbols, evaluate, coverage, state graph), and proof tools on
-  `tlapm` (check a module, check one step, list failed obligations).
+- The MCP server's proof tools (Phase 4): the skill's `proof_results`, `flip_test` and `proof_sync`, and tools on
+  `tlapm` (check a module, check one step, list failed obligations). Its declaration in the skill (Phase 5).
 - cvc5 and ethos for certified runs; Apalache; the TLA+ community modules.
 - A Linux arm64 build of `tlapm` from source.
 

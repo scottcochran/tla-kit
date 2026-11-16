@@ -18,6 +18,8 @@ One line per check, `ok` or `FAIL`, with the seconds it took:
   setup    the skill's setup_check.py --proofs, in an empty project whose tools/TLAPS-PIN holds the build
            arguments' tlapm digest: all fixture rows as expected, the fixture's proof proved, and its flip test
            failing as required
+  mcp      the MCP server (tla-kit mcp) starts over stdio on a copy of the fixture, lists its nine tools, and its
+           tlc_run finds the fixture's Bounded to hold in 4 states (ADR-0008)
 
 Exits non-zero if any check fails.
 """
@@ -215,6 +217,32 @@ def check_setup(tmp, args):
     print("\n".join("         " + line for line in out.rstrip().splitlines()), flush=True)
 
 
+def check_mcp(tmp):
+    start = time.time()
+    project = os.path.join(tmp, "mcp-project")
+    os.makedirs(os.path.join(project, "spec"))
+    for f in ("Counter.tla", "Counter-rows.txt"):
+        shutil.copy(os.path.join(FIXTURE, f), os.path.join(project, "spec"))
+    p = subprocess.Popen(["tla-kit", "mcp"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                         text=True, env=dict(os.environ, TLA_KIT_PROJECT=project))
+    msgs = [{"jsonrpc": "2.0", "id": 1, "method": "initialize",
+             "params": {"protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "selftest"}}},
+            {"jsonrpc": "2.0", "method": "notifications/initialized"},
+            {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
+            {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "tlc_run", "arguments": {
+                "module": "spec/Counter.tla", "mut": "none", "property": "Bounded", "states": 4}}}]
+    try:
+        out, err = p.communicate("".join(json.dumps(m) + "\n" for m in msgs), timeout=300)
+        replies = {r.get("id"): r for r in map(json.loads, out.splitlines())}
+        tools = [x["name"] for x in replies[2]["result"]["tools"]]
+        row = replies[3]["result"]["structuredContent"]
+        ok = len(tools) == 9 and row["verdict"] == "HOLDS" and row["count"] == "4 distinct states"
+        detail = f"{len(tools)} tools; tlc_run: Bounded {row['verdict']}, {row['count']}"
+    except Exception as e:  # any failure to start, answer or parse is this check's failure
+        ok, detail, err = False, f"{e!r}", locals().get("err", "")
+    report("mcp", start, ok, detail, "" if ok else err)
+
+
 def main():
     args = check_pins()
     check_env()
@@ -223,6 +251,7 @@ def main():
     try:
         check_wrappers(tmp)
         check_setup(tmp, args)
+        check_mcp(tmp)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print("selftest: " + ("ok" if not failed else f"FAILED ({', '.join(failed)})"))

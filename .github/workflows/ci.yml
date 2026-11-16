@@ -1,6 +1,8 @@
 # Every pull request is built and tested, and main merges only on a pass (ADR-0014 item 1). CI pushes nothing.
 #   records     the inventory against the Dockerfile and the README, and the vendored scripts against their pin
-#   image       the image built as the release builds it, from the kept prover tarball; its self-test; and the
+#   image       the image built as the release builds it, from the kept prover tarball; its self-test; the MCP
+#               client test, every tool of the server against the fixture, and, when the change touches the
+#               server, each tool compared with its command on TOPAK's Alone and Coupling (ADR-0008); and the
 #               PinLifecycle rows when the change touches spec/ or decisions/ or moves a checker pin (ADR-0015 item 8)
 #   reproduce   the same commit built twice, on two runners, from nothing, and the two digests compared
 #               (ADR-0014 item 8)
@@ -27,6 +29,7 @@ jobs:
     outputs:
       moved: ${{ steps.plan.outputs.moved }}
       rows: ${{ steps.plan.outputs.rows }}
+      server: ${{ steps.plan.outputs.server }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -75,6 +78,20 @@ jobs:
         run: docker run --rm tla-kit:ci tla-kit-selftest
       - name: What the image holds
         run: docker run --rm tla-kit:ci tla-kit-info | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: MCP client test, every tool against the fixture (ADR-0008 item 5)
+        run: >
+          python3 server/test_mcp.py --
+          docker run -i --rm --user "$(id -u):$(id -g)" -v {project}:/work tla-kit:ci tla-kit mcp
+      - name: The server's tools compared with their commands on TOPAK's Alone and Coupling (ADR-0008 item 5)
+        if: needs.plan.outputs.server == 'true'
+        run: |
+          source=$(awk '$1 == "source" {print $2}' vendor/writing-tla-specs-and-proofs/VENDOR-PIN)
+          commit=$(awk '$1 == "commit" {print $2}' vendor/writing-tla-specs-and-proofs/VENDOR-PIN)
+          git init -q "$RUNNER_TEMP/topak"
+          git -C "$RUNNER_TEMP/topak" fetch -q --depth 1 "$source" "$commit"
+          git -C "$RUNNER_TEMP/topak" checkout -q FETCH_HEAD
+          docker run --rm -v "$RUNNER_TEMP/topak:/topak:ro" -v "$PWD/server:/src:ro" tla-kit:ci \
+            python3 -B /src/compare_topak.py /topak --jobs 4 | tee -a "$GITHUB_STEP_SUMMARY"
       - name: PinLifecycle rows, compared with the committed results file (ADR-0015 item 8)
         if: needs.plan.outputs.rows == 'true'
         run: tools/ci/pinlifecycle.sh tla-kit:ci 4

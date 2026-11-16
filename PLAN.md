@@ -57,13 +57,13 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 | D3 | Registry and visibility for the image. | Chosen 2026.11.16: `ghcr.io/scottcochran/tla-kit`, public, published from a tag. ADR-0010 records it, accepted 2026.11.16. | Nothing now |
 | D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it, accepted 2026.11.15. | Nothing now |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
-| D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | A design to follow, with named changes, and no dependency on it. | Phase 4 |
+| D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | Chosen 2026.11.16: a design to follow, with named changes, and no dependency on it. ADR-0009 records it, accepted 2026.11.16. | Nothing now |
 | D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release, `tlapm-ff40755`, was made by `tools/keep-tlapm.sh` on 2026.11.15, before anything was published |
 
 ### Records to accept, and when
 
 This is the order in which the phases need the records. The Phase 1a and 1b rows were accepted on 2026.11.15,
-and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006 and ADR-0008 were accepted on 2026.11.16. Every other record is
+and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006, ADR-0008 and ADR-0009 were accepted on 2026.11.16. Every other record is
 Proposed.
 
 | Before | Accept | Why then |
@@ -72,7 +72,7 @@ Proposed.
 | Phase 1b | ADR-0015 | Its scope, so that `spec/PinLifecycle.tla` can be written. Accepted 2026.11.15. |
 | Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15, and ADR-0010 2026.11.16. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
 | Phase 3 | ADR-0006, 0008 | Both accepted 2026.11.16. ADR-0008 item 1 was changed first to the standard library, at the custodian's choice. |
-| Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0016 waits on ADR-0009 item 5's comparison of `tlapm` with `tlapm_lsp`. |
+| Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0009 accepted 2026.11.16. ADR-0016 waits on ADR-0009 item 5's comparison of `tlapm` with `tlapm_lsp`. |
 | Phase 6 | ADR-0012 (D5) | |
 
 ## Phases

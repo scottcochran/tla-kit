@@ -2,10 +2,10 @@
 
 Architecture decision records, one file each, after the form of TOPAK's `decisions/`. They were drafted on
 2026.11.15 from [PLAN.md](../PLAN.md) and [the founding session
-record](../derived/tla-kit-founding-session-2026.11.15.md), all as Proposed. **ADR-0001 to ADR-0008,
-ADR-0010, ADR-0011 and ADR-0013 to ADR-0015 were accepted by the custodian on 2026.11.15 and 2026.11.16, and the
-rest are Proposed.** The custodian chose the idea, the name and the spike. Every other choice was the
-assistant's, or is a recommendation the plan lists as owed. Nothing here is accepted until the custodian accepts it.
+record](../derived/tla-kit-founding-session-2026.11.15.md), all as Proposed. **ADR-0001 to ADR-0011 and ADR-0013 to
+ADR-0015 were accepted by the custodian on 2026.11.15 and 2026.11.16, and the rest are Proposed.** The custodian
+chose the idea, the name and the spike. Every other choice was the assistant's, or is a recommendation the plan
+lists as owed. Nothing here is accepted until the custodian accepts it.
 
 Once a record is accepted it is not edited. A change is a History row, or a new record that supersedes it.
 
@@ -23,7 +23,7 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0006](ADR-0006.md) | The MCP server has no way of its own to write a results file | Assistant | Built in part: Phase 3's tools; the proof tools are Phase 4 | Accepted · 2026.11.16 |
 | [ADR-0007](ADR-0007.md) | The skill is the source of the method; its scripts are vendored here at a named commit | Custodian (D2) | Built: vendored, and used by the server | Accepted · 2026.11.15 |
 | [ADR-0008](ADR-0008.md) | The MCP server is Python over stdio, inside the image, confined to the mounted project | Assistant; custodian (the standard library) | Built in part: items 1 to 5; item 6 is Phase 5 | Accepted · 2026.11.16 |
-| [ADR-0009](ADR-0009.md) | The proof tools follow marco6/tlapm-mcp's design, with named changes, and do not depend on it | Owed (D6) | Planned, Phase 4 | Proposed |
+| [ADR-0009](ADR-0009.md) | The proof tools follow marco6/tlapm-mcp's design, with named changes, and do not depend on it | Custodian (D6) | Planned, Phase 4 | Accepted · 2026.11.16 |
 | [ADR-0010](ADR-0010.md) | The image is published at `ghcr.io/scottcochran/tla-kit`, public, from a tag | Custodian (D3) | Built: `v0.1.0` and `v0.2.0` published | Accepted · 2026.11.16 |
 | [ADR-0011](ADR-0011.md) | Code is licensed Apache-2.0 and documentation CC BY 4.0, as in TOPAK | Custodian (D4) | Built | Accepted · 2026.11.15 |
 | [ADR-0012](ADR-0012.md) | One base image; large optional tools as variants by tag, each added with a check that uses it | Owed (D5) | Planned, Phase 6 | Proposed |

@@ -1,11 +1,11 @@
 # tla-kit
 
 One container image of the TLA+ tool family, so that the checker and the prover are the same build on a
-laptop and in CI, and an MCP server over those tools (in progress, Phase 3) to pair with the
+laptop and in CI, and an MCP server over those tools to pair with the
 [`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
 skill.
 
-**Status: Phase 1 of [PLAN.md](PLAN.md) is done.** The first release,
+**Status: Phases 1 and 3 of [PLAN.md](PLAN.md) are done.** The first release,
 [`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0), is published and attested:
 
 ```
@@ -20,8 +20,9 @@ ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c
   workflow publishes from a tag.
 - **The model:** Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), reproduces
   in the published image.
-- **What's next:** Phase 2, the projects' CI in the image, and Phase 3, the MCP server for model checking, which
-  is in progress (below). Neither is in a release yet.
+- **The MCP server:** Phase 3's model-checking tools are built and checked on `main` (below). No release holds them
+  yet; `v0.1.0` has none.
+- **What's next:** Phase 2, the projects' CI in the image, and Phase 4, the server's proof tools.
 
 ## What is in the image
 
@@ -104,7 +105,7 @@ built with other arguments is for working, not for citing (ADR-0002 item 7).
 `vendor/check.py` checks the vendored scripts against their pin, and with `--upstream <TOPAK checkout>` against
 the commit itself.
 
-## The MCP server (Phase 3, in progress)
+## The MCP server (Phase 3)
 
 `tla-kit mcp` is an MCP server over stdio for the model-checking tools, written with Python's standard library only
 (ADR-0008). A client starts it in the image with the project mounted:
@@ -130,7 +131,8 @@ output and keeps its scratch files outside the project (ADR-0006). A path outsid
 `server/test_mcp.py` drives every tool over stdio against the skill's fixture, natively or against the image, and CI
 runs it on every pull request. `server/compare_topak.py` is Phase 3's "Done when": it compares each tool with the
 command it stands for on TOPAK's `Alone` and `Coupling`, every row of both, and CI runs it in the image when a change
-touches the server. No release holds the server yet.
+touches the server. Phase 3 is done: on 2026.11.16, in the image CI built for pull request #11, all 84
+comparisons over the nine tools were the same. No release holds the server yet.
 
 ## Limits
 

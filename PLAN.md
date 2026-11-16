@@ -1,7 +1,7 @@
 # Development plan
 
 Written 2026.11.15, after the spike the README records, updated the same day for ADR-0013 to ADR-0016, and kept
-up to date since: Phase 1 is done (2026.11.16). It is a plan, not a record: nothing below is built unless the
+up to date since: Phases 1 and 3 are done (2026.11.16). It is a plan, not a record: nothing below is built unless the
 README says so.
 
 ## Goal
@@ -196,6 +196,23 @@ gains no package for it (ADR-0008 item 1).
 
 **Done when** each tool returns the same verdict as the script it wraps on TOPAK's `Alone` and `Coupling`, and
 an MCP client test in CI drives every tool against the fixture.
+
+**Done 2026.11.16**, by pull request #11, merged as `6624534`. In CI run 43921629481, in the image built from the
+pull request:
+1. **The comparison:** `server/compare_topak.py` compared each of the nine tools with the command it stands for, on
+   TOPAK at `5ade81e`. All 84 comparisons were the same: every row of `Alone` (47) and `Coupling` (15) through
+   `tlc_run` and `tlc_run.py`, and the results file of each, byte for byte, from `tlc_rows` and `tlc_rows.py`.
+   Neither module has a row list in the skill's format, so the script writes one from TOPAK's own files.
+2. **The client test:** `server/test_mcp.py` drove every tool against the fixture, with the server started as
+   ADR-0008 item 2 says. It also checked that nothing but `tlc_rows` writes into the project (ADR-0006) and that a
+   path outside it is refused, links included.
+
+Along the way:
+- **The SDK:** the server uses the standard library only (ADR-0008 item 1, the custodian's choice), so the image
+  gained no package.
+- **The tools:** what each one is compared with is named in ADR-0008 item 5, since only `tlc_run` and `tlc_rows`
+  wrap a script.
+- **Not in a release:** `v0.1.0` has no server. The next release would be a MINOR (ADR-0014 item 2).
 
 ### Phase 4: the MCP server, proofs
 

@@ -20,9 +20,9 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0003](ADR-0003.md) | The base is Ubuntu 24.04 with Temurin JRE 25, on Linux x86_64 only | Assistant (forced by glibc) | Built | Accepted · 2026.11.15 |
 | [ADR-0004](ADR-0004.md) | The image speaks through the variables the projects already read | Assistant | Built | Accepted · 2026.11.15 |
 | [ADR-0005](ADR-0005.md) | One prover build per image, from a copy of its tarball kept here | Assistant | Built; the weekly comparison has not run yet | Accepted · 2026.11.15 |
-| [ADR-0006](ADR-0006.md) | The MCP server has no way of its own to write a results file | Assistant | Planned, Phases 3 and 4 | Accepted · 2026.11.16 |
-| [ADR-0007](ADR-0007.md) | The skill is the source of the method; its scripts are vendored here at a named commit | Custodian (D2) | Built in part: vendored; the server is Phase 3 | Accepted · 2026.11.15 |
-| [ADR-0008](ADR-0008.md) | The MCP server is Python over stdio, inside the image, confined to the mounted project | Assistant; custodian (the standard library) | Planned, Phases 3 and 5 | Accepted · 2026.11.16 |
+| [ADR-0006](ADR-0006.md) | The MCP server has no way of its own to write a results file | Assistant | Built in part: Phase 3's tools; the proof tools are Phase 4 | Accepted · 2026.11.16 |
+| [ADR-0007](ADR-0007.md) | The skill is the source of the method; its scripts are vendored here at a named commit | Custodian (D2) | Built: vendored, and used by the server | Accepted · 2026.11.15 |
+| [ADR-0008](ADR-0008.md) | The MCP server is Python over stdio, inside the image, confined to the mounted project | Assistant; custodian (the standard library) | Built in part: items 1 to 5; item 6 is Phase 5 | Accepted · 2026.11.16 |
 | [ADR-0009](ADR-0009.md) | The proof tools follow marco6/tlapm-mcp's design, with named changes, and do not depend on it | Owed (D6) | Planned, Phase 4 | Proposed |
 | [ADR-0010](ADR-0010.md) | The image is published at `ghcr.io/scottcochran/tla-kit`, public, from a tag | Custodian (D3) | Built: `v0.1.0` published | Accepted · 2026.11.16 |
 | [ADR-0011](ADR-0011.md) | Code is licensed Apache-2.0 and documentation CC BY 4.0, as in TOPAK | Custodian (D4) | Built | Accepted · 2026.11.15 |

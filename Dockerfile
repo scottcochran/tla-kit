@@ -19,9 +19,9 @@
 # The tag is kept beside the digest to say what the digest was resolved from (2026.11.15); Docker uses the digest.
 ARG BASE_IMAGE=eclipse-temurin:25-jre-noble@sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5
 
-# The TLAPS tarball, from the kept copy. While this repository is private the copy cannot be fetched without a
-# token, so CI downloads it and passes it as the build context `tlapm-tarball` instead; the fetch stage below
-# checks its sha256 either way.
+# The TLAPS tarball, from the kept copy. CI downloads it with `gh` and passes it as the build context
+# `tlapm-tarball` instead, so that a missing release fails with a message that says so;
+# the fetch stage below checks its sha256 either way.
 FROM scratch AS tlapm-tarball
 ARG TLAPM_SHA256=99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc
 ARG TLAPM_URL=https://github.com/scottcochran/tla-kit/releases/download/tlapm-ff40755/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz

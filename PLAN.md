@@ -146,23 +146,22 @@ written down.
 **Done when** a published digest reproduces the README's spike table, `gh attestation verify` passes on it, and
 the `PinLifecycle` results regenerated in it match the committed file.
 
-**State on 2026.11.16 (branch `phase1c`).** Built and checked on one machine:
-- `PINS.json` and its checks;
-- the image built from the kept tarball and carrying `PINS.json`;
-- `SOURCE_DATE_EPOCH` and the labels, with two builds of one commit giving one digest;
-- D7 condition 3;
-- the `PinLifecycle` comparison.
+**Done 2026.11.16.** Release `v0.1.0` is
+`ghcr.io/scottcochran/tla-kit@sha256:454328cd7464efcf8a27a063c51c10086e09571c462c73d085b4a249e44950c6`, built from
+`bfeecc8`. All three conditions hold for it
+([`derived/tla-kit-phase1c-checks-2026.11.16.md`](derived/tla-kit-phase1c-checks-2026.11.16.md)):
+1. **The spike table:** it reproduces the README's spike table against TOPAK at `0ad9f88`. The defect run's two
+   clock-dependent state counts differ, and its verdicts do not.
+2. **The attestations:** `gh attestation verify` passes for the provenance and the SBOM.
+3. **The `PinLifecycle` results:** regenerated in it, they reproduce the committed file byte for byte.
 
-Written and not yet run: the CI, evidence, weekly and release workflows, Dependabot, and `CONSUMERS.md`.
-Left for the custodian:
-- making the `tlapm-ff40755` release (`tools/keep-tlapm.sh --create`);
-- making the repository public, which the attestations need;
-- pushing the branch, so CI runs;
-- turning on the required-checks ruleset once CI passes on `main`;
-- the first `v0.1.0` tag;
-- repeating the spike's TOPAK checks from the published image.
-
-gov-tla has no evidence run, and no token to read it.
+Along the way:
+- **The model:** CI found that the skill's generator printed a state count that depends on the machine. It was
+  fixed in TOPAK first and then vendored (ADR-0007), and gov-tla's own generator was fixed too.
+- **The repository:** it was made public with the `publishing-private-repos` skill. Its five rulesets are active,
+  including the required checks.
+- **Still open:** gov-tla has no evidence run here, because tla-kit has no token to read it. The weekly check
+  has not run yet; it first runs on its Monday schedule.
 
 ### Phase 2: the image in the projects' CI
 
@@ -251,8 +250,9 @@ Each is optional, pinned like the rest, and added only with a check that uses it
   image comes from Docker Hub, which refused the spike's pull (HTTP 429), the `apt` packages from Ubuntu's
   snapshot archive, and the jar from GitHub's releases. ADR-0015's `Durable` makes this a stated assumption
   rather than an unstated one.
-- **The gate on ADR-0005, 0013 and 0014 is working output.** Phase 1b checks the model in an unpublished image.
-  Until 1c regenerates the results in a published one, the acceptance rests on a run that cannot be cited.
+- **The gate on ADR-0005, 0013 and 0014 was working output.** Phase 1b checked the model in an unpublished
+  image. Phase 1c regenerated the results in the published `v0.1.0` image and they reproduced byte for byte, so
+  the acceptance now rests on a run that can be cited (2026.11.16).
 - **Emulation on Apple Silicon** was measured once, in Phase 1a: TOPAK's full proof run under emulation took
   6 min 43 s on a 12-CPU Mac, against 539 s natively on a 4-CPU x86_64 machine at the spike. That is one machine
   and not a ratio, but it is not the slowdown feared. The arm64 build (Phase 6) is for parity, not speed.

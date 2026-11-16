@@ -57,7 +57,7 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 | D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it, accepted 2026.11.15. | Nothing now |
 | D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
 | D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | A design to follow, with named changes, and no dependency on it. | Phase 4 |
-| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Conditions 2 and 3 are Phase 1c work, before anything is published |
+| D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release is assembled by `tools/keep-tlapm.sh` and is made before anything is published |
 
 ### Records to accept, and when
 
@@ -145,6 +145,24 @@ written down.
 
 **Done when** a published digest reproduces the README's spike table, `gh attestation verify` passes on it, and
 the `PinLifecycle` results regenerated in it match the committed file.
+
+**State on 2026.11.16 (branch `phase1c`).** Built and checked on one machine:
+- `PINS.json` and its checks;
+- the image built from the kept tarball and carrying `PINS.json`;
+- `SOURCE_DATE_EPOCH` and the labels, with two builds of one commit giving one digest;
+- D7 condition 3;
+- the `PinLifecycle` comparison.
+
+Written and not yet run: the CI, evidence, weekly and release workflows, Dependabot, and `CONSUMERS.md`.
+Left for the custodian:
+- making the `tlapm-ff40755` release (`tools/keep-tlapm.sh --create`);
+- making the repository public, which the attestations need;
+- pushing the branch, so CI runs;
+- turning on the required-checks ruleset once CI passes on `main`;
+- the first `v0.1.0` tag;
+- repeating the spike's TOPAK checks from the published image.
+
+gov-tla has no evidence run, and no token to read it.
 
 ### Phase 2: the image in the projects' CI
 

@@ -125,7 +125,7 @@
     {
       "name": "main: required checks",
       "target": "branch",
-      "enforcement": "disabled",
+      "enforcement": "active",
       "conditions": {
         "ref_name": {
           "exclude": [],
@@ -243,7 +243,13 @@
         "image",
         "reproduce"
       ],
-      "why": "TOPAK's checks do not exist here. These are the jobs of .github/workflows/ci.yml (ADR-0014 item 1). The ruleset stays disabled, as in the source, until CI has passed on main; then it is turned on, and with strict_required_status_checks_policy a pull request merges only on a pass against the main it merges into (ADR-0015, gap 1)."
+      "why": "TOPAK's checks do not exist here. These are the jobs of .github/workflows/ci.yml (ADR-0014 item 1). With strict_required_status_checks_policy, a pull request merges only on a pass against the main it merges into (ADR-0015, gap 1)."
+    },
+    {
+      "setting": "rulesets[main: required checks].enforcement",
+      "source": "disabled",
+      "here": "active",
+      "why": "TOPAK disables it because it has no CI. Here CI exists and passed on main at 48da7cf (run 43820404477, 2026.11.16), so the ruleset is active (ADR-0014 item 1). GitHub applies it once the repository is public, or on GitHub Pro."
     }
   ]
 }

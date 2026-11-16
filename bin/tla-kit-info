@@ -3,9 +3,11 @@
 
     tla-kit-info [--json]
 
-The digests are measured from the files, not read from a record, so they say what is installed. The build
-arguments the image was made with are printed beside them; the self-test (tla-kit-selftest) checks that the two
-agree. --json prints the same facts as one JSON object, for scripts and for the MCP server's info tool.
+The digests are measured from the files, not read from a record, so they say what is installed. Beside them are
+the build arguments the image was made with, the commit it was built from and that commit's time (the OCI
+revision and created labels, ADR-0014 item 8), and the inventory of what it is meant to hold and where each part
+came from (/opt/tla-kit/PINS.json, ADR-0013 item 7). The self-test (tla-kit-selftest) checks that they agree.
+--json prints the same facts as one JSON object, for scripts and for the MCP server's info tool.
 """
 import hashlib
 import json
@@ -19,6 +21,7 @@ JAR = os.environ.get("TLA_JAR", "/opt/tla/tla2tools.jar")
 TLAPM = os.environ.get("TLAPM", "/opt/tlaps/bin/tlapm")
 SKILL = os.environ.get("TLA_KIT_SKILL", "/opt/tla-kit/skill")
 BUILD_ARGS = "/opt/tla-kit/build-args"
+PINS = "/opt/tla-kit/PINS.json"
 
 
 def sha256(path):
@@ -66,6 +69,12 @@ def facts():
     version = run([TLAPM, "--version"]).strip().splitlines()
     backends = re.findall(r'^(\S[^=\n]*) version == "(.*)"$', run([TLAPM, "--config"]), re.M)
     pin = key_values(os.path.join(SKILL, "VENDOR-PIN"))
+    args = key_values(BUILD_ARGS)
+    try:
+        with open(PINS, encoding="utf-8") as f:
+            inventory = json.load(f)["pins"]
+    except (OSError, ValueError, KeyError):
+        inventory = []
     return {
         "platform": f"{platform.system()} {platform.machine()}",
         "os": os_name(),
@@ -79,7 +88,11 @@ def facts():
         "backends": [{"name": n, "version": v} for n, v in backends],
         "skill": {"path": SKILL, "source": pin.get("source"), "commit": pin.get("commit")},
         "packages": key_values("/opt/tla-kit/packages"),
-        "build_args": key_values(BUILD_ARGS),
+        "image": {"source": "https://github.com/scottcochran/tla-kit", "revision": args.get("revision"),
+                  "created": args.get("created")},
+        "build_args": {k: v for k, v in args.items() if k not in ("revision", "created")},
+        "pins": [{k: p.get(k) for k in ("tool", "kind", "version", "upstream", "kept_copy") if k in p}
+                 for p in inventory],
     }
 
 
@@ -101,8 +114,12 @@ def main(argv):
     print(f"skill     {f['skill']['path']}, from {f['skill']['source']} at {f['skill']['commit']}")
     for k, v in f["packages"].items():
         print(f"package   {k} {v}")
+    print(f"image     {f['image']['source']} at {f['image']['revision']}, committed {f['image']['created']}")
     for k, v in f["build_args"].items():
         print(f"build     {k} {v}")
+    for p in f["pins"]:
+        where = p.get("kept_copy") or p.get("upstream")
+        print(f"pin       {p['kind']:8} {p['tool']} {p.get('version', '')}".rstrip() + (f", from {where}" if where else ""))
     return 0
 
 

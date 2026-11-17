@@ -97,9 +97,9 @@ def main(argv):
         c.send({"jsonrpc": "2.0", "method": "notifications/initialized"})
         check("ping", c.request("ping")["result"] == {})
         tools = [t["name"] for t in c.request("tools/list")["result"]["tools"]]
-        check("tools/list has the nine tools of Phase 3", sorted(tools) == sorted(
-            ["info", "parse", "symbols", "evaluate", "tlc_run", "simulate", "coverage", "state_graph", "tlc_rows"]),
-              tools)
+        check("tools/list has the nine tools of Phase 3, and prove", sorted(tools) == sorted(
+            ["info", "parse", "symbols", "evaluate", "tlc_run", "simulate", "coverage", "state_graph", "tlc_rows",
+             "prove"]), tools)
         check("an unknown method is an error", c.request("nonesuch")["error"]["code"] == -32601)
 
         before = snapshot(project)

@@ -128,6 +128,12 @@ docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
 | `coverage` | TLC's per-action counts, naming the actions that never fire |
 | `state_graph` | The reachable graph of a small model as JSON |
 | `tlc_rows` | The skill's generator on a row list, as from the command line |
+| `prove` | TLAPS on a theorem or step by name, a line, a range or the whole module: success only when every obligation is proved; otherwise each unresolved obligation with its text, the backends tried and why each failed (Phase 4, in progress) |
+
+`prove` runs `tlapm` once per request, in a process group of its own that is killed whole on a timeout or a cancel,
+with a cache the server owns, one run per module at a time, and every child reaped before it answers: the design
+`spec/ProveRequests.tla` checks (ADR-0016). Requests run side by side, and a cancelled request gets no response.
+`server/test_prove.py` tries to break each of that module's properties in the image.
 
 Only `tlc_rows` writes into the project, and only the generator's results file. Every other tool returns working
 output and keeps its scratch files outside the project (ADR-0006). A path outside the mounted project is refused.

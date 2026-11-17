@@ -3,7 +3,9 @@
 
     examples/agent-repair/check.py PROJECT PLUGIN_DIR TRANSCRIPT
 
-1. The session had the plugin's tla-kit server, connected, with its fourteen tools, and ended without an error.
+1. The session declared the plugin's tla-kit server, the server answered every call the agent made to it, and the
+   session ended without an error. Claude Code connects MCP servers in the background, so the session's first
+   message may show the server pending, with none of its tools; when it lists them, all fourteen must be there.
 2. The last prove the agent ran on the whole module succeeded.
 3. In the project, only spec/Counter_proof.tla changed, and only in its proofs: with every proof taken out, the
    module before and after is the same, so no statement or definition changed, and Counter.tla did not.
@@ -28,6 +30,7 @@ def check(ok, what):
 
 
 init, result, calls, last_module_prove = None, None, {}, None
+server_calls, server_errors = 0, []
 for line in open(transcript):
     m = json.loads(line)
     if m.get("subtype") == "init":
@@ -46,6 +49,10 @@ for line in open(transcript):
                 name, args = calls.get(c["tool_use_id"], ("?", {}))
                 body = c["content"]
                 body = " ".join(x.get("text", "") for x in body) if isinstance(body, list) else str(body)
+                if name.startswith(PREFIX):
+                    server_calls += 1
+                    if c.get("is_error"):
+                        server_errors.append(f"{name[len(PREFIX):]}: {body[:200]}")
                 if name == PREFIX + "prove" and set(args) <= {"module", "timeout", "threads", "stretch", "nofp"}:
                     try:
                         last_module_prove = json.loads(body)
@@ -55,9 +62,16 @@ for line in open(transcript):
 
 check(init is not None, "the session started")
 servers = {s["name"]: s["status"] for s in (init or {}).get("mcp_servers", [])}
-check(servers.get(SERVER) == "connected", f"the plugin's server is connected ({servers.get(SERVER)})")
+check(SERVER in servers, f"the session declares the plugin's server (at its start: {servers.get(SERVER)})")
 have = {t[len(PREFIX):] for t in (init or {}).get("tools", []) if t.startswith(PREFIX)}
-check(have == TOOLS, f"it offers the fourteen tools ({len(have)})")
+if have or servers.get(SERVER) == "connected":
+    check(have == TOOLS, f"it offers the fourteen tools ({len(have)})")
+else:
+    print("      its tools were not listed yet at the session's start, while the server connected")
+check(server_calls > 0 and not server_errors,
+      f"the server answered every call made to it ({server_calls} calls, {len(server_errors)} errors)")
+for e in server_errors:
+    print("      " + e)
 check(result is not None and result.get("subtype") == "success" and not result.get("is_error"),
       "the session ended without an error")
 if result:

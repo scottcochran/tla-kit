@@ -928,6 +928,112 @@ def tool_prove(a):
                      "(ADR-0006)"}
 
 
+def tool_proof_check(a):
+    """tlapm --summary: the module parses and elaborates, and how many obligations it has, without a backend."""
+    spec_dir, module = module_path(a["module"])
+    pv = prover()
+    cache = cache_dir(spec_dir)
+    cmd = [pv["path"], "--summary", "--cache-dir", cache, module + ".tla"]
+    lock = hold_cache((cache, module))
+    try:
+        code, out = run(cmd, spec_dir, int(a.get("timeout", 300)))
+    finally:
+        lock.release()
+    count = re.search(r"obligations_count = (\d+)", out)
+    errors = [{"module": m.group(1), "line": int(m.group(2)), "col": int(m.group(3)), "message": m.group(5).strip()}
+              for m in re.finditer(r'File "\./?([^"]+?)(?:\.tla)?", line (\d+), characters (\d+)-(\d+):\n'
+                                   r'(?:Error|\[ERROR\]):?\s*(.*)', out)]
+    abnormal = "ending abnormally" in out
+    return {"module": rel(os.path.join(spec_dir, module + ".tla")),
+            "ok": bool(count) and not errors and not abnormal,
+            "obligations": int(count.group(1)) if count else None, "errors": errors, "abnormal_end": abnormal,
+            "exit": code, "output": tail(out, 40), "prover": pv, "label": WORKING}
+
+
+def base_module(arg):
+    """(spec directory, base module) for a module argument that names a module or its proof module."""
+    spec_dir, module = module_path(arg)
+    if module.endswith("_proof"):
+        module = module[:-len("_proof")]
+    return spec_dir, module
+
+
+def run_skill(script, args, timeout, unpinned):
+    """One of the skill's scripts, as from the command line, in a process group of its own. TLAPM_UNPINNED=1 only
+    when the client asks: the project's tools/TLAPS-PIN is the project's, and the server does not override it
+    (ADR-0005 item 5)."""
+    env = dict(os.environ)
+    if unpinned:
+        env["TLAPM_UNPINNED"] = "1"
+    else:
+        env.pop("TLAPM_UNPINNED", None)
+    return run(skill_script(script) + args, project_root(), timeout, env=env)
+
+
+def tool_proof_results(a):
+    """The skill's proof generator: the one tool beside tlc_rows that writes into the project, and only its results
+    file (ADR-0006 item 1)."""
+    spec_dir, module = base_module(a["module"])
+    if not os.path.isfile(os.path.join(spec_dir, module + "_proof.tla")):
+        raise ToolError(f"no {rel(os.path.join(spec_dir, module + '_proof.tla'))}")
+    args = [module, "--dir", spec_dir]
+    if a.get("threads"):
+        args += ["--threads", str(int(a["threads"]))]
+    if a.get("dry_run"):
+        args.append("--dry-run")
+    if a.get("date"):
+        args += ["--date", a["date"]]
+    results = t.Layout(spec_dir).results
+    lock = hold_cache(("proof_results", spec_dir, module))
+    try:
+        before = set(os.listdir(results))
+        code, out = run_skill("proof_results.py", args, int(a.get("timeout", 3600)), a.get("unpinned"))
+        written = sorted(set(os.listdir(results)) - before)
+    finally:
+        lock.release()
+    return {"module": rel(os.path.join(spec_dir, module + "_proof.tla")), "exit": code,
+            "results_files_written": [rel(os.path.join(results, w)) for w in written],
+            "reproduced": "byte for byte" in out, "command": "proof_results.py " + " ".join(args),
+            "output": tail(out, 60),
+            "label": ("the skill's generator, run as from the command line: a results file it writes is the file "
+                      "the script writes (ADR-0006 item 1)")}
+
+
+def tool_flip_test(a):
+    """The skill's flip test: each mutation's hypothesis flipped on a copy, and the proof must break where it
+    should. Nothing is written into the project."""
+    spec_dir, module = base_module(a["module"])
+    muts = a.get("mutations") or []
+    if not muts or not all(isinstance(m, str) and re.match(r"^\w+$", m) for m in muts):
+        raise ToolError("mutations: one or more names, such as M_NOLIMIT")
+    args = [module] + muts + ["--dir", spec_dir]
+    if a.get("threads"):
+        args += ["--threads", str(int(a["threads"]))]
+    code, out = run_skill("flip_test.py", args, int(a.get("timeout", 3600)), a.get("unpinned"))
+    lines = [l for l in out.splitlines() if any(m in l for m in muts) and ("|" in l or ":" in l)]
+    return {"module": rel(os.path.join(spec_dir, module + "_proof.tla")), "ok": code == 0, "exit": code,
+            "results": lines, "command": "flip_test.py " + " ".join(args), "output": tail(out, 60),
+            "label": WORKING}
+
+
+def tool_proof_sync(a):
+    """The skill's sync check: every results file against the tree and the pins. With run, each stale proof is
+    re-checked; no results file is written either way."""
+    spec_dir = resolve(a.get("dir") or "spec", kind="dir")
+    if not os.path.isdir(spec_dir):
+        raise ToolError(f"no directory {a.get('dir') or 'spec'} in the project")
+    args = ["--dir", spec_dir]
+    if a.get("run"):
+        args.append("--run")
+        if a.get("threads"):
+            args += ["--threads", str(int(a["threads"]))]
+    code, out = run_skill("proof_sync.py", args, int(a.get("timeout", 3600 if a.get("run") else 600)),
+                          a.get("unpinned"))
+    rows = [l for l in out.splitlines() if re.search(r"\b(IN SYNC|STALE|MISSING|UNPINNED|PROVED|FAILED)\b", l)]
+    return {"dir": rel(spec_dir), "in_sync": code == 0, "exit": code, "rows": rows,
+            "command": "proof_sync.py " + " ".join(args), "output": tail(out, 80), "label": WORKING}
+
+
 # ---------------------------------------------------------------------------------------------------------------
 # Tool definitions
 
@@ -940,6 +1046,9 @@ ROWS = {"type": "string", "description": "A row list whose # const: and # cfg: l
                                          "<Module>-rows.txt beside the module or in rows/"}
 CFG = {"type": "array", "items": {"type": "string"}, "description": "Extra configuration lines"}
 TIMEOUT = {"type": "integer", "description": "Seconds before the run is stopped"}
+UNPINNED = {"type": "boolean", "description": "Run with TLAPM_UNPINNED=1, for a project whose tools/TLAPS-PIN names "
+                                              "another build or none: the output and any results file say so"}
+PROOF_MODULE = {"type": "string", "description": "The module or its proof module, e.g. spec/Counter.tla"}
 
 
 def schema(props, required=()):
@@ -995,6 +1104,28 @@ TOOLS = [
              "isabelle_check": {"type": "boolean", "description": "Check the proofs in Isabelle (-C)"},
              "nofp": {"type": "boolean", "description": "Ignore the cache's earlier results"},
              "timeout": TIMEOUT}, ["module"])),
+    ("proof_check", tool_proof_check, "Check that a proof module parses and elaborates, and count its obligations, "
+     "with tlapm --summary and no backend. Quick, before prove. Working output.",
+     schema({"module": MODULE, "timeout": TIMEOUT}, ["module"])),
+    ("proof_results", tool_proof_results, "Run the skill's proof generator, proof_results.py, on <Module>_proof.tla, "
+     "as from the command line: tlapm --cleanfp --strict with a throwaway cache. It writes the dated proof results "
+     "file only when every obligation is proved, and never overwrites one; dry_run writes nothing. The prover must "
+     "be the project's pinned one unless unpinned is given.",
+     schema({"module": PROOF_MODULE, "threads": {"type": "integer"}, "dry_run": {"type": "boolean"},
+             "date": {"type": "string", "description": "YYYY.MM.DD"}, "unpinned": UNPINNED, "timeout": TIMEOUT},
+            ["module"])),
+    ("flip_test", tool_flip_test, "Run the skill's flip test: flip each named mutation's hypothesis in a copy of the "
+     "proof module, and check that the proof then fails in a statement that carried it. Nothing is written into "
+     "the project. Working output.",
+     schema({"module": PROOF_MODULE, "mutations": {"type": "array", "items": {"type": "string"}},
+             "threads": {"type": "integer"}, "unpinned": UNPINNED, "timeout": TIMEOUT}, ["module", "mutations"])),
+    ("proof_sync", tool_proof_sync, "Run the skill's sync check: whether every TLC and proof results file is in "
+     "step with the modules and the pins. With run, each stale proof is re-checked with tlapm; no results file is "
+     "written. Working output.",
+     schema({"dir": {"type": "string", "description": "The spec directory, relative to the project root "
+                                                    "(default spec)"},
+             "run": {"type": "boolean"}, "threads": {"type": "integer"}, "unpinned": UNPINNED,
+             "timeout": TIMEOUT})),
     ("tlc_rows", tool_tlc_rows, "Run the skill's generator, tlc_rows.py, on a row list, as from the command line. "
      "It writes a dated results file only when every row is as expected, and never overwrites one; --only and "
      "dry_run write nothing. This is the only tool that writes into the project.",
@@ -1050,8 +1181,9 @@ def handle(msg):
         result = {"protocolVersion": version, "capabilities": {"tools": {"listChanged": False}},
                   "serverInfo": {"name": SERVER_NAME, "version": server_version()},
                   "instructions": ("The TLA+ tools of the tla-kit image, on the project mounted at /work. Every "
-                                   "tool but tlc_rows returns working output and writes nothing into the project; "
-                                   "tlc_rows runs the skill's generator, which writes the results file.")}
+                                   "tool but tlc_rows and proof_results returns working output and writes nothing "
+                                   "into the project; those two run the skill's generators, which write the "
+                                   "results files.")}
     elif method == "ping":
         result = {}
     elif method == "tools/list":

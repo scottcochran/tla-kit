@@ -128,14 +128,20 @@ docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
 | `coverage` | TLC's per-action counts, naming the actions that never fire |
 | `state_graph` | The reachable graph of a small model as JSON |
 | `tlc_rows` | The skill's generator on a row list, as from the command line |
-| `prove` | TLAPS on a theorem or step by name, a line, a range or the whole module: success only when every obligation is proved; otherwise each unresolved obligation with its text, the backends tried and why each failed (Phase 4, in progress) |
+| `prove` | TLAPS on a theorem or step by name, a line, a range or the whole module: success only when every obligation is proved; otherwise each unresolved obligation with its text, the backends tried and why each failed (Phase 4) |
+| `proof_check` | `tlapm --summary`: the module parses and elaborates, and how many obligations it has, without a backend (Phase 4) |
+| `proof_results` | The skill's proof generator, as from the command line: the dated proof results file, written only when every obligation is proved (Phase 4) |
+| `flip_test` | The skill's flip test: each mutation's hypothesis flipped on a copy, and the proof must break where it should (Phase 4) |
+| `proof_sync` | The skill's sync check: every results file against the tree and the pins, and with `run` each stale proof re-checked (Phase 4) |
 
 `prove` runs `tlapm` once per request, in a process group of its own that is killed whole on a timeout or a cancel,
 with a cache the server owns, one run per module at a time, and every child reaped before it answers: the design
 `spec/ProveRequests.tla` checks (ADR-0016). Requests run side by side, and a cancelled request gets no response.
 `server/test_prove.py` tries to break each of that module's properties in the image.
 
-Only `tlc_rows` writes into the project, and only the generator's results file. Every other tool returns working
+Only `tlc_rows` and `proof_results` write into the project, and only the generators' results files. The proof
+scripts hold the prover to the project's `tools/TLAPS-PIN`, as from the command line; the server sets
+`TLAPM_UNPINNED=1` only when the client asks, and the output and any results file then say so. Every other tool returns working
 output and keeps its scratch files outside the project (ADR-0006). A path outside the mounted project is refused.
 `server/test_mcp.py` drives every tool over stdio against the skill's fixture, natively or against the image, and CI
 runs it on every pull request. `server/compare_topak.py` is Phase 3's "Done when": it compares each tool with the

@@ -1,0 +1,34 @@
+      call Read {"file_path": "/home/runner/work/_temp/project/spec/Counter_proof.tla"}
+      call Read {"file_path": "/home/runner/work/_temp/project/spec/Counter.tla"}
+      call Edit {"replace_all": false, "file_path": "/home/runner/work/_temp/project/spec/Counter_proof.tla"}
+      call prove {"module": "spec/Counter_proof.tla"}
+      call tla-kit:prove {"module": "spec/Counter_proof.tla"}
+        -> failed {'total': 18, 'proved': 8, 'trivial': 9, 'failed': 1, 'unresolved': 1, 'from_cache': 0}
+      call Edit {"replace_all": false, "file_path": "/home/runner/work/_temp/project/spec/Counter_proof.tla"}
+      call tla-kit:prove {"module": "spec/Counter_proof.tla"}
+        -> proved {'total': 31, 'proved': 14, 'trivial': 17, 'failed': 0, 'unresolved': 0, 'from_cache': 8}
+ok    the session started
+ok    the plugin's server is connected (connected)
+ok    it offers the fourteen tools (14)
+ok    the session ended without an error
+      8 turns, 26 s, $0.11, refused: []
+ok    the last prove of the whole module succeeded
+ok    only spec/Counter_proof.tla changed (['M', 'spec/Counter_proof.tla'])
+      -  BY DEF Bounded
+      +<1> SUFFICES ASSUME TypeOK, Bounded, [Next]_vars PROVE Bounded'
+      +    OBVIOUS
+      +<1>1. CASE Next
+      +    <2>1. n < Limit
+      +        BY <1>1 DEF Next, Step
+      +    <2>2. ~(n >= Limit)
+      +        BY <2>1, LimitNat DEF TypeOK
+      +    <2> QED
+      +        BY <1>1, <2>2 DEF Bounded, Next, Step
+      +<1>2. CASE UNCHANGED vars
+      +    BY <1>2 DEF Bounded, vars
+      +<1> QED
+      +    BY <1>1, <1>2
+FAIL  every changed line is a proof line
+ok    the plugin names the image by digest
+ok    tlapm, run directly in sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f, proves the module (31 obligations)
+agent-repair: 1 failed

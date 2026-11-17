@@ -1,8 +1,8 @@
 # Development plan
 
 Written 2026.11.15, after the spike the README records, updated the same day for ADR-0013 to ADR-0016, and kept
-up to date since: Phases 1 and 3 are done (2026.11.16), and so is Phase 4 (2026.11.17). It is a plan, not a record:
-nothing below is built unless the README says so.
+up to date since: Phases 1 and 3 are done (2026.11.16), and so are Phases 4 and 5 (2026.11.17). It is a plan, not a
+record: nothing below is built unless the README says so.
 
 ## Goal
 
@@ -282,16 +282,29 @@ Along the way:
 
 **Done when** one configuration serves a local session and an Actions job against the same project.
 
-**In progress, 2026.11.17.** ADR-0008's first unchecked recollection holds: a plugin's `.mcp.json` declares the
-server, and Claude Code starts it with the session. The plugin's declaration runs `sh -c`, so that `docker run`
-gets `--user "$(id -u):$(id -g)"` and mounts the repository's root, from `git rev-parse --show-toplevel`. Claude
-Code's `CLAUDE_PROJECT_DIR` is the session's starting directory, not the repository's root. The plugin's tools are
-named `mcp__plugin_writing-tla-specs-and-proofs_tla-kit__<tool>`. `--strict-mcp-config` would drop the plugin's
-server, so an agent is confined by `--allowedTools` and `--permission-mode dontAsk`, not by that flag. The
-configuration is the plugin, and `examples/agent-repair/` makes the project, runs the agent and checks the repair,
-the same way locally and in `.github/workflows/agent.yml`. The declaration is in TOPAK by pull request #88, merged
-as `2db08ff`, which the workflow pins. Locally, from that commit, the agent repaired the broken step and every check
-passed. Owed: the `ANTHROPIC_API_KEY` secret, and the run in Actions.
+**Done 2026.11.17**, by TOPAK pull request #88, merged as `2db08ff`, and pull request #24, merged as `e80350f`
+(`derived/tla-kit-phase5-checks-2026.11.17.md`):
+1. **The configuration:** the `writing-tla-specs-and-proofs` plugin at `2db08ff`. Its `.mcp.json` declares the
+   server by `v0.3.0`'s digest, and its `SKILL.md` says which tool answers which step and what to do without Docker.
+2. **The job:** `examples/agent-repair/` makes the fixture's project with one proof step broken, runs an agent with
+   the plugin and only `Read`, `Edit` and each of the fourteen tools allowed, and checks the repair apart from the
+   agent. `.github/workflows/agent.yml` runs the same scripts, and is the example a project copies.
+3. **The runs:** locally and in Actions (run 44080090637), the server connected, the agent repaired the step, and
+   every check passed. Two earlier runs in Actions repaired it too, and failed on faults in the check that their own
+   commits fixed.
+
+Along the way:
+- **ADR-0008's two recollections hold:** a plugin's `.mcp.json` declares the server, and a `docker run` command
+  serves as one, on macOS and on GitHub's runner.
+- **The project is the repository's root:** `CLAUDE_PROJECT_DIR` is the session's starting directory, so the
+  declaration runs `sh -c` and asks git.
+- **The confinement is the allowlist:** `--strict-mcp-config` would drop the plugin's server, so an agent is
+  confined by `--allowedTools` and `--permission-mode dontAsk`, with the tools named
+  `mcp__plugin_writing-tla-specs-and-proofs_tla-kit__<tool>`.
+- **What a check can rely on:** a session's first message can come before the server connects, and one agent of
+  four wrote a structured proof where the others extended a `BY`. So the check looks at the calls the server
+  answered, and at what lies outside the proofs.
+- **Each release reaches the plugin by a TOPAK pull request** that moves the digest in `.mcp.json`.
 
 ### Phase 6: more of the family
 

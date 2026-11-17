@@ -1,0 +1,3 @@
+CLAUDE_PLUGIN_ROOT=<R>/plugin
+CLAUDE_PROJECT_DIR=<R>/project/sub
+PWD=<R>/project/sub

@@ -22,7 +22,7 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0005](ADR-0005.md) | One prover build per image, from a copy of its tarball kept here | Assistant | Built; the weekly comparison has not run yet | Accepted · 2026.11.15 |
 | [ADR-0006](ADR-0006.md) | The MCP server has no way of its own to write a results file | Assistant | Built in part: Phase 3's tools; the proof tools are Phase 4 | Accepted · 2026.11.16 |
 | [ADR-0007](ADR-0007.md) | The skill is the source of the method; its scripts are vendored here at a named commit | Custodian (D2) | Built: vendored, and used by the server | Accepted · 2026.11.15 |
-| [ADR-0008](ADR-0008.md) | The MCP server is Python over stdio, inside the image, confined to the mounted project | Assistant; custodian (the standard library) | Built in part: items 1 to 5; item 6 is Phase 5 | Accepted · 2026.11.16 |
+| [ADR-0008](ADR-0008.md) | The MCP server is Python over stdio, inside the image, confined to the mounted project | Assistant; custodian (the standard library) | Built: items 1 to 6 | Accepted · 2026.11.16 |
 | [ADR-0009](ADR-0009.md) | The proof tools follow marco6/tlapm-mcp's design, with named changes, and do not depend on it | Custodian (D6) | Built: Phase 4, released in `v0.3.0` | Accepted · 2026.11.16 |
 | [ADR-0010](ADR-0010.md) | The image is published at `ghcr.io/scottcochran/tla-kit`, public, from a tag | Custodian (D3) | Built: `v0.1.0`, `v0.2.0` and `v0.3.0` published | Accepted · 2026.11.16 |
 | [ADR-0011](ADR-0011.md) | Code is licensed Apache-2.0 and documentation CC BY 4.0, as in TOPAK | Custodian (D4) | Built | Accepted · 2026.11.15 |

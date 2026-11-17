@@ -223,7 +223,8 @@ In this order: the comparison, the tests of `tlapm`, the module, then the tools.
 - Compare driving `tlapm` per request with driving `tlapm_lsp`, which already resolves a cursor position to its
   obligations (ADR-0009 item 5). The choice decides which processes exist. **Done 2026.11.16**
   (`derived/tla-kit-prove-comparison-2026.11.16.md`): the custodian chose `tlapm` per request. It also found that
-  Phase 3's `parse` and `symbols` do not give SANY the prover's library, so they fail on a proof module.
+  Phase 3's `parse` and `symbols` did not give SANY the prover's library, so they failed on a proof module. They
+  now do, from beside the prover `TLAPM` names, and the client test parses the fixture's proof module.
 - Test three assumptions about `tlapm` in the image: whether two processes can share a cache directory, whether
   every backend stays in `tlapm`'s process group, and what a kill leaves in the cache (ADR-0016 item 6). **Done
   2026.11.16** (`derived/tla-kit-tlapm-assumptions-2026.11.16.md`): backends stay in the group; a kill of `tlapm`

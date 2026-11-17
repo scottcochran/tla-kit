@@ -16,6 +16,7 @@ What it may write (ADR-0006):
 Every path a client sends is resolved against the project root (TLA_KIT_PROJECT, else /work when it exists, else the
 working directory) and refused if it leads outside it, links included (ADR-0008 item 3).
 """
+import faulthandler
 import hashlib
 import json
 import os
@@ -1105,6 +1106,7 @@ def serve(stdin=sys.stdin, stdout=sys.stdout):
     threading.Thread(target=reaper, daemon=True).start()
     if threading.current_thread() is threading.main_thread():
         signal.signal(signal.SIGTERM, on_sigterm)
+        faulthandler.register(signal.SIGUSR1, file=sys.stderr, all_threads=True)  # every thread's stack, on demand
     threads = []
     for line in stdin:
         if not line.strip():

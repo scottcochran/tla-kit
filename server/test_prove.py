@@ -21,6 +21,7 @@ import json
 import os
 import queue
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -38,6 +39,25 @@ def check(name, cond, detail=""):
     print(("ok    " if cond else "FAIL  ") + name + ("" if cond else f": {detail}"), flush=True)
     if not cond:
         failures.append(name)
+
+
+def dump(why):
+    """Every process, with its state, parent, group, what it waits on, and its command: printed when an answer is
+    late, so that a stall in tlapm can be told from a fault of the server's."""
+    print(f"----- {why}: every process", flush=True)
+    for d in sorted((x for x in os.listdir("/proc") if x.isdigit()), key=int):
+        try:
+            raw = open(f"/proc/{d}/stat").read()
+            cmd = open(f"/proc/{d}/cmdline").read().replace("\0", " ").strip()[:160]
+        except OSError:
+            continue
+        try:
+            wchan = open(f"/proc/{d}/wchan").read() or "-"
+        except OSError:
+            wchan = "?"
+        f = raw[raw.rindex(")") + 2:].split()
+        print(f"  pid {d} state {f[0]} ppid {f[1]} pgid {f[2]} wchan {wchan}: {cmd}", flush=True)
+    print("-----", flush=True)
 
 
 def procs():
@@ -66,11 +86,15 @@ class Client:
     def __init__(self, cmd, env):
         self.p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True, env=env, bufsize=1)
         self.q, self.n = queue.Queue(), 0
+        self.answers, self.arrived = {}, {}  # every response by id, and when it came: none is ever dropped
         threading.Thread(target=self.read, daemon=True).start()
 
     def read(self):
         for line in self.p.stdout:
-            self.q.put(json.loads(line))
+            m = json.loads(line)
+            if "id" in m:
+                self.arrived[m["id"]] = time.time()
+            self.q.put(m)
 
     def send(self, msg):
         self.p.stdin.write(json.dumps(msg) + "\n")
@@ -98,21 +122,36 @@ class Client:
                 break
         return got
 
-    def wait(self, rid, seconds=300):
-        """The response to rid, and any other message that came first."""
-        others, end = [], time.time() + seconds
-        while time.time() < end:
+    def wait(self, rid, seconds=280, dump_after=150):
+        """The response to rid, and any other message that came first. Responses to other requests are kept for
+        their own wait: two requests may be answered in either order. If none has come after dump_after seconds,
+        every process is printed once, while the stall lasts."""
+        if rid in self.answers:
+            return self.answers.pop(rid), []
+        others, start, dumped = [], time.time(), False
+        while time.time() < start + seconds:
             try:
-                m = self.q.get(timeout=max(0.01, end - time.time()))
+                m = self.q.get(timeout=1.0)
             except queue.Empty:
-                break
+                if not dumped and time.time() > start + dump_after:
+                    dump(f"no answer to request {rid} after {dump_after} s")
+                    print("----- the server's threads (SIGUSR1):", flush=True)
+                    os.kill(self.p.pid, signal.SIGUSR1)
+                    time.sleep(1)
+                    dumped = True
+                continue
             if m.get("id") == rid:
                 return m, others
+            if "id" in m:
+                self.answers[m["id"]] = m
             others.append(m)
         return None, others
 
 
 def result(m):
+    """(structured result, is error?, text) of a response; a missing response is an error, not a crash."""
+    if m is None:
+        return None, True, "no response"
     r = m["result"]
     return r.get("structuredContent"), r.get("isError"), r["content"][0]["text"]
 
@@ -153,7 +192,9 @@ def main():
                                     "clientInfo": {"name": "test_prove", "version": "0"}}))
     c.send({"jsonrpc": "2.0", "method": "notifications/initialized"})
     before = snapshot(project)
-    slow = {"module": "spec/Broken_proof.tla", "theorem": "NextBounded", "stretch": 3, "nofp": True}
+    # A server-side limit well inside the test's wait: a tlapm that hangs comes back as a timeout, and a lost
+    # answer stays missing, so the two can be told apart.
+    slow = {"module": "spec/Broken_proof.tla", "theorem": "NextBounded", "stretch": 3, "nofp": True, "timeout": 200}
     try:
         # The fixture proves.
         m, _ = c.wait(c.prove({"module": "spec/Counter_proof.tla"}))
@@ -188,24 +229,27 @@ def main():
         settled(c, "after a timeout")
 
         # OneWriterPerCache: one module twice at once takes turns; two modules run side by side.
-        t0 = time.time()
+        # Either request may take the module's cache first, so the order of the answers is not fixed: the later
+        # answer must come at least most of a run after the earlier one.
         a, b = c.prove(slow), c.prove(slow)
         ma, _ = c.wait(a)
-        ta = time.time() - t0
         mb, _ = c.wait(b)
-        tb = time.time() - t0
-        sa, sb = result(ma)[0], result(mb)[0]
-        check("one module twice: both answered, the second after the first", sa["verdict"] == "failed"
-              and sb["verdict"] == "failed" and tb >= ta + 0.8 * sa["seconds"], {"first": ta, "second": tb})
+        sa, sb = result(ma)[0] or {}, result(mb)[0] or {}
+        gap = abs(c.arrived.get(a, 0) - c.arrived.get(b, 0))
+        run = min(sa.get("seconds", 0), sb.get("seconds", 0))
+        check("one module twice: both answered, one after the other", sa.get("verdict") == "failed"
+              and sb.get("verdict") == "failed" and gap >= 0.8 * run,
+              {"gap": round(gap, 1), "run": run, "verdicts": [sa.get("verdict"), sb.get("verdict")]})
         t0 = time.time()
         a, b = c.prove(slow), c.prove(dict(slow, module="spec/Broken2_proof.tla"))
         ma, _ = c.wait(a)
         mb, _ = c.wait(b)
         both = time.time() - t0
-        sa, sb = result(ma)[0], result(mb)[0]
-        check("two modules: both answered, side by side", sa["verdict"] == "failed" and sb["verdict"] == "failed"
-              and both < sa["seconds"] + sb["seconds"] - 2, {"together": both, "each": [sa["seconds"],
-                                                                                         sb["seconds"]]})
+        sa, sb = result(ma)[0] or {}, result(mb)[0] or {}
+        check("two modules: both answered, side by side", sa.get("verdict") == "failed"
+              and sb.get("verdict") == "failed" and both < sa.get("seconds", 0) + sb.get("seconds", 0) - 2,
+              {"together": round(both, 1), "first": [sa.get("verdict"), sa.get("seconds")],
+               "second": [sb.get("verdict"), sb.get("seconds")]})
         settled(c, "after concurrent runs")
 
         # AtMostOneAnswer, NoProcessOutlives: a cancel during a run.

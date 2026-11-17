@@ -3,7 +3,7 @@
 Architecture decision records, one file each, after the form of TOPAK's `decisions/`. They were drafted on
 2026.11.15 from [PLAN.md](../PLAN.md) and [the founding session
 record](../derived/tla-kit-founding-session-2026.11.15.md), all as Proposed. **ADR-0001 to ADR-0011 and ADR-0013 to
-ADR-0015 were accepted by the custodian on 2026.11.15 and 2026.11.16, and the rest are Proposed.** The custodian
+ADR-0016 were accepted by the custodian on 2026.11.15 and 2026.11.16, and the rest are Proposed.** The custodian
 chose the idea, the name and the spike. Every other choice was the assistant's, or is a recommendation the plan
 lists as owed. Nothing here is accepted until the custodian accepts it.
 
@@ -30,7 +30,7 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0013](ADR-0013.md) | Every pin moves by one rule: one pull request, evidence that fits what the pin can change | Assistant | Built; the weekly check has not run yet | Accepted · 2026.11.15 |
 | [ADR-0014](ADR-0014.md) | Every pull request is built and tested; a release is an immutable tag, attested, and never deleted | Assistant | Built in part: Phase 1 done; the projects' pins are Phase 2 | Accepted · 2026.11.15 |
 | [ADR-0015](ADR-0015.md) | The pin and release process is specified in TLA+, and checked by TLC before the records it covers are accepted | Custodian (that it is written); assistant (its scope) | Built | Accepted · 2026.11.15 |
-| [ADR-0016](ADR-0016.md) | The `prove` tool's requests, processes and cache are specified in TLA+ before the tool is built | Custodian (that it is written); assistant (its scope) | Planned, Phase 4 | Proposed |
+| [ADR-0016](ADR-0016.md) | The `prove` tool's requests, processes and cache are specified in TLA+ before the tool is built | Custodian (that it is written); assistant (its scope) | Planned, Phase 4 | Accepted · 2026.11.16 |
 
 **Not recorded here.** `PLAN.md`'s D1, whether TOPAK moves `tools/TLAPS-PIN` to the image's Linux prover, is
 TOPAK's decision and is made there. So is the same question for gov-tla. ADR-0005 says what tla-kit provides

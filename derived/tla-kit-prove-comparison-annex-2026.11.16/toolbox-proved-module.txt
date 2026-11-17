@@ -1,0 +1,327 @@
+
+\* TLAPM version ff40755
+\* launched at 2026-11-16 23:56:23 with command line:
+\* tlapm --toolbox 0 0 --cache-dir /tmp/c --threads 2 Counter_proof.tla
+
+@!!BEGIN
+@!!type:obligation
+@!!id:1
+@!!loc:7:3:7:5
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:2
+@!!loc:10:3:10:5
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:3
+@!!loc:15:3:15:5
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:4
+@!!loc:15:6:15:14
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:5
+@!!loc:25:5:25:7
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:6
+@!!loc:25:8:25:12
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:7
+@!!loc:25:14:25:18
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:8
+@!!loc:25:20:25:23
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:9
+@!!loc:21:5:21:7
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:10
+@!!loc:21:8:21:16
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:11
+@!!loc:21:18:21:29
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:12
+@!!loc:23:5:23:7
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:13
+@!!loc:23:8:23:16
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:14
+@!!loc:33:5:33:7
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:15
+@!!loc:33:8:33:12
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:16
+@!!loc:31:5:31:7
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:17
+@!!loc:31:8:31:21
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:18
+@!!loc:38:3:38:5
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:19
+@!!loc:38:6:38:19
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligationsnumber
+@!!count:19
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:1
+@!!loc:7:3:7:5
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.1 (3%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:2
+@!!loc:10:3:10:5
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.2 (4%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:4
+@!!loc:15:6:15:14
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:5
+@!!loc:25:5:25:7
+@!!status:proved
+@!!prover:ls4
+@!!meth:time-limit: 10; time-used: 0.1 (1%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:6
+@!!loc:25:8:25:12
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:7
+@!!loc:25:14:25:18
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:8
+@!!loc:25:20:25:23
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:3
+@!!loc:15:3:15:5
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.2 (3%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:10
+@!!loc:21:8:21:16
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:11
+@!!loc:21:18:21:29
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:9
+@!!loc:21:5:21:7
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.1 (1%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:13
+@!!loc:23:8:23:16
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:12
+@!!loc:23:5:23:7
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.1 (2%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:15
+@!!loc:33:8:33:12
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:14
+@!!loc:33:5:33:7
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.1 (1%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:17
+@!!loc:31:8:31:21
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:16
+@!!loc:31:5:31:7
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.1 (2%)
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:19
+@!!loc:38:6:38:19
+@!!status:trivial
+@!!prover:tlapm
+@!!already:false
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:18
+@!!loc:38:3:38:5
+@!!status:proved
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 0.1 (2%)
+@!!already:false
+@!!END
+
+(* created new "/tmp/c/Counter_proof.tlaps/Counter_proof.thy" *)
+(* fingerprints written in "/tmp/c/Counter_proof.tlaps/fingerprints" *)
+File "./Counter_proof.tla", line 1, character 1 to line 39, character 77:
+[INFO]: All 19 obligations proved.

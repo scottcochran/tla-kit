@@ -63,8 +63,8 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 ### Records to accept, and when
 
 This is the order in which the phases need the records. The Phase 1a and 1b rows were accepted on 2026.11.15,
-and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006, ADR-0008 and ADR-0009 were accepted on 2026.11.16. Every other record is
-Proposed.
+and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006, ADR-0008, ADR-0009 and ADR-0016 were accepted on
+2026.11.16. Every other record is Proposed.
 
 | Before | Accept | Why then |
 |---|---|---|
@@ -72,7 +72,7 @@ Proposed.
 | Phase 1b | ADR-0015 | Its scope, so that `spec/PinLifecycle.tla` can be written. Accepted 2026.11.15. |
 | Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15, and ADR-0010 2026.11.16. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
 | Phase 3 | ADR-0006, 0008 | Both accepted 2026.11.16. ADR-0008 item 1 was changed first to the standard library, at the custodian's choice. |
-| Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0009 accepted 2026.11.16. ADR-0016 waits on ADR-0009 item 5's comparison of `tlapm` with `tlapm_lsp`. |
+| Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0009 accepted 2026.11.16. Its item 5's comparison was made the same day, and the custodian chose `tlapm` per request; ADR-0016 was brought into line with it and accepted the same day. |
 | Phase 6 | ADR-0012 (D5) | |
 
 ## Phases
@@ -221,7 +221,9 @@ Along the way:
 In this order: the comparison, the tests of `tlapm`, the module, then the tools.
 
 - Compare driving `tlapm` per request with driving `tlapm_lsp`, which already resolves a cursor position to its
-  obligations (ADR-0009 item 5). The choice decides which processes exist.
+  obligations (ADR-0009 item 5). The choice decides which processes exist. **Done 2026.11.16**
+  (`derived/tla-kit-prove-comparison-2026.11.16.md`): the custodian chose `tlapm` per request. It also found that
+  Phase 3's `parse` and `symbols` do not give SANY the prover's library, so they fail on a proof module.
 - Test three assumptions about `tlapm` in the image: whether two processes can share a cache directory, whether
   every backend stays in `tlapm`'s process group, and what a kill leaves in the cache (ADR-0016 item 6).
 - Write `spec/ProveRequests.tla` for the chosen option, before the tool's code: a row for a naive design, one for

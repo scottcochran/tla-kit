@@ -1,0 +1,1187 @@
+[
+ {
+  "t": 0.0,
+  "sent": {
+   "jsonrpc": "2.0",
+   "id": 1,
+   "method": "initialize",
+   "params": {
+    "processId": 7,
+    "rootUri": "file:///work",
+    "capabilities": {}
+   }
+  }
+ },
+ {
+  "t": 0.33,
+  "got": {
+   "id": 1,
+   "jsonrpc": "2.0",
+   "result": {
+    "capabilities": {
+     "codeActionProvider": {
+      "codeActionKinds": [
+       "tlaplus.tlaps.check-step.ca",
+       "refactor"
+      ],
+      "resolveProvider": false,
+      "workDoneProgress": false
+     },
+     "diagnosticProvider": {
+      "identifier": "TLAPM",
+      "interFileDependencies": false,
+      "workDoneProgress": false,
+      "workspaceDiagnostics": false
+     },
+     "executeCommandProvider": {
+      "commands": [
+       "tlaplus.tlaps.check-step.lsp",
+       "tlaplus.tlaps.proofStepMarkers.fetch.lsp",
+       "tlaplus.tlaps.currentProofStep.set.lsp",
+       "tlaplus.tlaps.moduleSearchPaths.updated.lsp"
+      ],
+      "workDoneProgress": true
+     },
+     "experimental": {
+      "moduleSearchPaths": [
+       "/opt/tlaps/lib/tlapm/stdlib"
+      ]
+     },
+     "renameProvider": {
+      "prepareProvider": true,
+      "workDoneProgress": false
+     },
+     "textDocumentSync": 1
+    },
+    "serverInfo": {
+     "name": "tlapm-lsp",
+     "version": "ff40755"
+    }
+   }
+  }
+ },
+ {
+  "t": 3.19,
+  "sent": {
+   "jsonrpc": "2.0",
+   "method": "initialized",
+   "params": {}
+  }
+ },
+ {
+  "t": 3.2,
+  "sent": {
+   "jsonrpc": "2.0",
+   "method": "textDocument/didOpen",
+   "params": {
+    "textDocument": {
+     "uri": "file:///work/Counter_proof.tla",
+     "languageId": "tlaplus",
+     "version": 1,
+     "text": "--------------------------- MODULE Counter_proof ---------------------------\n(* Proof of Counter's one property, in the shape the skill describes: the type invariant under every mutation,\n   one Next lemma under the hypothesis, a three-line theorem, SafeAlways, and one lemma for the mutation. *)\nEXTENDS Counter, TLAPS\n\nLEMMA TypeInit == Init => TypeOK\n  BY DEF Init, TypeOK\n\nLEMMA TypeNext == TypeOK /\\ [Next]_vars => TypeOK'\n  BY DEF TypeOK, Next, Step, vars\n\nLEMMA NextBounded ==\n    ASSUME Mut # \"M_NOLIMIT\"\n    PROVE  TypeOK /\\ Bounded /\\ [Next]_vars => Bounded'\n  BY DEF Bounded\n\nTHEOREM BoundedAlways ==\n    ASSUME Mut # \"M_NOLIMIT\"\n    PROVE  Spec => []Bounded\n<1>1. (TypeOK /\\ Bounded) /\\ [Next]_vars => (TypeOK /\\ Bounded)'\n    BY TypeNext, NextBounded\n<1>2. Init => TypeOK /\\ Bounded\n    BY TypeInit DEF Init, Bounded\n<1> QED\n    BY <1>1, <1>2, PTL DEF Spec\n\nTHEOREM SafeAlways ==\n    ASSUME Mut = \"none\"\n    PROVE  Spec => []Bounded\n<1>1. Spec => []Bounded\n    BY BoundedAlways\n<1> QED\n    BY <1>1\n\nLEMMA MutNoLimitAllowsStep ==\n    ASSUME Mut = \"M_NOLIMIT\", TypeOK\n    PROVE  ENABLED Step\n  BY ExpandENABLED DEF Step, TypeOK\n=============================================================================\n"
+    }
+   }
+  }
+ },
+ {
+  "t": 6.25,
+  "sent": {
+   "jsonrpc": "2.0",
+   "id": 2,
+   "method": "workspace/executeCommand",
+   "params": {
+    "command": "tlaplus.tlaps.check-step.lsp",
+    "arguments": [
+     {
+      "uri": "file:///work/Counter_proof.tla",
+      "version": 1
+     },
+     {
+      "start": {
+       "line": 14,
+       "character": 2
+      },
+      "end": {
+       "line": 14,
+       "character": 2
+      }
+     }
+    ]
+   }
+  }
+ },
+ {
+  "t": 6.32,
+  "got": {
+   "id": 1,
+   "params": {
+    "token": "tlapm_lsp-p_ref-1"
+   },
+   "method": "window/workDoneProgress/create",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 6.32,
+  "got": {
+   "params": {
+    "diagnostics": [],
+    "uri": "file:///work/Counter_proof.tla",
+    "version": 1
+   },
+   "method": "textDocument/publishDiagnostics",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 6.32,
+  "got": {
+   "params": [
+    "file:///work/Counter_proof.tla",
+    [
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 36
+       },
+       "start": {
+        "character": 0,
+        "line": 34
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 31
+       },
+       "start": {
+        "character": 0,
+        "line": 31
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 29
+       },
+       "start": {
+        "character": 0,
+        "line": 29
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 28
+       },
+       "start": {
+        "character": 0,
+        "line": 26
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 23
+       },
+       "start": {
+        "character": 0,
+        "line": 23
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 31,
+        "line": 21
+       },
+       "start": {
+        "character": 0,
+        "line": 21
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 64,
+        "line": 19
+       },
+       "start": {
+        "character": 0,
+        "line": 19
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 18
+       },
+       "start": {
+        "character": 0,
+        "line": 16
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 55,
+        "line": 13
+       },
+       "start": {
+        "character": 0,
+        "line": 11
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 50,
+        "line": 8
+       },
+       "start": {
+        "character": 0,
+        "line": 8
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 32,
+        "line": 5
+       },
+       "start": {
+        "character": 0,
+        "line": 5
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 1,
+        "line": 0
+       },
+       "start": {
+        "character": 0,
+        "line": 0
+       }
+      },
+      "hover": "Proof pending."
+     }
+    ]
+   ],
+   "method": "tlaplus/tlaps/proofStepMarkers",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 6.33,
+  "got": {
+   "id": 2,
+   "jsonrpc": "2.0",
+   "result": null
+  }
+ },
+ {
+  "t": 6.59,
+  "got": {
+   "params": {
+    "token": "tlapm_lsp-p_ref-1",
+    "value": {
+     "kind": "begin",
+     "cancellable": true,
+     "message": "0 of 1 obligations checked",
+     "percentage": 0,
+     "title": "Checking TLA+ proofs"
+    }
+   },
+   "method": "$/progress",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 6.86,
+  "got": {
+   "params": {
+    "diagnostics": [],
+    "uri": "file:///work/Counter_proof.tla",
+    "version": 1
+   },
+   "method": "textDocument/publishDiagnostics",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 6.86,
+  "got": {
+   "params": [
+    "file:///work/Counter_proof.tla",
+    [
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 36
+       },
+       "start": {
+        "character": 0,
+        "line": 34
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 31
+       },
+       "start": {
+        "character": 0,
+        "line": 31
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 29
+       },
+       "start": {
+        "character": 0,
+        "line": 29
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 28
+       },
+       "start": {
+        "character": 0,
+        "line": 26
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 23
+       },
+       "start": {
+        "character": 0,
+        "line": 23
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 31,
+        "line": 21
+       },
+       "start": {
+        "character": 0,
+        "line": 21
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 64,
+        "line": 19
+       },
+       "start": {
+        "character": 0,
+        "line": 19
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 18
+       },
+       "start": {
+        "character": 0,
+        "line": 16
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "progress",
+      "range": {
+       "end": {
+        "character": 55,
+        "line": 13
+       },
+       "start": {
+        "character": 0,
+        "line": 11
+       }
+      },
+      "hover": "Proving in progress."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 50,
+        "line": 8
+       },
+       "start": {
+        "character": 0,
+        "line": 8
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 32,
+        "line": 5
+       },
+       "start": {
+        "character": 0,
+        "line": 5
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 1,
+        "line": 0
+       },
+       "start": {
+        "character": 0,
+        "line": 0
+       }
+      },
+      "hover": "Proof pending."
+     }
+    ]
+   ],
+   "method": "tlaplus/tlaps/proofStepMarkers",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 9.88,
+  "got": {
+   "params": {
+    "diagnostics": [],
+    "uri": "file:///work/Counter_proof.tla",
+    "version": 1
+   },
+   "method": "textDocument/publishDiagnostics",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 9.88,
+  "got": {
+   "params": [
+    "file:///work/Counter_proof.tla",
+    [
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 36
+       },
+       "start": {
+        "character": 0,
+        "line": 34
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 31
+       },
+       "start": {
+        "character": 0,
+        "line": 31
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 29
+       },
+       "start": {
+        "character": 0,
+        "line": 29
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 28
+       },
+       "start": {
+        "character": 0,
+        "line": 26
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 23
+       },
+       "start": {
+        "character": 0,
+        "line": 23
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 31,
+        "line": 21
+       },
+       "start": {
+        "character": 0,
+        "line": 21
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 64,
+        "line": 19
+       },
+       "start": {
+        "character": 0,
+        "line": 19
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 18
+       },
+       "start": {
+        "character": 0,
+        "line": 16
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "progress",
+      "range": {
+       "end": {
+        "character": 55,
+        "line": 13
+       },
+       "start": {
+        "character": 0,
+        "line": 11
+       }
+      },
+      "hover": "Proving in progress."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 50,
+        "line": 8
+       },
+       "start": {
+        "character": 0,
+        "line": 8
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 32,
+        "line": 5
+       },
+       "start": {
+        "character": 0,
+        "line": 5
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 1,
+        "line": 0
+       },
+       "start": {
+        "character": 0,
+        "line": 0
+       }
+      },
+      "hover": "Proof pending."
+     }
+    ]
+   ],
+   "method": "tlaplus/tlaps/proofStepMarkers",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 11.9,
+  "got": {
+   "params": {
+    "diagnostics": [
+     {
+      "message": "Obligation: failed\n\nASSUME NEW CONSTANT Mut,\n       NEW CONSTANT Limit,\n       NEW VARIABLE n,\n       NEW VARIABLE over,\n       Mut # \"M_NOLIMIT\" \nPROVE  TypeOK /\\ ~over /\\ [Next]_vars => (~over)'\n",
+      "range": {
+       "end": {
+        "character": 4,
+        "line": 14
+       },
+       "start": {
+        "character": 2,
+        "line": 14
+       }
+      },
+      "severity": 1,
+      "source": "TLAPM"
+     }
+    ],
+    "uri": "file:///work/Counter_proof.tla",
+    "version": 1
+   },
+   "method": "textDocument/publishDiagnostics",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 11.9,
+  "got": {
+   "params": [
+    "file:///work/Counter_proof.tla",
+    [
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 36
+       },
+       "start": {
+        "character": 0,
+        "line": 34
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 31
+       },
+       "start": {
+        "character": 0,
+        "line": 31
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 29
+       },
+       "start": {
+        "character": 0,
+        "line": 29
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 28
+       },
+       "start": {
+        "character": 0,
+        "line": 26
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 23
+       },
+       "start": {
+        "character": 0,
+        "line": 23
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 31,
+        "line": 21
+       },
+       "start": {
+        "character": 0,
+        "line": 21
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 64,
+        "line": 19
+       },
+       "start": {
+        "character": 0,
+        "line": 19
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 18
+       },
+       "start": {
+        "character": 0,
+        "line": 16
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "progress",
+      "range": {
+       "end": {
+        "character": 55,
+        "line": 13
+       },
+       "start": {
+        "character": 0,
+        "line": 11
+       }
+      },
+      "hover": "Proving in progress."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 50,
+        "line": 8
+       },
+       "start": {
+        "character": 0,
+        "line": 8
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 32,
+        "line": 5
+       },
+       "start": {
+        "character": 0,
+        "line": 5
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 1,
+        "line": 0
+       },
+       "start": {
+        "character": 0,
+        "line": 0
+       }
+      },
+      "hover": "Proof pending."
+     }
+    ]
+   ],
+   "method": "tlaplus/tlaps/proofStepMarkers",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 12.26,
+  "got": {
+   "params": {
+    "token": "tlapm_lsp-p_ref-1",
+    "value": {
+     "kind": "report",
+     "cancellable": true,
+     "message": "1 of 1 obligations checked",
+     "percentage": 100
+    }
+   },
+   "method": "$/progress",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 12.26,
+  "got": {
+   "params": {
+    "token": "tlapm_lsp-p_ref-1",
+    "value": {
+     "kind": "end",
+     "message": "1 of 1 obligations checked"
+    }
+   },
+   "method": "$/progress",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 12.26,
+  "got": {
+   "params": {
+    "diagnostics": [
+     {
+      "message": "Obligation: failed\n\nASSUME NEW CONSTANT Mut,\n       NEW CONSTANT Limit,\n       NEW VARIABLE n,\n       NEW VARIABLE over,\n       Mut # \"M_NOLIMIT\" \nPROVE  TypeOK /\\ ~over /\\ [Next]_vars => (~over)'\n",
+      "range": {
+       "end": {
+        "character": 4,
+        "line": 14
+       },
+       "start": {
+        "character": 2,
+        "line": 14
+       }
+      },
+      "severity": 1,
+      "source": "TLAPM"
+     }
+    ],
+    "uri": "file:///work/Counter_proof.tla",
+    "version": 1
+   },
+   "method": "textDocument/publishDiagnostics",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 12.26,
+  "got": {
+   "params": [
+    "file:///work/Counter_proof.tla",
+    [
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 36
+       },
+       "start": {
+        "character": 0,
+        "line": 34
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 31
+       },
+       "start": {
+        "character": 0,
+        "line": 31
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 23,
+        "line": 29
+       },
+       "start": {
+        "character": 0,
+        "line": 29
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 28
+       },
+       "start": {
+        "character": 0,
+        "line": 26
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 7,
+        "line": 23
+       },
+       "start": {
+        "character": 0,
+        "line": 23
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 31,
+        "line": 21
+       },
+       "start": {
+        "character": 0,
+        "line": 21
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 64,
+        "line": 19
+       },
+       "start": {
+        "character": 0,
+        "line": 19
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 28,
+        "line": 18
+       },
+       "start": {
+        "character": 0,
+        "line": 16
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "failed",
+      "range": {
+       "end": {
+        "character": 55,
+        "line": 13
+       },
+       "start": {
+        "character": 0,
+        "line": 11
+       }
+      },
+      "hover": "Proof failed."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 50,
+        "line": 8
+       },
+       "start": {
+        "character": 0,
+        "line": 8
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 32,
+        "line": 5
+       },
+       "start": {
+        "character": 0,
+        "line": 5
+       }
+      },
+      "hover": "Proof pending."
+     },
+     {
+      "status": "pending",
+      "range": {
+       "end": {
+        "character": 1,
+        "line": 0
+       },
+       "start": {
+        "character": 0,
+        "line": 0
+       }
+      },
+      "hover": "Proof pending."
+     }
+    ]
+   ],
+   "method": "tlaplus/tlaps/proofStepMarkers",
+   "jsonrpc": "2.0"
+  }
+ },
+ {
+  "t": 31.43,
+  "sent": {
+   "jsonrpc": "2.0",
+   "id": 3,
+   "method": "shutdown",
+   "params": null
+  }
+ },
+ {
+  "t": 31.45,
+  "not sent, server gone": "exit"
+ },
+ {
+  "exit": 125
+ }
+]

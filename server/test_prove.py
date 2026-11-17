@@ -184,6 +184,14 @@ def main():
     for name in ("Broken_proof", "Broken2_proof"):
         with open(os.path.join(spec, name + ".tla"), "w") as f:
             f.write(broken.replace("MODULE Counter_proof", "MODULE " + name))
+    with open(os.path.join(spec, "Bad_proof.tla"), "w") as f:
+        f.write("---- MODULE Bad_proof ----\nEXTENDS Counter, TLAPS\nTHEOREM T == Init => TypeOK\n"
+                "  BY DEF Init, TypeOKK\n====\n")
+    # A clean copy of the fixture, for the generators, which write results files into it.
+    spec2 = os.path.join(project, "spec2")
+    os.makedirs(spec2)
+    for f in ("Counter.tla", "Counter-rows.txt", "Counter_proof.tla"):
+        shutil.copy(os.path.join(FIXTURE, f), spec2)
     exe = shutil.which("tla-kit")
     cmd = [exe, "mcp"] if exe else [sys.executable, "-B", os.path.join(HERE, "tla_kit_mcp.py")]
     cache = tempfile.mkdtemp(prefix="tla-kit-prove-cache-")
@@ -191,7 +199,7 @@ def main():
     c.wait(c.request("initialize", {"protocolVersion": "2025-06-18", "capabilities": {},
                                     "clientInfo": {"name": "test_prove", "version": "0"}}))
     c.send({"jsonrpc": "2.0", "method": "notifications/initialized"})
-    before = snapshot(project)
+    before = snapshot(spec)
     # A server-side limit well inside the test's wait: a tlapm that hangs comes back as a timeout, and a lost
     # answer stays missing, so the two can be told apart.
     slow = {"module": "spec/Broken_proof.tla", "theorem": "NextBounded", "stretch": 3, "nofp": True, "timeout": 200}
@@ -280,12 +288,52 @@ def main():
         got = others + c.collect(2)
         check("cancel after the response: nothing more is sent", pm is not None and m is not None
               and all(x.get("id") != rid for x in got), got)
+        settled(c, "after the prove tests")
+
+        # proof_check: parse and count without a backend.
+        m, _ = c.wait(c.request("tools/call", {"name": "proof_check",
+                                               "arguments": {"module": "spec/Counter_proof.tla"}}))
+        s, err, text = result(m)
+        check("proof_check: the fixture's proof parses, 19 obligations", not err and s["ok"]
+              and s["obligations"] == 19, text[:400])
+        m, _ = c.wait(c.request("tools/call", {"name": "proof_check", "arguments": {"module": "spec/Bad_proof.tla"}}))
+        s, err, text = result(m)
+        check("proof_check: an undefined operator, at its line", not err and not s["ok"]
+              and any(e["line"] == 4 and "TypeOKK" in e["message"] for e in s["errors"]), text[:600])
+
+        # proof_results through the server writes the file the script writes (Phase 4's "Done when").
+        def tool(name, args, seconds=600):
+            m, _ = c.wait(c.request("tools/call", {"name": name, "arguments": args}), seconds)
+            return result(m)
+        s, err, text = tool("tlc_rows", {"rows": "spec2/Counter-rows.txt", "jobs": 2, "date": "2000.01.01"})
+        check("tlc_rows: the clean copy's TLC results, for proof_results to name", not err and s["exit"] == 0,
+              text[:400])
+        s, err, text = tool("proof_results", {"module": "spec2/Counter.tla", "date": "2000.01.01"})
+        check("proof_results: refused for a project with no prover pin, unless asked, and nothing written",
+              not err and s["exit"] != 0 and not s["results_files_written"] and "TLAPM_UNPINNED" in s["output"],
+              text[:600])
+        s, err, text = tool("proof_results", {"module": "spec2/Counter.tla", "date": "2000.01.01", "unpinned": True})
+        written = (s or {}).get("results_files_written", [])
+        check("proof_results: writes the dated proof results file", not err and s["exit"] == 0
+              and written == ["spec2/Counter-proof-results-2000.01.01.txt"], text[:600])
+        direct = subprocess.run([sys.executable, "-B", os.path.join(SKILL, "scripts", "proof_results.py"), "Counter",
+                                 "--dir", spec2, "--date", "2000.01.01"], capture_output=True, text=True,
+                                cwd=project, env=dict(os.environ, TLAPM_UNPINNED="1"))
+        out = direct.stdout + direct.stderr
+        check("proof_results: the script, run directly, reproduces the server's file byte for byte",
+              direct.returncode == 0 and "reproduced" in out and "byte for byte" in out, out[-600:])
+        s, err, text = tool("flip_test", {"module": "spec2/Counter.tla", "mutations": ["M_NOLIMIT"],
+                                          "unpinned": True})
+        check("flip_test: flipping M_NOLIMIT's hypothesis breaks the proof", not err and s["ok"], text[:600])
+        s, err, text = tool("proof_sync", {"dir": "spec2", "unpinned": True})
+        check("proof_sync: reports the clean copy's results against the tree", not err
+              and any("Counter" in r for r in s["rows"]), text[:800])
         settled(c, "at the end")
     finally:
         c.p.stdin.close()
         c.p.wait(timeout=60)
-    check("nothing was written into the project (NothingInProject)", snapshot(project) == before,
-          sorted(set(snapshot(project)) ^ set(before)))
+    check("nothing was written into spec/ by any tool but the generators (NothingInProject)",
+          snapshot(spec) == before, sorted(set(snapshot(spec)) ^ set(before)))
     shutil.rmtree(project, ignore_errors=True)
     shutil.rmtree(cache, ignore_errors=True)
     print(f"\n{'FAILED: ' + ', '.join(failures) if failures else 'prove: every check passed'}")

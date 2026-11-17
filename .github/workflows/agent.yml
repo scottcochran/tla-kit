@@ -1,0 +1,87 @@
+# An agent job against the tla-kit server, declared by the writing-tla-specs-and-proofs plugin (PLAN.md Phase 5;
+# ADR-0008 item 6). It is also the example a project copies: check out the plugin at a commit, pull the image its
+# .mcp.json names, and run Claude Code with --plugin-dir and each of the server's tools in --allowedTools.
+#
+# The job makes the fixture's project with one proof step broken, lets the agent repair it with the server's tools
+# and Read and Edit only, and checks the repair apart from the agent (examples/agent-repair/). The same scripts
+# run a local session against the same project, from the same plugin commit.
+#
+# It costs an API call per run, so it runs by hand, and on a pull request that changes it. It needs the
+# repository secret ANTHROPIC_API_KEY.
+name: agent
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: The agent's model
+        default: claude-opus-5-5
+  pull_request:
+    paths:
+      - .github/workflows/agent.yml
+      - examples/agent-repair/**
+
+permissions:
+  contents: read
+
+env:
+  # The plugin, at the TOPAK commit whose .mcp.json declares the server.
+  TOPAK_COMMIT: 2db08ff7e44929ac5ade7ca9d7a5c7ec612e42ff # pull request #88
+  # Claude Code, by version and by the integrity npm records for that version.
+  CLAUDE_CODE_VERSION: 2.1.312
+  CLAUDE_CODE_INTEGRITY: sha512-/gx8byG8VOm4YoNuT5tal/Ov5Z5oydJzZkmHCJcBFLbNGGpyYDbKA/CNdB+iIKwcLQC8pVwBoj6Dt7H3L2J5bw==
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: The plugin, at its commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: scottcochran/TOPAK
+          ref: ${{ env.TOPAK_COMMIT }}
+          path: topak
+          sparse-checkout: skills/writing-tla-specs-and-proofs
+      - name: The image the plugin names, pulled before the session starts the server
+        run: |
+          image=$(grep -o 'ghcr\.io/scottcochran/tla-kit@sha256:[0-9a-f]\{64\}' \
+            topak/skills/writing-tla-specs-and-proofs/.mcp.json)
+          echo "$image" | tee -a "$GITHUB_STEP_SUMMARY"
+          docker pull -q "$image"
+      - name: Claude Code, checked against its recorded integrity
+        run: |
+          cd "$RUNNER_TEMP"
+          npm pack "@anthropic-ai/claude-code@$CLAUDE_CODE_VERSION" --json > pack.json
+          got=$(python3 -c 'import json; print(json.load(open("pack.json"))[0]["integrity"])')
+          [ "$got" = "$CLAUDE_CODE_INTEGRITY" ] || { echo "integrity $got, expected $CLAUDE_CODE_INTEGRITY"; exit 1; }
+          npm install -g "./anthropic-ai-claude-code-$CLAUDE_CODE_VERSION.tgz"
+          claude --version
+      - name: The project, with one proof step broken
+        run: examples/agent-repair/make-project.sh "$RUNNER_TEMP/project"
+      - name: The agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AGENT_MODEL: ${{ inputs.model || 'claude-opus-5-5' }}
+        run: >
+          examples/agent-repair/run.sh "$RUNNER_TEMP/project"
+          topak/skills/writing-tla-specs-and-proofs "$RUNNER_TEMP/transcript.jsonl"
+      - name: The repair, checked apart from the agent
+        if: ${{ !cancelled() }}
+        run: |
+          set -o pipefail
+          python3 examples/agent-repair/check.py "$RUNNER_TEMP/project" \
+            topak/skills/writing-tla-specs-and-proofs "$RUNNER_TEMP/transcript.jsonl" | tee "$RUNNER_TEMP/check.txt"
+          git -C "$RUNNER_TEMP/project" diff > "$RUNNER_TEMP/repair.diff"
+          { echo '```'; cat "$RUNNER_TEMP/check.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      - name: Keep the transcript, the check and the diff
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: agent-repair
+          path: |
+            ${{ runner.temp }}/transcript.jsonl
+            ${{ runner.temp }}/check.txt
+            ${{ runner.temp }}/repair.diff
+          if-no-files-found: ignore

@@ -1,0 +1,4 @@
+15c15
+<   BY LimitNat DEF TypeOK, Bounded, Next, Step, vars
+---
+>   BY DEF Bounded

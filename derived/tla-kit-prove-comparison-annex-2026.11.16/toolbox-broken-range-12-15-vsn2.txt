@@ -1,0 +1,113 @@
+
+\* TLAPM version ff40755
+\* launched at 2026-11-16 23:56:52 with command line:
+\* tlapm --toolbox 12 15 --toolbox-vsn 2 --cache-dir /tmp/e --threads 2 Counter_proof.tla
+
+@!!BEGIN
+@!!type:obligation
+@!!id:1
+@!!loc:15:3:15:5
+@!!status:to be proved
+@!!END
+
+@!!BEGIN
+@!!type:obligationsnumber
+@!!count:1
+@!!END
+
+@!!BEGIN
+@!!type:obligationprovers
+@!!id:1
+@!!provers:smt,zenon,isabelle
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:1
+@!!loc:15:3:15:5
+@!!status:being proved
+@!!prover:smt
+@!!meth:time-limit: 5
+@!!obl:
+ASSUME NEW CONSTANT Mut,
+       NEW CONSTANT Limit,
+       NEW VARIABLE n,
+       NEW VARIABLE over,
+       Mut # "M_NOLIMIT" 
+PROVE  TypeOK /\ ~over /\ [Next]_vars => (~over)'
+
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:1
+@!!loc:15:3:15:5
+@!!status:failed
+@!!prover:smt
+@!!meth:time-limit: 5; time-used: 5.0 (100%)
+@!!reason:timeout
+@!!already:false
+@!!obl:
+ASSUME NEW CONSTANT Mut,
+       NEW CONSTANT Limit,
+       NEW VARIABLE n,
+       NEW VARIABLE over,
+       Mut # "M_NOLIMIT" 
+PROVE  TypeOK /\ ~over /\ [Next]_vars => (~over)'
+
+@!!END
+
+Zenon error: exhausted search space without finding a proof
+@!!BEGIN
+@!!type:obligation
+@!!id:1
+@!!loc:15:3:15:5
+@!!status:failed
+@!!prover:zenon
+@!!meth:time-limit: 10; time-used: 0.0 (0%)
+@!!reason:false
+@!!already:false
+@!!obl:
+ASSUME NEW CONSTANT Mut,
+       NEW CONSTANT Limit,
+       NEW VARIABLE n,
+       NEW VARIABLE over,
+       Mut # "M_NOLIMIT" 
+PROVE  TypeOK /\ ~over /\ [Next]_vars => (~over)'
+
+@!!END
+
+@!!BEGIN
+@!!type:obligation
+@!!id:1
+@!!loc:15:3:15:5
+@!!status:failed
+@!!prover:isabelle
+@!!meth:auto; time-limit: 30; time-used: 0.3 (1%)
+@!!reason:false
+@!!already:false
+@!!obl:
+ASSUME NEW CONSTANT Mut,
+       NEW CONSTANT Limit,
+       NEW VARIABLE n,
+       NEW VARIABLE over,
+       Mut # "M_NOLIMIT" 
+PROVE  TypeOK /\ ~over /\ [Next]_vars => (~over)'
+
+@!!END
+
+(* created new "/tmp/e/Counter_proof.tlaps/Counter_proof.thy" *)
+(* fingerprints written in "/tmp/e/Counter_proof.tlaps/fingerprints" *)
+File "./Counter_proof.tla", line 15, characters 3-4:
+[ERROR]: Could not prove or check:
+           ASSUME NEW CONSTANT Mut,
+                  NEW CONSTANT Limit,
+                  LimitNat == Limit \in Nat,
+                  NEW VARIABLE n,
+                  NEW VARIABLE over,
+                  Bounded == ~over,
+                  Mut # "M_NOLIMIT" 
+           PROVE  TypeOK /\ Bounded /\ [Next]_vars => Bounded'
+File "./Counter_proof.tla", line 1, character 1 to line 39, character 77:
+[ERROR]: 1/1 obligation failed.
+There were backend errors processing module `"Counter_proof"`.

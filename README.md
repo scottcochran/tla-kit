@@ -214,7 +214,7 @@ run the image under emulation and in GitHub Actions.
 
 [PLAN.md](PLAN.md) is the development plan, and [derived/](derived/) holds dated, frozen records: the session
 that produced the spike, with the raw output of its runs, the licence check of the bundled tools, the settling of
-their copyleft sources, and the checks of the first release. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0015 accepted, the rest Proposed. In short:
+their copyleft sources, and the checks of the first release. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0016 accepted, the rest Proposed. In short:
 
 - The MCP server's proof tools (Phase 4): the skill's `proof_results`, `flip_test` and `proof_sync`, and tools on
   `tlapm` (check a module, check one step, list failed obligations). Its declaration in the skill (Phase 5).

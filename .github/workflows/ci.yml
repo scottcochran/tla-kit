@@ -2,7 +2,8 @@
 #   records     the inventory against the Dockerfile and the README, and the vendored scripts against their pin
 #   image       the image built as the release builds it, from the kept prover tarball; its self-test; the MCP
 #               client test, every tool of the server against the fixture, and, when the change touches the
-#               server, each tool compared with its command on TOPAK's Alone and Coupling (ADR-0008); and the
+#               server, the prove tool's tests (ADR-0016 item 7) and each tool compared with its command on
+#               TOPAK's Alone and Coupling (ADR-0008); and the
 #               PinLifecycle and ProveRequests rows when the change touches spec/ or decisions/ or moves a checker
 #               pin (ADR-0015 item 8, ADR-0016 item 1)
 #   reproduce   the same commit built twice, on two runners, from nothing, and the two digests compared
@@ -83,6 +84,11 @@ jobs:
         run: >
           python3 server/test_mcp.py --
           docker run -i --rm --user "$(id -u):$(id -g)" -v {project}:/work tla-kit:ci tla-kit mcp
+      - name: The prove tool, and ADR-0016 item 7's tests of spec/ProveRequests.tla's properties
+        if: needs.plan.outputs.server == 'true'
+        run: >
+          docker run --rm --init --user "$(id -u):$(id -g)" -v "$PWD/server:/src:ro" tla-kit:ci
+          python3 -B /src/test_prove.py
       - name: The server's tools compared with their commands on TOPAK's Alone and Coupling (ADR-0008 item 5)
         if: needs.plan.outputs.server == 'true'
         run: |

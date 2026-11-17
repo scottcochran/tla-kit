@@ -18,7 +18,7 @@ One line per check, `ok` or `FAIL`, with the seconds it took:
   setup    the skill's setup_check.py --proofs, in an empty project whose tools/TLAPS-PIN holds the build
            arguments' tlapm digest: all fixture rows as expected, the fixture's proof proved, and its flip test
            failing as required
-  mcp      the MCP server (tla-kit mcp) starts over stdio on a copy of the fixture, lists its nine tools, and its
+  mcp      the MCP server (tla-kit mcp) starts over stdio on a copy of the fixture, lists its tools, and its
            tlc_run finds the fixture's Bounded to hold in 4 states (ADR-0008)
 
 Exits non-zero if any check fails.
@@ -236,7 +236,8 @@ def check_mcp(tmp):
         replies = {r.get("id"): r for r in map(json.loads, out.splitlines())}
         tools = [x["name"] for x in replies[2]["result"]["tools"]]
         row = replies[3]["result"]["structuredContent"]
-        ok = len(tools) == 9 and row["verdict"] == "HOLDS" and row["count"] == "4 distinct states"
+        ok = {"tlc_run", "tlc_rows", "prove"} <= set(tools) and row["verdict"] == "HOLDS" \
+            and row["count"] == "4 distinct states"
         detail = f"{len(tools)} tools; tlc_run: Bounded {row['verdict']}, {row['count']}"
     except Exception as e:  # any failure to start, answer or parse is this check's failure
         ok, detail, err = False, f"{e!r}", locals().get("err", "")

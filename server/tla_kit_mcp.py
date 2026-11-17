@@ -16,6 +16,8 @@ What it may write (ADR-0006):
 Every path a client sends is resolved against the project root (TLA_KIT_PROJECT, else /work when it exists, else the
 working directory) and refused if it leads outside it, links included (ADR-0008 item 3).
 """
+import faulthandler
+import hashlib
 import json
 import os
 import re
@@ -24,6 +26,8 @@ import signal
 import subprocess
 import sys
 import tempfile
+import threading
+import time
 import traceback
 import xml.etree.ElementTree as ET
 
@@ -61,6 +65,110 @@ class ToolError(Exception):
     """A refusal or a bad argument: returned to the client as a tool error, never raised to the transport."""
 
 
+class Cancelled(Exception):
+    """The client cancelled the request: its processes are stopped and it gets no response (MCP 2025-06-18)."""
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Requests in flight, their processes, and reaping (ADR-0016; spec/ProveRequests.tla)
+
+class Request:
+    """One tools/call in flight: the process groups it started, and whether the client has cancelled it."""
+
+    def __init__(self, rid):
+        self.id = rid
+        self.cancelled = threading.Event()
+        self.groups = set()
+        self.lock = threading.Lock()
+
+    def add_group(self, pgid):
+        with self.lock:
+            self.groups.add(pgid)
+            if self.cancelled.is_set():
+                kill_group(pgid)
+
+    def cancel(self):
+        with self.lock:
+            self.cancelled.set()
+            for g in self.groups:
+                kill_group(g)
+
+
+INFLIGHT = {}                  # request id -> Request, from its arrival until it is answered or dropped
+INFLIGHT_LOCK = threading.Lock()
+CURRENT = threading.local()    # the Request the running thread serves
+
+
+def current():
+    return getattr(CURRENT, "request", None)
+
+
+def kill_group(pgid):
+    try:
+        os.killpg(pgid, signal.SIGKILL)
+    except (ProcessLookupError, PermissionError):
+        pass
+
+
+def proc_stat(pid):
+    """(state, ppid, pgid) of a process from /proc, or None: Linux only, as in the image."""
+    try:
+        raw = open(f"/proc/{pid}/stat").read()
+    except OSError:
+        return None
+    f = raw[raw.rindex(")") + 2:].split()
+    return f[0], int(f[1]), int(f[2])
+
+
+def reap_orphans():
+    """Reap the zombies the server has inherited: tlapm's backends, re-parented to the server when it is PID 1, as
+    it is under `docker run ... tla-kit mcp` (the custodian's choice of 2026.11.16: the server reaps every child).
+    Only zombies in another process's group are taken, so a child the server itself waits for is never taken from
+    under it: those lead groups of their own, or share the server's."""
+    if not os.path.isdir("/proc"):
+        return
+    me, mine = os.getpid(), os.getpgrp()
+    for d in os.listdir("/proc"):
+        if not d.isdigit():
+            continue
+        s = proc_stat(int(d))
+        if s and s[0] == "Z" and s[1] == me and s[2] not in (int(d), mine):
+            try:
+                os.waitpid(int(d), os.WNOHANG)
+            except ChildProcessError:
+                pass
+
+
+def finish_group(pgid, limit=10.0):
+    """Kill whatever is left of a process group, wait until none of it is alive, and reap: so that when a request is
+    answered, none of its processes is alive or an unreaped zombie of the server's (NoProcessOutlives, AllReaped)."""
+    kill_group(pgid)
+    end = time.time() + limit
+    while time.time() < end:
+        if os.path.isdir("/proc"):
+            alive = [1 for d in os.listdir("/proc") if d.isdigit()
+                     for s in [proc_stat(int(d))] if s and s[2] == pgid and s[0] != "Z"]
+        else:
+            try:
+                os.killpg(pgid, 0)
+                alive = [1]
+            except (ProcessLookupError, PermissionError):
+                alive = []
+        reap_orphans()
+        if not alive:
+            return
+        time.sleep(0.05)
+
+
+def reaper():
+    while True:
+        time.sleep(1.0)
+        try:
+            reap_orphans()
+        except Exception:  # the reaper must never stop the server
+            pass
+
+
 # ---------------------------------------------------------------------------------------------------------------
 # Paths, processes, and the pieces shared by the TLC tools
 
@@ -88,22 +196,39 @@ def rel(real):
     return os.path.relpath(real, project_root())
 
 
-def run(cmd, cwd, timeout, env=None):
-    """(exit code, output) of cmd in its own process group, killed whole at the end or on timeout."""
+def run_group(cmd, cwd, timeout, env=None):
+    """Run cmd in a process group of its own, for the current request. The whole group is killed on a timeout or a
+    cancel, and when the command ends whatever is left of it is killed, waited for and reaped.
+    Returns (exit code, output, timed out?, cancelled?)."""
+    req = current()
     p = subprocess.Popen(cmd, cwd=cwd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
                          start_new_session=True)
+    if req:
+        req.add_group(p.pid)
+    deadline, timed_out, chunks = time.time() + timeout, False, []
     try:
-        out, _ = p.communicate(timeout=timeout)
-    except subprocess.TimeoutExpired:
-        os.killpg(p.pid, signal.SIGKILL)
-        p.communicate()
-        raise ToolError(f"timed out after {timeout} s: {' '.join(cmd[:4])} ...")
+        while True:
+            try:
+                out, _ = p.communicate(timeout=0.25)
+                chunks.append(out or "")
+                break
+            except subprocess.TimeoutExpired:
+                if (req and req.cancelled.is_set()) or time.time() > deadline:
+                    timed_out = not (req and req.cancelled.is_set())
+                    kill_group(p.pid)
     finally:
-        try:
-            os.killpg(p.pid, signal.SIGKILL)
-        except (ProcessLookupError, PermissionError):
-            pass
-    return p.returncode, t.quiet(out or "")
+        finish_group(p.pid)
+    return p.returncode, t.quiet("".join(chunks)), timed_out, bool(req and req.cancelled.is_set())
+
+
+def run(cmd, cwd, timeout, env=None):
+    """(exit code, output) of cmd in its own process group: a timeout is a tool error, a cancel ends the request."""
+    code, out, timed_out, cancelled = run_group(cmd, cwd, timeout, env)
+    if cancelled:
+        raise Cancelled()
+    if timed_out:
+        raise ToolError(f"timed out after {timeout} s: {' '.join(cmd[:4])} ...")
+    return code, out
 
 
 def checker_for(spec_dir):
@@ -388,26 +513,32 @@ def tool_parse(a):
             "output": tail(out, 60), "label": WORKING}
 
 
-def tool_symbols(a):
-    spec_dir, module = module_path(a["module"])
+def export_xml(spec_dir, module, timeout):
+    """SANY's XML export of a module, made on a copy of its chain, with the prover's library for proof modules."""
     c = checker_for(spec_dir)
-    tmp = tempfile.mkdtemp(prefix="tla-kit-symbols-")
+    tmp = tempfile.mkdtemp(prefix="tla-kit-xml-")
     try:
         copy_chain(module, spec_dir, tmp)
-        chain = t.module_chain(module, spec_dir)
         lib = tlaps_stdlib()
         p = subprocess.run(java(c, tmp, "tla2sany.xml.XMLExporter", ["-o"] + (["-I", lib] if lib else [])
                                 + [module + ".tla"]), cwd=tmp,
-                           capture_output=True, text=True, timeout=a.get("timeout", DEFAULT_TIMEOUT))
+                           capture_output=True, text=True, timeout=timeout)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     start = p.stdout.find("<?xml")
     if p.returncode != 0 or start < 0:
         errors, _ = sany_messages(p.stdout + p.stderr)
         raise ToolError(f"SANY could not export {module}: " + json.dumps(errors or tail(p.stdout + p.stderr, 20)))
+    return p.stdout[start:]
+
+
+def tool_symbols(a):
+    spec_dir, module = module_path(a["module"])
+    xml_text = export_xml(spec_dir, module, a.get("timeout", DEFAULT_TIMEOUT))
+    chain = t.module_chain(module, spec_dir)
     modules = chain if a.get("all_modules") else [module]
     return dict({"module": rel(os.path.join(spec_dir, module + ".tla")), "modules": modules},
-                **xml_symbols(p.stdout[start:], set(modules)), label=WORKING)
+                **xml_symbols(xml_text, set(modules)), label=WORKING)
 
 
 STANDARD = ["Naturals", "Integers", "Reals", "Sequences", "FiniteSets", "Bags", "TLC"]
@@ -602,6 +733,202 @@ def tool_tlc_rows(a):
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# prove: tlapm per request, through the Toolbox protocol (ADR-0009; ADR-0016; spec/ProveRequests.tla)
+
+TACTIC = {"smt": "SMT", "zenon": "Zenon", "isabelle": "Isa", "ls4": "PTL"}
+CACHE_LOCKS = {}
+CACHE_LOCKS_LOCK = threading.Lock()
+PROVER_SHA = {}
+
+
+def prover():
+    """The image's tlapm, as TLAPM names it (ADR-0009 item 3: never whatever is on PATH), with its sha256 and whether
+    that is the build the image was made with."""
+    path = os.environ.get("TLAPM")
+    if not path or not os.path.isfile(path):
+        raise ToolError("no prover: TLAPM names no file. In the tla-kit image it is /opt/tlaps/bin/tlapm")
+    real = os.path.realpath(path)
+    if real not in PROVER_SHA:
+        h = hashlib.sha256()
+        with open(real, "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 20), b""):
+                h.update(chunk)
+        PROVER_SHA[real] = h.hexdigest()
+    built = None
+    try:
+        for line in open("/opt/tla-kit/build-args", encoding="utf-8"):
+            k, _, v = line.strip().partition(" ")
+            if k == "tlapm_binary_sha256":
+                built = v
+    except OSError:
+        pass
+    return {"path": path, "sha256": PROVER_SHA[real], "pinned": None if built is None else PROVER_SHA[real] == built}
+
+
+def cache_dir(spec_dir):
+    """A cache directory the server owns, never in the project (ADR-0006 item 3), one per spec directory; tlapm keeps
+    one subdirectory in it per module."""
+    base = os.environ.get("TLA_KIT_CACHE") or os.path.join(tempfile.gettempdir(), "tla-kit-cache")
+    d = os.path.realpath(os.path.join(base, "tlapm", hashlib.sha256(spec_dir.encode()).hexdigest()[:16]))
+    root = project_root()
+    if d == root or d.startswith(root + os.sep):
+        raise ToolError(f"the cache directory {d} is inside the project; set TLA_KIT_CACHE outside it")
+    os.makedirs(d, exist_ok=True)
+    return d
+
+
+def hold_cache(key):
+    """Wait for one module's cache, one request at a time (OneWriterPerCache), giving up if the request is
+    cancelled while it waits."""
+    with CACHE_LOCKS_LOCK:
+        lock = CACHE_LOCKS.setdefault(key, threading.Lock())
+    req = current()
+    while not lock.acquire(timeout=0.2):
+        if req and req.cancelled.is_set():
+            raise Cancelled()
+    return lock
+
+
+def theorem_span(spec_dir, module, name, timeout):
+    """The lines of a named theorem or step, with its proof, from SANY's XML export."""
+    root = ET.fromstring(export_xml(spec_dir, module, timeout))
+    defs, nodes = [], []
+    for e in root.find("context").findall("entry"):
+        n = e[1]
+        loc = n.find("location")
+        if loc is None or loc.findtext("filename") != module:
+            continue
+        span = (int(loc.find("line").findtext("begin")), int(loc.find("line").findtext("end")))
+        if n.tag == "TheoremDefNode" and n.findtext("uniquename") == name:
+            defs.append(span)
+        elif n.tag == "TheoremNode":
+            nodes.append(span)
+    if not defs:
+        raise ToolError(f"no theorem or step named {name} in {module}")
+    if len(defs) > 1:
+        raise ToolError(f"{name} names {len(defs)} steps in {module}, at lines "
+                        f"{', '.join(str(b) for b, _ in sorted(defs))}: give the lines instead")
+    begin = defs[0][0]
+    ends = [e for b, e in nodes if b == begin]
+    return begin, max(ends + [defs[0][1]])
+
+
+def toolbox_blocks(out):
+    """The Toolbox protocol's @!!BEGIN ... @!!END blocks, as dicts, and whether the last one was closed."""
+    blocks, cur, key = [], None, None
+    for line in out.splitlines():
+        if line == "@!!BEGIN":
+            cur, key = {}, None
+        elif line == "@!!END":
+            if cur is not None:
+                blocks.append(cur)
+            cur = None
+        elif cur is not None:
+            m = re.match(r"^@!!(\w+):(.*)$", line)
+            if m:
+                key = m.group(1)
+                cur[key] = m.group(2)
+            elif key:
+                cur[key] += "\n" + line
+    return blocks, cur is None
+
+
+def location(loc):
+    f = [int(x) for x in loc.split(":")] if loc else []
+    return dict(zip(("line", "col", "end_line", "end_col"), f))
+
+
+def read_toolbox(out):
+    """Each obligation's final status, the attempts on it, its text when tlapm gave one, and the counts."""
+    blocks, complete = toolbox_blocks(out)
+    total, obligations = None, {}
+    for b in blocks:
+        if b.get("type") == "obligationsnumber":
+            total = int(b.get("count", "0"))
+        elif b.get("type") == "obligation":
+            o = obligations.setdefault(b["id"], {"id": int(b["id"]), "location": location(b.get("loc")),
+                                                 "status": None, "text": None, "attempts": [], "cached": False})
+            o["status"] = b.get("status")
+            if b.get("obl", "").strip():
+                o["text"] = b["obl"].strip()
+            if b.get("already") == "true":
+                o["cached"] = True
+            if b.get("prover") and b.get("status") in ("proved", "failed"):
+                o["attempts"].append({"prover": b["prover"], "status": b["status"], "method": b.get("meth"),
+                                      "reason": b.get("reason")})
+    return total, list(obligations.values()), complete
+
+
+def fallback_warnings(obligations):
+    """A step that passed only because a later backend closed what an earlier one failed (ADR-0009 item 4)."""
+    out = []
+    for o in obligations:
+        failed = [a["prover"] for a in o["attempts"] if a["status"] == "failed"]
+        proved = [a["prover"] for a in o["attempts"] if a["status"] == "proved"]
+        if o["status"] == "proved" and failed and proved:
+            p = proved[-1]
+            out.append({"line": o["location"].get("line"), "proved_by": p, "failed_first": failed,
+                        "note": f"passed only by {p}, after {', '.join(failed)} failed"
+                                + (f": BY {TACTIC[p]} would name the backend it needs" if p in TACTIC else "")})
+    return out
+
+
+def tool_prove(a):
+    spec_dir, module = module_path(a["module"])
+    if sum(k in a for k in ("theorem", "line", "from_line")) > 1:
+        raise ToolError("give one of theorem, line, or from_line with to_line")
+    timeout = int(a.get("timeout", DEFAULT_TIMEOUT))
+    if "theorem" in a:
+        first, last = theorem_span(spec_dir, module, a["theorem"], timeout)
+    elif "line" in a:
+        first = last = int(a["line"])
+    elif "from_line" in a:
+        first, last = int(a["from_line"]), int(a.get("to_line", a["from_line"]))
+    else:
+        first = last = 0
+    scope = {"theorem": a.get("theorem"), "from_line": first, "to_line": last} if first else {"module": True}
+    pv = prover()
+    cache = cache_dir(spec_dir)
+    cmd = [pv["path"], "--toolbox", str(first), str(last), "--toolbox-vsn", "2", "--cache-dir", cache]
+    if a.get("threads"):
+        cmd += ["--threads", str(int(a["threads"]))]
+    if a.get("stretch"):
+        cmd += ["--stretch", str(float(a["stretch"]))]
+    if a.get("isabelle_check"):
+        cmd.append("-C")
+    if a.get("nofp"):
+        cmd.append("--nofp")
+    cmd.append(module + ".tla")
+    lock = hold_cache((cache, module))
+    t0 = time.time()
+    try:
+        code, out, timed_out, cancelled = run_group(cmd, spec_dir, timeout)
+    finally:
+        lock.release()
+    if cancelled:
+        raise Cancelled()
+    total, obligations, complete = read_toolbox(out)
+    errors = [l for l in out.splitlines() if l.startswith("[ERROR]")]
+    settled = {"proved", "trivial"}
+    unresolved = [o for o in obligations if o["status"] not in settled]
+    success = (code == 0 and not timed_out and complete and not errors and bool(total) and not unresolved)
+    verdict = ("timeout" if timed_out else "proved" if success else
+               "failed" if (unresolved or errors) and complete else "error")
+    counts = {"total": total, "proved": sum(o["status"] == "proved" for o in obligations),
+              "trivial": sum(o["status"] == "trivial" for o in obligations),
+              "failed": sum(o["status"] == "failed" for o in obligations), "unresolved": len(unresolved),
+              "from_cache": sum(o["cached"] for o in obligations)}
+    return {"module": rel(os.path.join(spec_dir, module + ".tla")), "scope": scope, "success": success,
+            "verdict": verdict, "counts": counts, "unresolved": unresolved,
+            "warnings": fallback_warnings(obligations),
+            "messages": [l for l in out.splitlines() if re.match(r"\[(ERROR|WARNING|INFO)\]", l)],
+            "exit": code, "output_complete": complete, "seconds": round(time.time() - t0, 1), "prover": pv,
+            "cache": cache, "command": " ".join(cmd[1:]),
+            "label": "working output: a proof run, not a proof results file, which only proof_results writes "
+                     "(ADR-0006)"}
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # Tool definitions
 
 MODULE = {"type": "string", "description": "The module, relative to the project root, e.g. spec/Counter.tla"}
@@ -656,6 +983,18 @@ TOOLS = [
      "ones marked, and edges labelled by action. Working output.",
      schema({"module": MODULE, "mut": MUT, "spec": SPEC, "constants": CONSTS, "constraint": {"type": "string"},
              "max_states": {"type": "integer"}, "rows": ROWS, "cfg": CFG, "timeout": TIMEOUT}, ["module"])),
+    ("prove", tool_prove, "Prove with TLAPS: a theorem or step by name, a line, a line range, or the whole module. "
+     "Returns success only when every obligation in scope is proved; otherwise each unresolved obligation with its "
+     "text, the backends tried and why each failed, and warnings when a step passed only by a later backend. "
+     "tlapm runs in a process group of its own, killed whole on a timeout or a cancel, with a cache the server owns. "
+     "Working output: proof_results writes the results file.",
+     schema({"module": MODULE, "theorem": {"type": "string", "description": "A theorem's or a unique step's name"},
+             "line": {"type": "integer"}, "from_line": {"type": "integer"}, "to_line": {"type": "integer"},
+             "threads": {"type": "integer"}, "stretch": {"type": "number", "description": "Multiply every "
+                                                                                        "backend's time limit"},
+             "isabelle_check": {"type": "boolean", "description": "Check the proofs in Isabelle (-C)"},
+             "nofp": {"type": "boolean", "description": "Ignore the cache's earlier results"},
+             "timeout": TIMEOUT}, ["module"])),
     ("tlc_rows", tool_tlc_rows, "Run the skill's generator, tlc_rows.py, on a row list, as from the command line. "
      "It writes a dated results file only when every row is as expected, and never overwrites one; --only and "
      "dry_run write nothing. This is the only tool that writes into the project.",
@@ -678,6 +1017,8 @@ def call_tool(name, args):
         if unknown or missing:
             raise ToolError(f"unknown arguments {unknown}" if unknown else f"missing arguments {missing}")
         result = fn(args)
+    except Cancelled:
+        return None
     except ToolError as e:
         return {"content": [{"type": "text", "text": str(e)}], "isError": True}
     except Exception as e:  # a fault of the server's: reported, never fatal to the session
@@ -690,8 +1031,17 @@ def call_tool(name, args):
 # ---------------------------------------------------------------------------------------------------------------
 # The transport: JSON-RPC 2.0, one message per line
 
+WRITE_LOCK = threading.Lock()
+
+
+def send(out, msg):
+    with WRITE_LOCK:
+        out.write(json.dumps(msg) + "\n")
+        out.flush()
+
+
 def handle(msg):
-    """The response to one message, or None for a notification."""
+    """The response to one message that is not a tools/call, or None for a notification."""
     method, mid, params = msg.get("method"), msg.get("id"), msg.get("params") or {}
     is_request = "id" in msg
     if method == "initialize":
@@ -706,32 +1056,84 @@ def handle(msg):
         result = {}
     elif method == "tools/list":
         result = {"tools": [{"name": n, "description": d, "inputSchema": s} for n, _, d, s in TOOLS]}
-    elif method == "tools/call":
-        result = call_tool(params.get("name"), params.get("arguments"))
+    elif method == "notifications/cancelled":
+        cancel(params.get("requestId"))
+        return None
     elif not is_request:
-        return None  # notifications/initialized, notifications/cancelled and the like
+        return None  # notifications/initialized and the like
     else:
         return {"jsonrpc": "2.0", "id": mid, "error": {"code": -32601, "message": f"method not found: {method}"}}
     return {"jsonrpc": "2.0", "id": mid, "result": result} if is_request else None
 
 
+def cancel(rid):
+    """Act on a client's cancel: stop the request's processes, and it will get no response. A cancel for a request
+    already answered, or never seen, changes nothing (MCP 2025-06-18; AtMostOneAnswer)."""
+    with INFLIGHT_LOCK:
+        req = INFLIGHT.get(rid)
+    if req:
+        req.cancel()
+
+
+def worker(req, msg, out):
+    CURRENT.request = req
+    params = msg.get("params") or {}
+    result = call_tool(params.get("name"), params.get("arguments"))
+    with INFLIGHT_LOCK:  # the answer and a cancel are settled under one lock: one or the other, never both
+        INFLIGHT.pop(req.id, None)
+        answer = result is not None and not req.cancelled.is_set()
+    if answer:
+        send(out, {"jsonrpc": "2.0", "id": req.id, "result": result})
+
+
+def cancel_all():
+    with INFLIGHT_LOCK:
+        pending = list(INFLIGHT.values())
+    for req in pending:
+        req.cancel()
+
+
+def on_sigterm(signum, frame):
+    """MCP's stdio shutdown ends with SIGTERM: stop every run in flight, its whole process group, and exit."""
+    cancel_all()
+    time.sleep(0.5)
+    reap_orphans()
+    os._exit(0)
+
+
 def serve(stdin=sys.stdin, stdout=sys.stdout):
     print(f"{SERVER_NAME} MCP server: project {project_root()}, skill {SKILL}", file=sys.stderr)
+    threading.Thread(target=reaper, daemon=True).start()
+    if threading.current_thread() is threading.main_thread():
+        signal.signal(signal.SIGTERM, on_sigterm)
+        faulthandler.register(signal.SIGUSR1, file=sys.stderr, all_threads=True)  # every thread's stack, on demand
+    threads = []
     for line in stdin:
         if not line.strip():
             continue
         try:
             msg = json.loads(line)
         except ValueError as e:
-            reply = {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": f"parse error: {e}"}}
-        else:
-            if not isinstance(msg, dict):
-                reply = {"jsonrpc": "2.0", "id": None, "error": {"code": -32600, "message": "invalid request"}}
-            else:
-                reply = handle(msg)
+            send(stdout, {"jsonrpc": "2.0", "id": None, "error": {"code": -32700, "message": f"parse error: {e}"}})
+            continue
+        if not isinstance(msg, dict):
+            send(stdout, {"jsonrpc": "2.0", "id": None, "error": {"code": -32600, "message": "invalid request"}})
+            continue
+        if msg.get("method") == "tools/call" and "id" in msg:
+            req = Request(msg["id"])
+            with INFLIGHT_LOCK:
+                INFLIGHT[req.id] = req
+            th = threading.Thread(target=worker, args=(req, msg, stdout), daemon=True)
+            th.start()
+            threads = [x for x in threads if x.is_alive()] + [th]
+            continue
+        reply = handle(msg)
         if reply is not None:
-            stdout.write(json.dumps(reply) + "\n")
-            stdout.flush()
+            send(stdout, reply)
+    # The client has closed its input, the first step of MCP's stdio shutdown: answer what is in flight, then exit.
+    # A client that will not wait sends SIGTERM, which stops it all.
+    for th in threads:
+        th.join()
 
 
 if __name__ == "__main__":

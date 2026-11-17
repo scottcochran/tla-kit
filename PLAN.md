@@ -1,8 +1,8 @@
 # Development plan
 
 Written 2026.11.15, after the spike the README records, updated the same day for ADR-0013 to ADR-0016, and kept
-up to date since: Phases 1 and 3 are done (2026.11.16). It is a plan, not a record: nothing below is built unless the
-README says so.
+up to date since: Phases 1 and 3 are done (2026.11.16), and so is Phase 4 (2026.11.17). It is a plan, not a record:
+nothing below is built unless the README says so.
 
 ## Goal
 
@@ -248,6 +248,31 @@ In this order: the comparison, the tests of `tlapm`, the module, then the tools.
 **Done when** an agent using only these tools repairs a deliberately broken step in the fixture,
 `proof_results` through the server writes the file the script writes, every `ProveRequests` row has its expected
 outcome, and the tests of ADR-0016 item 7 pass.
+
+**Done 2026.11.17**, by pull requests #21 and #22, merged as `d13b0dd` and `4aee1f5`, and released in `v0.3.0`
+(`derived/tla-kit-phase4-checks-2026.11.17.md`):
+1. **The agent:** `claude-opus-5-5`, with the server's 14 tools and `Read` and `Edit` only, at the custodian's
+   choice, against the published digest, repaired the fixture's broken `NextBounded` step without being told which
+   step it was. It took three `prove` calls and two edits, led by the failed obligation's text, and its module is
+   the fixture byte for byte.
+2. **`proof_results`:** in `server/test_prove.py`, the script run directly reproduced the server's file byte for
+   byte, in CI for pull request #22 and for `main` at `4aee1f5`.
+3. **The rows:** all 78 `ProveRequests` rows as expected, and their results file reproduced byte for byte in
+   `v0.3.0`, as in `v0.2.0`.
+4. **The tests:** ADR-0016 item 7's tests in `server/test_prove.py` passed in CI for both pull requests and for
+   `main` at `4aee1f5`.
+
+Along the way:
+- **The design:** `tlapm` per request, not `tlapm_lsp` (ADR-0009 item 5, the custodian's choice), with
+  `spec/ProveRequests.tla` written before the code. The server reaps every child, at the custodian's choice, since
+  under `docker run` it is PID 1.
+- **The server:** requests run concurrently, and a cancelled request gets no response (MCP 2025-06-18). End of input
+  answers what is in flight, and `SIGTERM` cancels it. `parse` and `symbols` now read proof modules.
+- **A test's fault, not the server's:** pull request #21's first CI run stalled in "two modules". A thread dump
+  showed no worker and no `tlapm` alive: the test had dropped a response that came out of order. The client now
+  keeps every response by id, and dumps processes and threads on a stall.
+- **Released:** `v0.3.0`, a MINOR (ADR-0014 item 2) that moves no pin, was published on 2026.11.17 from `4aee1f5`
+  as `sha256:948e6d1f…257f`, the digest CI's two runners reproduced, with both attestations verified.
 
 ### Phase 5: pairing with the skill
 

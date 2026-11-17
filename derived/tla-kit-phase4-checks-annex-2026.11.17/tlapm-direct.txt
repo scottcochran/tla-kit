@@ -1,0 +1,6 @@
+WARNING: The requested image's platform (linux/amd64) does not match the detected host platform (linux/arm64/v8) and no specific platform was requested
+(* created new ".tlacache/Counter_proof.tlaps/Counter_proof.thy" *)
+(* fingerprints written in ".tlacache/Counter_proof.tlaps/fingerprints" *)
+File "./Counter_proof.tla", line 1, character 1 to line 39, character 77:
+[INFO]: All 19 obligations proved.
+tlapm exit 0

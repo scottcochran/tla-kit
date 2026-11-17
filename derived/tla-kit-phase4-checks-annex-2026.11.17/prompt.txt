@@ -1,0 +1,6 @@
+This project's TLAPS proof, spec/Counter_proof.tla, no longer checks: one step of it was deliberately broken. Find the failing step with the tla-kit tools and repair it so that the whole module is proved.
+
+Rules:
+- Change only proofs (the BY/OBVIOUS/PROOF parts). Do not change any LEMMA or THEOREM statement, its ASSUME/PROVE, or spec/Counter.tla.
+- You are done when the tla-kit prove tool, run on the whole module, reports success.
+- Finish by saying which step was broken, what was wrong with it, and what you changed.

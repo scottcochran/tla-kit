@@ -73,14 +73,15 @@ def main(argv):
     os.chmod(project, 0o777)
     spec = os.path.join(project, "spec")
     os.makedirs(spec)
-    for f in ("Counter.tla", "Counter-rows.txt"):
+    for f in ("Counter.tla", "Counter-rows.txt", "Counter_proof.tla"):
         shutil.copy(os.path.join(FIXTURE, f), spec)
     with open(os.path.join(spec, "Bad.tla"), "w") as f:
         f.write(BAD)
     os.symlink("/etc", os.path.join(spec, "outside"))
     os.system(f"chmod -R a+rwX {project}")
 
-    if "--" in argv:
+    in_image = "--" in argv
+    if in_image:
         cmd = [a.replace("{project}", project) for a in argv[argv.index("--") + 1:]]
         env = dict(os.environ)
     else:
@@ -111,6 +112,20 @@ def main(argv):
         s, err, text = c.call("parse", {"module": "spec/Bad"})
         check("parse: Bad's unknown operator, with its location", not err and not s["ok"] and any(
             e["line"] == 5 and "Unknown operator" in e["message"] for e in s["errors"]), text)
+
+        # A proof module extends TLAPS, which SANY finds only in the prover's library. The image has one; natively the
+        # server finds it only when TLAPM names a prover.
+        if in_image or os.environ.get("TLAPM"):
+            s, err, text = c.call("parse", {"module": "spec/Counter_proof.tla"})
+            check("parse: a proof module, with TLAPS from the prover's library", not err and s["ok"]
+                  and "TLAPS" in s["modules_parsed"], text)
+            s, err, text = c.call("symbols", {"module": "spec/Counter_proof.tla"})
+            names = {x["name"] for x in (s or {}).get("theorems", [])}
+            check("symbols: a proof module's theorems", not err and {"TypeInit", "NextBounded", "BoundedAlways",
+                                                                      "SafeAlways", "MutNoLimitAllowsStep"} <= names,
+                  text)
+        else:
+            print("skip  parse and symbols on a proof module: natively, TLAPM names no prover", flush=True)
 
         s, err, text = c.call("symbols", {"module": "spec/Counter.tla"})
         ok = not err and [v["name"] for v in s["variables"]] == ["n", "over"] and \

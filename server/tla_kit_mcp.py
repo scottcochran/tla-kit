@@ -114,9 +114,22 @@ def checker_for(spec_dir):
         raise ToolError(str(e))
 
 
-def java(checker, tmp, main, args):
-    return ["java", "-XX:+UseParallelGC", f"-Xmx{os.environ.get('TLC_XMX', '2g')}", f"-Djava.io.tmpdir={tmp}",
-            "-cp", checker.path, main] + args
+def java(checker, tmp, main, args, props=()):
+    return ["java", "-XX:+UseParallelGC", f"-Xmx{os.environ.get('TLC_XMX', '2g')}", f"-Djava.io.tmpdir={tmp}"] + \
+        list(props) + ["-cp", checker.path, main] + args
+
+
+def tlaps_stdlib():
+    """The prover's library, where TLAPS.tla is, so that SANY can parse a proof module: TLA_KIT_TLAPS_STDLIB, else
+    beside the prover TLAPM names (in the image, /opt/tlaps/lib/tlapm/stdlib). None when neither is there."""
+    named = os.environ.get("TLA_KIT_TLAPS_STDLIB")
+    tlapm = os.environ.get("TLAPM")
+    for cand in ([named] if named else []) + \
+            ([os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(tlapm))), "lib", "tlapm", "stdlib")]
+             if tlapm else []):
+        if os.path.isfile(os.path.join(cand, "TLAPS.tla")):
+            return cand
+    return None
 
 
 def copy_chain(module, spec_dir, tmp):
@@ -362,7 +375,10 @@ def tool_parse(a):
     tmp = tempfile.mkdtemp(prefix="tla-kit-parse-")
     try:
         copy_chain(module, spec_dir, tmp)
-        code, out = run(java(c, tmp, "tla2sany.SANY", [module + ".tla"]), tmp, a.get("timeout", DEFAULT_TIMEOUT))
+        lib = tlaps_stdlib()
+        props = [f"-DTLA-Library={lib}"] if lib else []
+        code, out = run(java(c, tmp, "tla2sany.SANY", [module + ".tla"], props), tmp,
+                        a.get("timeout", DEFAULT_TIMEOUT))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     errors, warnings = sany_messages(out)
@@ -379,7 +395,9 @@ def tool_symbols(a):
     try:
         copy_chain(module, spec_dir, tmp)
         chain = t.module_chain(module, spec_dir)
-        p = subprocess.run(java(c, tmp, "tla2sany.xml.XMLExporter", ["-o", module + ".tla"]), cwd=tmp,
+        lib = tlaps_stdlib()
+        p = subprocess.run(java(c, tmp, "tla2sany.xml.XMLExporter", ["-o"] + (["-I", lib] if lib else [])
+                                + [module + ".tla"]), cwd=tmp,
                            capture_output=True, text=True, timeout=a.get("timeout", DEFAULT_TIMEOUT))
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

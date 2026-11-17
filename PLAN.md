@@ -225,7 +225,10 @@ In this order: the comparison, the tests of `tlapm`, the module, then the tools.
   (`derived/tla-kit-prove-comparison-2026.11.16.md`): the custodian chose `tlapm` per request. It also found that
   Phase 3's `parse` and `symbols` do not give SANY the prover's library, so they fail on a proof module.
 - Test three assumptions about `tlapm` in the image: whether two processes can share a cache directory, whether
-  every backend stays in `tlapm`'s process group, and what a kill leaves in the cache (ADR-0016 item 6).
+  every backend stays in `tlapm`'s process group, and what a kill leaves in the cache (ADR-0016 item 6). **Done
+  2026.11.16** (`derived/tla-kit-tlapm-assumptions-2026.11.16.md`): backends stay in the group; a kill of `tlapm`
+  alone leaves `z3` running; a kill empties the module's cache without making the next run wrong; one writer per
+  module directory stands; and a server at PID 1 has to reap, or the client command needs `--init`.
 - Write `spec/ProveRequests.tla` for the chosen option, before the tool's code: a row for a naive design, one for
   the chosen design, and one with a backend that leaves the process group (ADR-0016).
 - `proof_check`: parse and count obligations without backends (`tlapm --summary`).

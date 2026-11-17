@@ -3,7 +3,8 @@
 #   image       the image built as the release builds it, from the kept prover tarball; its self-test; the MCP
 #               client test, every tool of the server against the fixture, and, when the change touches the
 #               server, each tool compared with its command on TOPAK's Alone and Coupling (ADR-0008); and the
-#               PinLifecycle rows when the change touches spec/ or decisions/ or moves a checker pin (ADR-0015 item 8)
+#               PinLifecycle and ProveRequests rows when the change touches spec/ or decisions/ or moves a checker
+#               pin (ADR-0015 item 8, ADR-0016 item 1)
 #   reproduce   the same commit built twice, on two runners, from nothing, and the two digests compared
 #               (ADR-0014 item 8)
 #   evidence    for a pull request that moves a pin, the runs ADR-0013 item 3 asks for (evidence.yml)
@@ -95,6 +96,9 @@ jobs:
       - name: PinLifecycle rows, compared with the committed results file (ADR-0015 item 8)
         if: needs.plan.outputs.rows == 'true'
         run: tools/ci/pinlifecycle.sh tla-kit:ci 4
+      - name: ProveRequests rows, compared with the committed results file (ADR-0016 item 1)
+        if: needs.plan.outputs.rows == 'true'
+        run: tools/ci/pinlifecycle.sh tla-kit:ci 4 ProveRequests
 
   reproduce-build:
     name: reproduce-build (${{ matrix.run }})

@@ -1,0 +1,8 @@
+1c1
+< --------------------------- MODULE Counter_proof ---------------------------
+---
+> --------------------------- MODULE Broken_proof ---------------------------
+15c15
+<   BY LimitNat DEF TypeOK, Bounded, Next, Step, vars
+---
+>   BY DEF Bounded

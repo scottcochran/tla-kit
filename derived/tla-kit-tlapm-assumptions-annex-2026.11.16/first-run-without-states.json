@@ -1,0 +1,262 @@
+{
+ "tlapm": "ff40755",
+ "groups": {
+  "tlapm": {
+   "pid": 15,
+   "pgid": 15,
+   "sid": 15
+  },
+  "exit": 0,
+  "descendants_seen": [
+   {
+    "comm": "poly",
+    "pgid": 15,
+    "sid": 15,
+    "in_tlapm_group": true,
+    "count": 1
+   },
+   {
+    "comm": "ps",
+    "pgid": 15,
+    "sid": 15,
+    "in_tlapm_group": true,
+    "count": 1
+   },
+   {
+    "comm": "sh",
+    "pgid": 15,
+    "sid": 15,
+    "in_tlapm_group": true,
+    "count": 8
+   },
+   {
+    "comm": "z3",
+    "pgid": 15,
+    "sid": 15,
+    "in_tlapm_group": true,
+    "count": 1
+   }
+  ],
+  "descendants_alive_after_exit": [
+   {
+    "pid": 36,
+    "comm": "z3",
+    "ppid": 1,
+    "pgid": 15,
+    "sid": 15
+   }
+  ],
+  "result": {
+   "final_status_by_location": {
+    "15:3:15:5": "failed (isabelle)"
+   },
+   "notable_lines": [
+    "Zenon error: exhausted search space without finding a proof",
+    "[ERROR]: Could not prove or check:",
+    "[ERROR]: 1/1 obligation failed.",
+    "There were backend errors processing module `\"Broken_proof\"`."
+   ]
+  }
+ },
+ "groups_seconds": 16.2,
+ "kill": {
+  "clean_run": {
+   "exit": 0,
+   "final_status_by_location": {
+    "15:3:15:5": "failed (isabelle)"
+   },
+   "notable_lines": [
+    "Zenon error: exhausted search space without finding a proof",
+    "[ERROR]: Could not prove or check:",
+    "[ERROR]: 1/1 obligation failed.",
+    "There were backend errors processing module `\"Broken_proof\"`."
+   ]
+  },
+  "kill_group": {
+   "descendants_at_kill": [
+    "sh",
+    "z3"
+   ],
+   "survivors": [
+    {
+     "pid": 137,
+     "comm": "sh",
+     "ppid": 1,
+     "pgid": 117,
+     "sid": 117
+    },
+    {
+     "pid": 138,
+     "comm": "z3",
+     "ppid": 1,
+     "pgid": 117,
+     "sid": 117
+    }
+   ],
+   "cache_after_kill": [
+    "Broken_proof.tlaps/Broken_proof.thy 0",
+    "Broken_proof.tlaps/fingerprints 0",
+    "Broken_proof.tlaps/fingerprints.history/2026-11-17_00_43_01/Broken_proof.tla 1216",
+    "Broken_proof.tlaps/fingerprints.history/2026-11-17_00_43_01/Counter.tla 1584",
+    "Broken_proof.tlaps/tlapm_85254b.smt 2878",
+    "Broken_proof.tlaps/tlapm_85254b.smt.out 0"
+   ],
+   "rerun_on_that_cache": {
+    "exit": 0,
+    "final_status_by_location": {
+     "15:3:15:5": "failed (isabelle)"
+    },
+    "notable_lines": [
+     "Zenon error: exhausted search space without finding a proof",
+     "[ERROR]: Could not prove or check:",
+     "[ERROR]: 1/1 obligation failed.",
+     "There were backend errors processing module `\"Broken_proof\"`."
+    ],
+    "same_final_statuses_as_clean": true
+   }
+  },
+  "kill_tlapm_alone": {
+   "descendants_at_kill": [
+    "sh",
+    "z3",
+    "zenon"
+   ],
+   "survivors": [
+    {
+     "pid": 212,
+     "comm": "sh",
+     "ppid": 1,
+     "pgid": 192,
+     "sid": 192
+    },
+    {
+     "pid": 213,
+     "comm": "z3",
+     "ppid": 212,
+     "pgid": 192,
+     "sid": 192
+    }
+   ]
+  }
+ },
+ "kill_seconds": 36.4,
+ "shared": {
+  "same_module": {
+   "concurrent_runs": [
+    {
+     "module": "Broken_proof.tla",
+     "exit": 0,
+     "final_status_by_location": {
+      "15:3:15:5": "failed (isabelle)"
+     },
+     "notable_lines": [
+      "Zenon error: exhausted search space without finding a proof",
+      "[ERROR]: Could not prove or check:",
+      "[ERROR]: 1/1 obligation failed.",
+      "There were backend errors processing module `\"Broken_proof\"`."
+     ]
+    },
+    {
+     "module": "Broken_proof.tla",
+     "exit": 0,
+     "final_status_by_location": {
+      "15:3:15:5": "failed (isabelle)"
+     },
+     "notable_lines": [
+      "Zenon error: exhausted search space without finding a proof",
+      "[ERROR]: Could not prove or check:",
+      "[ERROR]: 1/1 obligation failed.",
+      "There were backend errors processing module `\"Broken_proof\"`."
+     ]
+    }
+   ],
+   "cache_after": [
+    "Broken_proof.tlaps/Broken_proof.thy 411",
+    "Broken_proof.tlaps/fingerprints 803",
+    "Broken_proof.tlaps/fingerprints.history/2026-11-17_00_43_22/Broken_proof.tla 1216",
+    "Broken_proof.tlaps/fingerprints.history/2026-11-17_00_43_22/Counter.tla 1584"
+   ],
+   "third_run_on_that_cache": {
+    "Broken_proof.tla": {
+     "exit": 0,
+     "final_status_by_location": {
+      "15:3:15:5": "failed (isabelle)"
+     },
+     "notable_lines": [
+      "[ERROR]: Could not prove or check:",
+      "[ERROR]: 1/1 obligation failed.",
+      "There were backend errors processing module `\"Broken_proof\"`."
+     ],
+     "already_true": 3
+    }
+   }
+  },
+  "two_modules": {
+   "concurrent_runs": [
+    {
+     "module": "Broken_proof.tla",
+     "exit": 0,
+     "final_status_by_location": {
+      "15:3:15:5": "failed (isabelle)"
+     },
+     "notable_lines": [
+      "Zenon error: exhausted search space without finding a proof",
+      "[ERROR]: Could not prove or check:",
+      "[ERROR]: 1/1 obligation failed.",
+      "There were backend errors processing module `\"Broken_proof\"`."
+     ]
+    },
+    {
+     "module": "Broken2_proof.tla",
+     "exit": 0,
+     "final_status_by_location": {
+      "15:3:15:5": "failed (isabelle)"
+     },
+     "notable_lines": [
+      "Zenon error: exhausted search space without finding a proof",
+      "[ERROR]: Could not prove or check:",
+      "[ERROR]: 1/1 obligation failed.",
+      "There were backend errors processing module `\"Broken2_proof\"`."
+     ]
+    }
+   ],
+   "cache_after": [
+    "Broken2_proof.tlaps/Broken2_proof.thy 412",
+    "Broken2_proof.tlaps/fingerprints 803",
+    "Broken2_proof.tlaps/fingerprints.history/2026-11-17_00_43_38/Broken2_proof.tla 1217",
+    "Broken2_proof.tlaps/fingerprints.history/2026-11-17_00_43_38/Counter.tla 1584",
+    "Broken_proof.tlaps/Broken_proof.thy 411",
+    "Broken_proof.tlaps/fingerprints 803",
+    "Broken_proof.tlaps/fingerprints.history/2026-11-17_00_43_38/Broken_proof.tla 1216",
+    "Broken_proof.tlaps/fingerprints.history/2026-11-17_00_43_38/Counter.tla 1584"
+   ],
+   "third_run_on_that_cache": {
+    "Broken2_proof.tla": {
+     "exit": 0,
+     "final_status_by_location": {
+      "15:3:15:5": "failed (isabelle)"
+     },
+     "notable_lines": [
+      "[ERROR]: Could not prove or check:",
+      "[ERROR]: 1/1 obligation failed.",
+      "There were backend errors processing module `\"Broken2_proof\"`."
+     ],
+     "already_true": 3
+    },
+    "Broken_proof.tla": {
+     "exit": 0,
+     "final_status_by_location": {
+      "15:3:15:5": "failed (isabelle)"
+     },
+     "notable_lines": [
+      "[ERROR]: Could not prove or check:",
+      "[ERROR]: 1/1 obligation failed.",
+      "There were backend errors processing module `\"Broken_proof\"`."
+     ],
+     "already_true": 3
+    }
+   }
+  }
+ },
+ "shared_seconds": 32.8
+}

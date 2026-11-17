@@ -5,7 +5,7 @@ laptop and in CI, and an MCP server over those tools to pair with the
 [`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
 skill.
 
-**Status: Phases 1, 3 and 4 of [PLAN.md](PLAN.md) are done.** The latest release,
+**Status: Phases 1, 3, 4 and 5 of [PLAN.md](PLAN.md) are done.** The latest release,
 [`v0.3.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.3.0), is published and attested:
 
 ```
@@ -28,7 +28,9 @@ pin: the checker, the prover and the runtime are the same bytes in all three.
 - **The MCP server:** `tla-kit mcp`, with Phase 3's model-checking tools and Phase 4's proof tools, is in `v0.3.0`
   (below). An agent with only its tools, and `Read` and `Edit`, repaired a broken proof step against the published
   image ([the record](derived/tla-kit-phase4-checks-2026.11.17.md)).
-- **What's next:** Phase 2, the projects' CI in the image, and Phase 5, the server's declaration in the skill.
+- **The skill:** the `writing-tla-specs-and-proofs` plugin declares the server by digest, so a session with the
+  plugin has its tools; one configuration serves a local session and an Actions job (below).
+- **What's next:** Phase 2, the projects' CI in the image, and Phase 6, more of the tool family.
 
 ## What is in the image
 
@@ -174,6 +176,12 @@ examples/agent-repair/run.sh /tmp/agent-project <TOPAK>/skills/writing-tla-specs
 python3 examples/agent-repair/check.py /tmp/agent-project <TOPAK>/skills/writing-tla-specs-and-proofs transcript.jsonl
 ```
 
+Phase 5 is done: on 2026.11.17 the plugin at TOPAK `2db08ff` served a local session and an Actions job against the
+same project, and in both the agent repaired the step and every check passed
+([`derived/tla-kit-phase5-checks-2026.11.17.md`](derived/tla-kit-phase5-checks-2026.11.17.md)). A session's first
+message can show the server still connecting, so a check looks at the calls it answered. A new release reaches the
+plugin by a TOPAK pull request that moves the digest in its `.mcp.json`.
+
 ## Limits
 
 - **Linux x86_64 only.** Upstream publishes no Linux arm64 build of `tlapm`. On Apple Silicon the image runs
@@ -251,10 +259,9 @@ run the image under emulation and in GitHub Actions.
 
 [PLAN.md](PLAN.md) is the development plan, and [derived/](derived/) holds dated, frozen records: the session
 that produced the spike, with the raw output of its runs, the licence check of the bundled tools, the settling of
-their copyleft sources, the checks of the first release, and those of Phase 4. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0016 accepted, the rest Proposed. In short:
+their copyleft sources, the checks of the first release, and those of Phases 4 and 5. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0016 accepted, the rest Proposed. In short:
 
-- An agent job in GitHub Actions against the server the skill's plugin declares (TOPAK pull request #88), not yet
-  run (Phase 5).
+- The projects' CI in the image, with each project's pin (Phase 2).
 - cvc5 and ethos for certified runs; Apalache; the TLA+ community modules.
 - A Linux arm64 build of `tlapm` from source.
 

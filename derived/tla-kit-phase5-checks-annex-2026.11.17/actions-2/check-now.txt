@@ -1,0 +1,24 @@
+      call Read {"file_path": "/home/runner/work/_temp/project/spec/Counter_proof.tla"}
+      call Read {"file_path": "/home/runner/work/_temp/project/spec/Counter.tla"}
+      call tla-kit:prove {"module": "spec/Counter_proof.tla"}
+        -> failed {'total': 18, 'proved': 8, 'trivial': 9, 'failed': 1, 'unresolved': 1, 'from_cache': 0}
+      call Edit {"replace_all": false, "file_path": "/home/runner/work/_temp/project/spec/Counter_proof.tla"}
+      call tla-kit:prove {"module": "spec/Counter_proof.tla"}
+        -> failed {'total': 18, 'proved': 8, 'trivial': 9, 'failed': 1, 'unresolved': 1, 'from_cache': 8}
+      call Edit {"replace_all": false, "file_path": "/home/runner/work/_temp/project/spec/Counter_proof.tla"}
+      call tla-kit:prove {"module": "spec/Counter_proof.tla"}
+        -> proved {'total': 19, 'proved': 9, 'trivial': 10, 'failed': 0, 'unresolved': 0, 'from_cache': 8}
+ok    the session started
+ok    the session declares the plugin's server (at its start: pending)
+      its tools were not listed yet at the session's start, while the server connected
+ok    the server answered every call made to it (3 calls, 0 errors)
+ok    the session ended without an error
+      8 turns, 27 s, $0.10, refused: []
+ok    the last prove of the whole module succeeded
+ok    only spec/Counter_proof.tla changed (['M', 'spec/Counter_proof.tla'])
+      -  BY DEF Bounded
+      +  BY LimitNat DEF TypeOK, Bounded, Next, Step, vars
+ok    only proofs changed: outside them the module is as it was
+ok    the plugin names the image by digest
+ok    tlapm, run directly in sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f, proves the module (19 obligations)
+agent-repair: every check passed

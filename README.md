@@ -158,6 +158,22 @@ comparisons over the nine tools were the same. The server is in `v0.2.0` and lat
 `Read` and `Edit`, without being told which step it was
 ([`derived/tla-kit-phase4-checks-2026.11.17.md`](derived/tla-kit-phase4-checks-2026.11.17.md)).
 
+## An agent with the skill's plugin (Phase 5)
+
+The `writing-tla-specs-and-proofs` plugin declares the server in its `.mcp.json`, by image digest, so a session
+with the plugin has the fourteen tools as `mcp__plugin_writing-tla-specs-and-proofs_tla-kit__<tool>`. The server
+mounts the repository's root. [`examples/agent-repair/`](examples/agent-repair/) runs an agent with only those
+tools and `Read` and `Edit` on the fixture with one proof step broken, and checks its repair apart from the agent.
+[`.github/workflows/agent.yml`](.github/workflows/agent.yml) runs the same scripts in Actions, and is the example
+a project copies: the plugin checked out at a commit, the image pulled first, Claude Code installed by version and
+integrity, `--plugin-dir`, and each tool in `--allowedTools`.
+
+```sh
+examples/agent-repair/make-project.sh /tmp/agent-project
+examples/agent-repair/run.sh /tmp/agent-project <TOPAK>/skills/writing-tla-specs-and-proofs transcript.jsonl
+python3 examples/agent-repair/check.py /tmp/agent-project <TOPAK>/skills/writing-tla-specs-and-proofs transcript.jsonl
+```
+
 ## Limits
 
 - **Linux x86_64 only.** Upstream publishes no Linux arm64 build of `tlapm`. On Apple Silicon the image runs
@@ -237,7 +253,8 @@ run the image under emulation and in GitHub Actions.
 that produced the spike, with the raw output of its runs, the licence check of the bundled tools, the settling of
 their copyleft sources, the checks of the first release, and those of Phase 4. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0016 accepted, the rest Proposed. In short:
 
-- The MCP server's declaration in the skill, and an agent job in GitHub Actions against it (Phase 5).
+- An agent job in GitHub Actions against the server the skill's plugin declares (TOPAK pull request #88), not yet
+  run (Phase 5).
 - cvc5 and ethos for certified runs; Apalache; the TLA+ community modules.
 - A Linux arm64 build of `tlapm` from source.
 

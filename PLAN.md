@@ -282,6 +282,17 @@ Along the way:
 
 **Done when** one configuration serves a local session and an Actions job against the same project.
 
+**In progress, 2026.11.17.** ADR-0008's first unchecked recollection holds: a plugin's `.mcp.json` declares the
+server, and Claude Code starts it with the session. The plugin's declaration runs `sh -c`, so that `docker run`
+gets `--user "$(id -u):$(id -g)"` and mounts the repository's root, from `git rev-parse --show-toplevel`. Claude
+Code's `CLAUDE_PROJECT_DIR` is the session's starting directory, not the repository's root. The plugin's tools are
+named `mcp__plugin_writing-tla-specs-and-proofs_tla-kit__<tool>`. `--strict-mcp-config` would drop the plugin's
+server, so an agent is confined by `--allowedTools` and `--permission-mode dontAsk`, not by that flag. The
+configuration is the plugin, and `examples/agent-repair/` makes the project, runs the agent and checks the repair,
+the same way locally and in `.github/workflows/agent.yml`. The declaration is in TOPAK by pull request #88, merged
+as `2db08ff`, which the workflow pins. Locally, from that commit, the agent repaired the broken step and every check
+passed. Owed: the `ANTHROPIC_API_KEY` secret, and the run in Actions.
+
 ### Phase 6: more of the family
 
 Each is optional, pinned like the rest, and added only with a check that uses it.

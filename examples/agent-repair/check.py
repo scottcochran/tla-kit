@@ -5,7 +5,8 @@
 
 1. The session had the plugin's tla-kit server, connected, with its fourteen tools, and ended without an error.
 2. The last prove the agent ran on the whole module succeeded.
-3. In the project, only spec/Counter_proof.tla changed, and only in proof lines: no statement, and not Counter.tla.
+3. In the project, only spec/Counter_proof.tla changed, and only in its proofs: with every proof taken out, the
+   module before and after is the same, so no statement or definition changed, and Counter.tla did not.
 4. tlapm --cleanfp --strict, run directly in the image the plugin names, outside the server and with no cache,
    proves the repaired module.
 Prints a summary of the session and exits 1 if any check fails.
@@ -69,11 +70,35 @@ status = subprocess.run(["git", "-C", project, "status", "--porcelain"], capture
 check(status.splitlines() == [" M spec/Counter_proof.tla"], f"only spec/Counter_proof.tla changed ({status.split()})")
 diff = subprocess.run(["git", "-C", project, "diff", "-U0", "--", "spec/Counter_proof.tla"],
                       capture_output=True, text=True).stdout
-changed = [l for l in diff.splitlines() if l[:1] in "+-" and not l.startswith(("+++", "---"))]
-proof_line = re.compile(r"^[+-]\s+(BY|OBVIOUS|OMITTED|PROOF|<\d+>|QED)\b|^[+-]\s*$")
-for l in changed:
-    print("      " + l)
-check(bool(changed) and all(proof_line.match(l) for l in changed), "every changed line is a proof line")
+for l in diff.splitlines():
+    if l[:1] in "+-" and not l.startswith(("+++", "---")):
+        print("      " + l)
+
+PROOF_START = re.compile(r"^\s*(BY|OBVIOUS|OMITTED|PROOF)\b|^\s*<\d+>")
+
+
+def outside_proofs(text):
+    """The module with every proof taken out: what is left is its statements, definitions and the rest. A proof
+    starts at BY, OBVIOUS, OMITTED, PROOF or a step <n>, and runs over blank lines, indented lines and further
+    steps, to the next line that starts at the margin with anything else."""
+    kept, in_proof = [], False
+    for line in text.splitlines():
+        if PROOF_START.match(line):
+            in_proof = True
+        elif in_proof and (not line.strip() or line[0].isspace()):
+            pass
+        else:
+            in_proof = False
+            if line.strip():
+                kept.append(line.rstrip())
+    return kept
+
+
+before = subprocess.run(["git", "-C", project, "show", "HEAD:spec/Counter_proof.tla"],
+                        capture_output=True, text=True).stdout
+after = open(os.path.join(project, "spec", "Counter_proof.tla")).read()
+check(before != after and outside_proofs(before) == outside_proofs(after),
+      "only proofs changed: outside them the module is as it was")
 
 image = re.search(r"ghcr\.io/scottcochran/tla-kit@sha256:[0-9a-f]{64}", open(os.path.join(plugin, ".mcp.json")).read())
 check(image is not None, "the plugin names the image by digest")

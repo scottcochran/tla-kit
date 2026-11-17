@@ -70,11 +70,14 @@ jobs:
       - name: The repair, checked apart from the agent
         if: ${{ !cancelled() }}
         run: |
-          set -o pipefail
-          python3 examples/agent-repair/check.py "$RUNNER_TEMP/project" \
-            topak/skills/writing-tla-specs-and-proofs "$RUNNER_TEMP/transcript.jsonl" | tee "$RUNNER_TEMP/check.txt"
           git -C "$RUNNER_TEMP/project" diff > "$RUNNER_TEMP/repair.diff"
+          set +e
+          python3 examples/agent-repair/check.py "$RUNNER_TEMP/project" \
+            topak/skills/writing-tla-specs-and-proofs "$RUNNER_TEMP/transcript.jsonl" > "$RUNNER_TEMP/check.txt" 2>&1
+          code=$?
+          cat "$RUNNER_TEMP/check.txt"
           { echo '```'; cat "$RUNNER_TEMP/check.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          exit $code
       - name: Keep the transcript, the check and the diff
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

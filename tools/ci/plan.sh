@@ -6,7 +6,7 @@
 #                  commit is unknown, HEAD's parent
 #   moved=<list>   the pins PINS.json moves against base, as `<kind> <tool>` separated by `;` (tools/pins.py moved)
 #   checker=       true when a checker pin moves (ADR-0013 item 1)
-#   rows=          true when the PinLifecycle rows are regenerated: the change touches spec/ or decisions/, or moves
+#   rows=          true when the rows of spec/'s modules are regenerated: the change touches spec/ or decisions/, or moves
 #                  a checker pin (ADR-0014 item 1, ADR-0015 item 8), or changes the vendored scripts that generate
 #                  them or this plan; always on workflow_dispatch
 #   server=        true when the MCP server's tools are compared with their commands on TOPAK (ADR-0008 item 5):

@@ -1,0 +1,118 @@
+# Rows for tlc_rows.py: name mut spec kind property expected [KEY=value ...]
+# module: ProveRequests
+# title: ProveRequests.tla - the prove tool's requests, processes and cache (ADR-0016)
+# expected: Mut = "none", the chosen design, HOLDS on every property, at three requests in Safe and two elsewhere, with
+# expected: one cache per module and with one shared cache. Each mutation is COUNTEREXAMPLE on the properties its rule
+# expected: guards and HOLDS on the rest: M_NOLOCK on OneWriterPerCache; M_KILLONE, M_NAIVE (ADR-0016 item 5's naive
+# expected: design) and M_ESCAPE (a backend leaves the group) on NoProcessOutlives and OneWriterPerCache; M_EXITCODE on
+# expected: SuccessOnlyComplete; M_ANSWERCANCEL and M_LATECANCEL on AtMostOneAnswer; M_NOREAP on AllReaped;
+# expected: M_DEFAULTCACHE on NothingInProject. EveryRequestEnds and WaitingRuns HOLD under SpecLive in both cache
+# expected: layouts, and EveryRequestEnds is COUNTEREXAMPLE under Spec, which has no fairness; NoBehaviour is
+# expected: COUNTEREXAMPLE under SpecLive. Every witness is VIOLATED under none with one cache per module. With one
+# expected: shared cache, NeverTwoRunning HOLDS: one cache serialises every run.
+# const: NReq = 2
+# const: CacheMode = "permodule"
+
+# The chosen design: every property at once at ADR-0016 item 5's bounds, three requests and two modules, with one
+# cache per module and with one shared cache.
+n-safe-3               none            Spec      INVARIANT  Safe                 HOLDS           NReq=3
+n-safe-3-shared        none            Spec      INVARIANT  Safe                 HOLDS           NReq=3 CacheMode="shared"
+# Each property alone, at two requests.
+n-answer               none            Spec      INVARIANT  AtMostOneAnswer      HOLDS
+n-success              none            Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+n-outlive              none            Spec      INVARIANT  NoProcessOutlives    HOLDS
+n-writer               none            Spec      INVARIANT  OneWriterPerCache    HOLDS
+n-project              none            Spec      INVARIANT  NothingInProject     HOLDS
+n-reaped               none            Spec      INVARIANT  AllReaped            HOLDS
+# Liveness, with fairness and without.
+n-ends                 none            SpecLive  PROPERTY   EveryRequestEnds     HOLDS
+n-ends-shared          none            SpecLive  PROPERTY   EveryRequestEnds     HOLDS           CacheMode="shared"
+n-waits                none            SpecLive  PROPERTY   WaitingRuns          HOLDS
+n-waits-shared         none            SpecLive  PROPERTY   WaitingRuns          HOLDS           CacheMode="shared"
+n-ends-nofair          none            Spec      PROPERTY   EveryRequestEnds     COUNTEREXAMPLE
+n-behaviour            none            SpecLive  PROPERTY   NoBehaviour          COUNTEREXAMPLE
+
+# M_NOLOCK: it must break OneWriterPerCache, and no other.
+m-nolock-answer        M_NOLOCK        Spec      INVARIANT  AtMostOneAnswer      HOLDS
+m-nolock-success       M_NOLOCK        Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-nolock-outlive       M_NOLOCK        Spec      INVARIANT  NoProcessOutlives    HOLDS
+m-nolock-writer        M_NOLOCK        Spec      INVARIANT  OneWriterPerCache    COUNTEREXAMPLE
+m-nolock-project       M_NOLOCK        Spec      INVARIANT  NothingInProject     HOLDS
+m-nolock-reaped        M_NOLOCK        Spec      INVARIANT  AllReaped            HOLDS
+
+# M_KILLONE: it must break NoProcessOutlives and OneWriterPerCache, and no other.
+m-killone-answer       M_KILLONE       Spec      INVARIANT  AtMostOneAnswer      HOLDS
+m-killone-success      M_KILLONE       Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-killone-outlive      M_KILLONE       Spec      INVARIANT  NoProcessOutlives    COUNTEREXAMPLE
+m-killone-writer       M_KILLONE       Spec      INVARIANT  OneWriterPerCache    COUNTEREXAMPLE
+m-killone-project      M_KILLONE       Spec      INVARIANT  NothingInProject     HOLDS
+m-killone-reaped       M_KILLONE       Spec      INVARIANT  AllReaped            HOLDS
+
+# M_EXITCODE: it must break SuccessOnlyComplete, and no other.
+m-exitcode-answer      M_EXITCODE      Spec      INVARIANT  AtMostOneAnswer      HOLDS
+m-exitcode-success     M_EXITCODE      Spec      INVARIANT  SuccessOnlyComplete  COUNTEREXAMPLE
+m-exitcode-outlive     M_EXITCODE      Spec      INVARIANT  NoProcessOutlives    HOLDS
+m-exitcode-writer      M_EXITCODE      Spec      INVARIANT  OneWriterPerCache    HOLDS
+m-exitcode-project     M_EXITCODE      Spec      INVARIANT  NothingInProject     HOLDS
+m-exitcode-reaped      M_EXITCODE      Spec      INVARIANT  AllReaped            HOLDS
+
+# M_ANSWERCANCEL: it must break AtMostOneAnswer, and no other.
+m-answercancel-answer  M_ANSWERCANCEL  Spec      INVARIANT  AtMostOneAnswer      COUNTEREXAMPLE
+m-answercancel-success M_ANSWERCANCEL  Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-answercancel-outlive M_ANSWERCANCEL  Spec      INVARIANT  NoProcessOutlives    HOLDS
+m-answercancel-writer  M_ANSWERCANCEL  Spec      INVARIANT  OneWriterPerCache    HOLDS
+m-answercancel-project M_ANSWERCANCEL  Spec      INVARIANT  NothingInProject     HOLDS
+m-answercancel-reaped  M_ANSWERCANCEL  Spec      INVARIANT  AllReaped            HOLDS
+
+# M_LATECANCEL: it must break AtMostOneAnswer, and no other.
+m-latecancel-answer    M_LATECANCEL    Spec      INVARIANT  AtMostOneAnswer      COUNTEREXAMPLE
+m-latecancel-success   M_LATECANCEL    Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-latecancel-outlive   M_LATECANCEL    Spec      INVARIANT  NoProcessOutlives    HOLDS
+m-latecancel-writer    M_LATECANCEL    Spec      INVARIANT  OneWriterPerCache    HOLDS
+m-latecancel-project   M_LATECANCEL    Spec      INVARIANT  NothingInProject     HOLDS
+m-latecancel-reaped    M_LATECANCEL    Spec      INVARIANT  AllReaped            HOLDS
+
+# M_NOREAP: it must break AllReaped, and no other.
+m-noreap-answer        M_NOREAP        Spec      INVARIANT  AtMostOneAnswer      HOLDS
+m-noreap-success       M_NOREAP        Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-noreap-outlive       M_NOREAP        Spec      INVARIANT  NoProcessOutlives    HOLDS
+m-noreap-writer        M_NOREAP        Spec      INVARIANT  OneWriterPerCache    HOLDS
+m-noreap-project       M_NOREAP        Spec      INVARIANT  NothingInProject     HOLDS
+m-noreap-reaped        M_NOREAP        Spec      INVARIANT  AllReaped            COUNTEREXAMPLE
+
+# M_DEFAULTCACHE: it must break NothingInProject, and no other.
+m-defaultcache-answer  M_DEFAULTCACHE  Spec      INVARIANT  AtMostOneAnswer      HOLDS
+m-defaultcache-success M_DEFAULTCACHE  Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-defaultcache-outlive M_DEFAULTCACHE  Spec      INVARIANT  NoProcessOutlives    HOLDS
+m-defaultcache-writer  M_DEFAULTCACHE  Spec      INVARIANT  OneWriterPerCache    HOLDS
+m-defaultcache-project M_DEFAULTCACHE  Spec      INVARIANT  NothingInProject     COUNTEREXAMPLE
+m-defaultcache-reaped  M_DEFAULTCACHE  Spec      INVARIANT  AllReaped            HOLDS
+
+# M_NAIVE: it must break NoProcessOutlives and OneWriterPerCache, and no other.
+m-naive-answer         M_NAIVE         Spec      INVARIANT  AtMostOneAnswer      HOLDS
+m-naive-success        M_NAIVE         Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-naive-outlive        M_NAIVE         Spec      INVARIANT  NoProcessOutlives    COUNTEREXAMPLE
+m-naive-writer         M_NAIVE         Spec      INVARIANT  OneWriterPerCache    COUNTEREXAMPLE
+m-naive-project        M_NAIVE         Spec      INVARIANT  NothingInProject     HOLDS
+m-naive-reaped         M_NAIVE         Spec      INVARIANT  AllReaped            HOLDS
+
+# M_ESCAPE: it must break NoProcessOutlives and OneWriterPerCache, and no other.
+m-escape-answer        M_ESCAPE        Spec      INVARIANT  AtMostOneAnswer      HOLDS
+m-escape-success       M_ESCAPE        Spec      INVARIANT  SuccessOnlyComplete  HOLDS
+m-escape-outlive       M_ESCAPE        Spec      INVARIANT  NoProcessOutlives    COUNTEREXAMPLE
+m-escape-writer        M_ESCAPE        Spec      INVARIANT  OneWriterPerCache    COUNTEREXAMPLE
+m-escape-project       M_ESCAPE        Spec      INVARIANT  NothingInProject     HOLDS
+m-escape-reaped        M_ESCAPE        Spec      INVARIANT  AllReaped            HOLDS
+
+# Witnesses: each must be VIOLATED under none, so that what it denies can happen.
+w-answered             none            Spec      INVARIANT  NeverAnswered        COUNTEREXAMPLE
+w-success              none            Spec      INVARIANT  NeverSuccess         COUNTEREXAMPLE
+w-failure              none            Spec      INVARIANT  NeverFailure         COUNTEREXAMPLE
+w-timeout              none            Spec      INVARIANT  NeverTimeout         COUNTEREXAMPLE
+w-cancelled            none            Spec      INVARIANT  NeverCancelled       COUNTEREXAMPLE
+w-latecancel           none            Spec      INVARIANT  NeverLateCancel      COUNTEREXAMPLE
+w-tworunning           none            Spec      INVARIANT  NeverTwoRunning      COUNTEREXAMPLE
+w-queued               none            Spec      INVARIANT  NeverQueued          COUNTEREXAMPLE
+w-zombie               none            Spec      INVARIANT  NeverZombie          COUNTEREXAMPLE
+# With one shared cache, no two runs are ever alive at once.
+w-tworunning-shared    none            Spec      INVARIANT  NeverTwoRunning      HOLDS           CacheMode="shared"

@@ -96,8 +96,10 @@ cancelled. With one shared cache, no two runs are ever alive at once (`w-tworunn
 module serialises every run.
 
 **These results are evidence.** They were made natively, as working output, and then regenerated in the published
-image `v0.2.0` (`sha256:5554015f…1e5d`), where they reproduced byte for byte. CI regenerates them on every pull
-request that touches `spec/` or `decisions/` (`tools/ci/pinlifecycle.sh … ProveRequests`).
+image `v0.2.0` (`sha256:5554015f…1e5d`), where they reproduced byte for byte, and again in `v0.3.0`
+(`sha256:948e6d1f…257f`), the release with the tool they describe
+(`derived/tla-kit-phase4-checks-2026.11.17.md`). CI regenerates them on every pull request that touches `spec/` or
+`decisions/` (`tools/ci/pinlifecycle.sh … ProveRequests`).
 
 ## Working on a spec natively
 

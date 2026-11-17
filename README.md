@@ -5,15 +5,17 @@ laptop and in CI, and an MCP server over those tools to pair with the
 [`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
 skill.
 
-**Status: Phases 1 and 3 of [PLAN.md](PLAN.md) are done.** The latest release,
-[`v0.2.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.2.0), is published and attested:
+**Status: Phases 1, 3 and 4 of [PLAN.md](PLAN.md) are done.** The latest release,
+[`v0.3.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.3.0), is published and attested:
 
 ```
-ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d
+ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f
 ```
 
-It adds the MCP server to the first release, [`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0)
-(`sha256:454328cd…50c6`), and moves no pin: the checker, the prover and the runtime are the same bytes in both.
+It adds the MCP server's proof tools to [`v0.2.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.2.0)
+(`sha256:5554015f…1e5d`), which added the server to the first release,
+[`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0) (`sha256:454328cd…50c6`). Neither moved a
+pin: the checker, the prover and the runtime are the same bytes in all three.
 
 - **How it is built:** from a base pinned by digest, packages pinned by date, and a prover tarball kept in this
   repository. Every build of one commit gives one digest.
@@ -23,8 +25,10 @@ It adds the MCP server to the first release, [`v0.1.0`](https://github.com/scott
   workflow publishes from a tag.
 - **The model:** Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), reproduces
   in the published image.
-- **The MCP server:** Phase 3's model-checking tools, `tla-kit mcp`, are in `v0.2.0` (below).
-- **What's next:** Phase 2, the projects' CI in the image, and Phase 4, the server's proof tools.
+- **The MCP server:** `tla-kit mcp`, with Phase 3's model-checking tools and Phase 4's proof tools, is in `v0.3.0`
+  (below). An agent with only its tools, and `Read` and `Edit`, repaired a broken proof step against the published
+  image ([the record](derived/tla-kit-phase4-checks-2026.11.17.md)).
+- **What's next:** Phase 2, the projects' CI in the image, and Phase 5, the server's declaration in the skill.
 
 ## What is in the image
 
@@ -60,8 +64,8 @@ listed in [`licenses/THIRD-PARTY.md`](licenses/THIRD-PARTY.md), which the image 
 A project cites the published image by its digest. The tag names the same image, for reading:
 
 ```sh
-docker pull ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d
-gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d --repo scottcochran/tla-kit
+docker pull ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f
+gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f --repo scottcochran/tla-kit
 ```
 
 To build it here:
@@ -107,14 +111,14 @@ built with other arguments is for working, not for citing (ADR-0002 item 7).
 `vendor/check.py` checks the vendored scripts against their pin, and with `--upstream <TOPAK checkout>` against
 the commit itself.
 
-## The MCP server (Phase 3)
+## The MCP server (Phases 3 and 4)
 
-`tla-kit mcp` is an MCP server over stdio for the model-checking tools, written with Python's standard library only
-(ADR-0008). A client starts it in the image with the project mounted:
+`tla-kit mcp` is an MCP server over stdio for the model-checking and proof tools, written with Python's standard
+library only (ADR-0008). A client starts it in the image with the project mounted:
 
 ```sh
 docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
-  ghcr.io/scottcochran/tla-kit@sha256:5554015f9927001f933a4ec9e440fc0e1d37dc5676ce3acd47190b2d6dfc1e5d tla-kit mcp
+  ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f tla-kit mcp
 ```
 
 | Tool | Does |
@@ -134,10 +138,12 @@ docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
 | `flip_test` | The skill's flip test: each mutation's hypothesis flipped on a copy, and the proof must break where it should (Phase 4) |
 | `proof_sync` | The skill's sync check: every results file against the tree and the pins, and with `run` each stale proof re-checked (Phase 4) |
 
-`prove` runs `tlapm` once per request, in a process group of its own that is killed whole on a timeout or a cancel,
-with a cache the server owns, one run per module at a time, and every child reaped before it answers: the design
-`spec/ProveRequests.tla` checks (ADR-0016). Requests run side by side, and a cancelled request gets no response.
-`server/test_prove.py` tries to break each of that module's properties in the image.
+The proof tools follow the design of [marco6/tlapm-mcp](https://github.com/marco6/tlapm-mcp) (MIT), with the
+changes ADR-0009 names; none of its code is used. `prove` runs `tlapm` once per request, in a process group of its
+own that is killed whole on a timeout or a cancel, with a cache the server owns, one run per module at a time, and
+every child reaped before it answers: the design `spec/ProveRequests.tla` checks (ADR-0016). Requests run side by
+side, and a cancelled request gets no response. `server/test_prove.py` tries to break each of that module's
+properties in the image.
 
 Only `tlc_rows` and `proof_results` write into the project, and only the generators' results files. The proof
 scripts hold the prover to the project's `tools/TLAPS-PIN`, as from the command line; the server sets
@@ -147,7 +153,10 @@ output and keeps its scratch files outside the project (ADR-0006). A path outsid
 runs it on every pull request. `server/compare_topak.py` is Phase 3's "Done when": it compares each tool with the
 command it stands for on TOPAK's `Alone` and `Coupling`, every row of both, and CI runs it in the image when a change
 touches the server. Phase 3 is done: on 2026.11.16, in the image CI built for pull request #11, all 84
-comparisons over the nine tools were the same. The server is in `v0.2.0` and later releases.
+comparisons over the nine tools were the same. The server is in `v0.2.0` and later releases. Phase 4 is done: on
+2026.11.17, against `v0.3.0`, an agent repaired the fixture's broken `NextBounded` step with the server's tools, and
+`Read` and `Edit`, without being told which step it was
+([`derived/tla-kit-phase4-checks-2026.11.17.md`](derived/tla-kit-phase4-checks-2026.11.17.md)).
 
 ## Limits
 
@@ -226,10 +235,9 @@ run the image under emulation and in GitHub Actions.
 
 [PLAN.md](PLAN.md) is the development plan, and [derived/](derived/) holds dated, frozen records: the session
 that produced the spike, with the raw output of its runs, the licence check of the bundled tools, the settling of
-their copyleft sources, and the checks of the first release. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0016 accepted, the rest Proposed. In short:
+their copyleft sources, the checks of the first release, and those of Phase 4. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0016 accepted, the rest Proposed. In short:
 
-- The MCP server's proof tools (Phase 4): the skill's `proof_results`, `flip_test` and `proof_sync`, and tools on
-  `tlapm` (check a module, check one step, list failed obligations). Its declaration in the skill (Phase 5).
+- The MCP server's declaration in the skill, and an agent job in GitHub Actions against it (Phase 5).
 - cvc5 and ethos for certified runs; Apalache; the TLA+ community modules.
 - A Linux arm64 build of `tlapm` from source.
 

@@ -344,7 +344,19 @@ only after a certified rerun in the image. In this order:
   - the self-test gains ADR-0012 item 8's check.
 
   The image sets `CVC5` and `ETHOS`, which TOPAK's `proof-cert.sh` already reads (ADR-0004, by a History row).
+  **Kept 2026.11.17:** the custodian created `cvc5-1.4.0` from `main` at `6f73402`. Its `SHA256SUMS` verifies,
+  and its `licenses.tar.gz` holds `main`'s notices. **In pull request #27:** the `Dockerfile` installs the three
+  from the kept copies, CI fetches them as it does the prover's tarball, and `PINS.json` gains them, with
+  `tools/pins.py` checking that they agree and that a new pin counts as a move. The weekly check compares them
+  and their kept copies with upstream, and the evidence workflow runs TOPAK's certified step for them.
 - **Run TOPAK's certified step in the candidate image**, at a named TOPAK commit, as the spike ran `defects-run.sh`.
+  **Run locally 2026.11.17**, in a candidate built from the branch, at TOPAK `0dfdfcd`:
+  - `proof-cert.sh Alone_proof` certified all 263 obligations, with the route counts of TOPAK's own record under
+    `7824dab`;
+  - `defects-run.sh`'s certified section printed counts for all twelve modules. Nine differ from TOPAK's §8 under
+    `ff40755`, as the spike's run did, which is TOPAK's to explain (its ADR-0077 §5).
+
+  The self-test's `smt` check passed, and fails with an `ethos` that accepts everything or refuses everything.
 
 **Done when**, in the published image:
 - the self-test's check of `cvc5` and `ethos` passes;

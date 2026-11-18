@@ -46,7 +46,7 @@ jobs:
           [ -n "$(git tag -l --format='%(contents)' "$tag" | tr -d '[:space:]')" ] || { echo "release: $tag has no message"; exit 1; }
           git merge-base --is-ancestor HEAD origin/main || { echo "release: $tag is not on main"; exit 1; }
           echo "TAG=$tag" >> "$GITHUB_ENV"
-      - name: Fetch the kept prover tarball (ADR-0005 item 2)
+      - name: Fetch the kept copies (ADR-0005 item 2; ADR-0017 item 2)
         env:
           GH_TOKEN: ${{ github.token }}
         run: tools/ci/fetch-kept.sh

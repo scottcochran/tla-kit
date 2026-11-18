@@ -4,10 +4,13 @@
     tools/weekly.py [--scan FILE] > report.md
 
 For each pin in PINS.json it asks upstream, and prints one Markdown report:
-  - whether upstream still serves the pinned value as pinned: the jar and the TLAPS tarball are downloaded and
-    their sha256 compared, the base's digest is looked up in its registry, and the apt snapshot's index fetched;
-  - whether the kept copy of the TLAPS tarball is still in this repository's release, with its sha256;
-  - a new tla2tools.jar release, a change to what the tlapm tag serves, and a new digest behind the base's tag;
+  - whether upstream still serves the pinned value as pinned: the jar, the TLAPS tarball, and cvc5's, ethos's and
+    cvc5's source archives are downloaded and their sha256 compared, the base's digest is looked up in its
+    registry, and the apt snapshot's index fetched;
+  - whether the kept copies, of the TLAPS tarball and of cvc5's three, are still in this repository's releases,
+    with their sha256 (ADR-0005 item 3; ADR-0017 item 3);
+  - a new tla2tools.jar release, a change to what the tlapm tag serves, a new cvc5 release, and a new digest
+    behind the base's tag;
   - how long ago the runtime pins were taken, against the 90-day refresh (ADR-0013 item 5);
   - each project's tla-kit pin, from the file CONSUMERS.md names for it (ADR-0014 item 6);
   - with --scan, the vulnerability scan of the current release.
@@ -112,6 +115,37 @@ def main(argv):
         else:
             kept = f"**missing**: {err.splitlines()[-1] if err else 'not found'}"
     out.append(f"| tlapm, the kept copy | release `{tl['kept_release']}` | {kept} | kept here; no log |")
+
+    # cvc5, ethos and the CPC signature: upstream's archive, and the kept copy, against the pin (ADR-0017 item 3).
+    for tool in ("cvc5", "ethos", "CPC signature"):
+        p = pins.get(tool)
+        if p is None:
+            continue
+        status, got = fetch_sha256(p["upstream"])
+        ok = status == "ok" and got == p["download_sha256"]
+        note = "the same bytes" if ok else (f"{status}" if status != "ok" else f"**different bytes**, sha256 {got}")
+        line, e = served_line(p, ok, "sha256", p["download_sha256"])
+        out.append(f"| {tool} | {p['version']}, `{p['download_sha256'][:12]}` | {note} | {line} |")
+        if e:
+            entries.append((tool, e))
+        if status == "ok" and not ok and tool == "CPC signature":
+            moves.append("GitHub's archive of cvc5's tag now has different bytes. The tag may not have moved: GitHub "
+                         "makes the archive on request. The kept copy and the tree digest are what the image uses.")
+        with tempfile.TemporaryDirectory() as d:
+            name = os.path.basename(p["kept_copy"])
+            code, _, err = sh("gh", "release", "download", p["kept_release"], "--pattern", name, "--dir", d)
+            if code == 0:
+                h = hashlib.sha256(open(os.path.join(d, name), "rb").read()).hexdigest()
+                kept = "the same bytes" if h == p["download_sha256"] else f"**different bytes**, sha256 {h}"
+            else:
+                kept = f"**missing**: {err.splitlines()[-1] if err else 'not found'}"
+        out.append(f"| {tool}, the kept copy | release `{p['kept_release']}` | {kept} | kept here; no log |")
+    if "cvc5" in pins:
+        code, latest, _ = sh("gh", "api", "repos/cvc5/cvc5/releases/latest", "-q", ".tag_name")
+        pinned = "cvc5-" + pins["cvc5"]["version"]
+        if code == 0 and latest and latest != pinned:
+            moves.append(f"A new cvc5 release: {latest} (pinned {pinned}). cvc5, ethos at the commit it names, and "
+                         "its CPC signature move together, after a new kept release (ADR-0017 items 1 and 4).")
 
     base = pins["base"]
     r = base["resolved"]

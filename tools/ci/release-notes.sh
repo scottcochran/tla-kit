@@ -9,6 +9,7 @@ cd "$(dirname "$0")/../.."
 tag=${1:?usage: release-notes.sh TAG DIGEST INFO_JSON [SCAN_FILE]}; digest=${2:?}; info=${3:?}; scan=${4:-}
 image=ghcr.io/scottcochran/tla-kit
 kept=$(python3 -c 'import json; p=next(p for p in json.load(open("PINS.json"))["pins"] if p["tool"]=="tlapm"); print(p["kept_release"])')
+smt=$(python3 -c 'import json; print(next((p["kept_release"] for p in json.load(open("PINS.json"))["pins"] if p["tool"]=="cvc5"), ""))')
 echo "$(git tag -l --format='%(contents)' "$tag")"
 cat <<EOF
 
@@ -29,7 +30,9 @@ gh attestation verify oci://$image@$digest --repo scottcochran/tla-kit
 
 The inventory, \`PINS.json\`, as committed at the tag, and \`tla-kit-info --json\` from the image, are attached. The
 prover tarball, with the licence notices and the source of its copyleft parts, is kept in the release
-[\`$kept\`](../../releases/tag/$kept) (ADR-0005 item 2).
+[\`$kept\`](../../releases/tag/$kept) (ADR-0005 item 2).$( [ -n "$smt" ] && printf '%s' " cvc5's and ethos's zips, with the licence notices,
+cvc5's and ethos's source and the source of the copyleft parts linked into them, are kept in the release
+[\`$smt\`](../../releases/tag/$smt) (ADR-0017 item 1)." )
 
 \`\`\`
 $(python3 -c '
@@ -40,6 +43,11 @@ print("tlc      ", f["checker"]["tlc"])
 print("prover   ", f["prover"]["path"], "sha256", f["prover"]["sha256"])
 print("tlapm    ", f["prover"]["version"])
 for b in f["backends"]: print("backend  ", b["name"], b["version"])
+s = f.get("smt")
+if s:
+    print("cvc5     ", s["cvc5"]["path"], "sha256", s["cvc5"]["sha256"], "|", s["cvc5"]["version"])
+    print("ethos    ", s["ethos"]["path"], "sha256", s["ethos"]["sha256"], "|", s["ethos"]["version"])
+    print("cpc      ", s["cpc"]["path"], s["cpc"]["files"], "files, tree", s["cpc"]["tree"])
 print("java     ", f["java"])
 print("skill    ", f["skill"]["source"], "at", f["skill"]["commit"])
 print("image    ", f["image"]["source"], "at", f["image"]["revision"], "committed", f["image"]["created"])

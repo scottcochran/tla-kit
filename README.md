@@ -5,20 +5,22 @@ laptop and in CI, and an MCP server over those tools to pair with the
 [`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
 skill.
 
-**Status: Phases 1, 3, 4 and 5 of [PLAN.md](PLAN.md) are done.** The latest release,
-[`v0.3.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.3.0), is published and attested:
+**Status: Phases 1, 3, 4 and 5 of [PLAN.md](PLAN.md) are done, and so is Phase 6's cvc5 and ethos.** The latest
+release, [`v0.4.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.4.0), is published and attested:
 
 ```
-ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f
+ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f
 ```
 
-It adds the MCP server's proof tools to [`v0.2.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.2.0)
+It adds `cvc5` and `ethos`, for certified proofs, to
+[`v0.3.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.3.0) (`sha256:948e6d1f…257f`). That release
+added the server's proof tools to [`v0.2.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.2.0)
 (`sha256:5554015f…1e5d`), which added the server to the first release,
-[`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0) (`sha256:454328cd…50c6`). Neither moved a
-pin: the checker, the prover and the runtime are the same bytes in all three.
+[`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0) (`sha256:454328cd…50c6`). None moved an
+existing pin: TLC, the prover and the runtime are the same bytes in all four.
 
-- **How it is built:** from a base pinned by digest, packages pinned by date, and a prover tarball kept in this
-  repository. Every build of one commit gives one digest.
+- **How it is built:** from a base pinned by digest, packages pinned by date, and the prover's tarball and
+  `cvc5`'s and `ethos`'s builds, kept in this repository's releases. Every build of one commit gives one digest.
 - **What it carries:** it runs as a non-root user, and carries the skill's scripts, a self-test and its inventory,
   [`PINS.json`](PINS.json). It says what it holds.
 - **What CI does:** it builds and tests every pull request. A weekly check watches upstream, and a release
@@ -26,11 +28,13 @@ pin: the checker, the prover and the runtime are the same bytes in all three.
 - **The model:** Phase 1b's model of the pin and release process, [`spec/PinLifecycle.tla`](spec/), reproduces
   in the published image.
 - **The MCP server:** `tla-kit mcp`, with Phase 3's model-checking tools and Phase 4's proof tools, is in `v0.3.0`
-  (below). An agent with only its tools, and `Read` and `Edit`, repaired a broken proof step against the published
-  image ([the record](derived/tla-kit-phase4-checks-2026.11.17.md)).
+  and later releases (below). An agent with only its tools, and `Read` and `Edit`, repaired a broken proof step
+  against the published image ([the record](derived/tla-kit-phase4-checks-2026.11.17.md)).
 - **The skill:** the `writing-tla-specs-and-proofs` plugin declares the server by digest, so a session with the
   plugin has its tools; one configuration serves a local session and an Actions job (below).
-- **What's next:** Phase 2, the projects' CI in the image, and Phase 6, more of the tool family.
+- **Certified proofs:** `cvc5`, `ethos` and the CPC signature, so that a project's certified run checks every SMT
+  proof. TOPAK's `proof-cert.sh` certified a proof module in the published image (below).
+- **What's next:** Phase 2, the projects' CI in the image, and the rest of Phase 6.
 
 ## What is in the image
 
@@ -54,12 +58,13 @@ served state (ADR-0013 item 7). CI fails if the two differ, or if the `Dockerfil
 `tla-kit-info`, the default command, prints each tool with the digest a results file would cite, the skill's
 commit, the package versions and the build arguments; `tla-kit-info --json` prints the same as JSON.
 `tla-kit-selftest` checks the image against itself in about half a minute: the digests, `TLA_JAR` and `TLAPM`,
-the licence texts, the `sany`, `pcal` and `tlc` wrappers, and the skill's setup check with proofs (the fixture's
-row list, its proof and its flip test). `tlapm` and `tlapm_lsp` are on `PATH`, and the skill's scripts are at
-`/opt/tla-kit/skill` (`$TLA_KIT_SKILL`).
+the licence texts, the `sany`, `pcal` and `tlc` wrappers, the skill's setup check with proofs (the fixture's
+row list, its proof and its flip test), the server, and `ethos`'s check of a `cvc5` proof. `tlapm`, `tlapm_lsp`,
+`cvc5` and `ethos` are on `PATH`, and the skill's scripts are at `/opt/tla-kit/skill` (`$TLA_KIT_SKILL`).
 
 The image sets `TLA_JAR` and `TLAPM`, the two variables the skill's scripts and the projects' run scripts
-already read, so a mounted project uses the image's tools without changes.
+already read, and `CVC5` and `ETHOS`, which a project's certified run reads, so a mounted project uses the image's
+tools without changes. The CPC signature is at `/opt/cvc5/cpc`.
 
 The third-party software in the image, with each part's licence, the path of its licence text and its source, is
 listed in [`licenses/THIRD-PARTY.md`](licenses/THIRD-PARTY.md), which the image carries at `/opt/tla-kit/licenses/`.
@@ -69,8 +74,8 @@ listed in [`licenses/THIRD-PARTY.md`](licenses/THIRD-PARTY.md), which the image 
 A project cites the published image by its digest. The tag names the same image, for reading:
 
 ```sh
-docker pull ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f
-gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f --repo scottcochran/tla-kit
+docker pull ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f
+gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f --repo scottcochran/tla-kit
 ```
 
 To build it here:
@@ -97,12 +102,14 @@ Every input is held to a digest or a date: the base by digest, the `apt` sources
 by sha256. Upstream rebuilds the `1.6.0-pre` TLAPS tag under the same name, so the tarball is taken from the copy
 kept in this repository's release `tlapm-ff40755`, beside its licence notices and the source of its copyleft parts
 (ADR-0005 item 2). A new prover build is a decision: a release of its own first, then a pull request that moves
-`TLAPM_SHA256` and `PINS.json` together.
+`TLAPM_SHA256` and `PINS.json` together. `cvc5`'s and `ethos`'s zips, and cvc5's source with the CPC signature, are
+taken the same way from the release `cvc5-1.4.0`, beside the source of the libraries linked into them, and the
+three move together (ADR-0017).
 
 To build it as CI and the release workflow do, fixed in time to the commit (ADR-0014 item 8):
 
 ```sh
-tools/ci/fetch-kept.sh                     # the kept tarball into build/tlapm-tarball/, its sha256 checked
+tools/ci/fetch-kept.sh                     # the kept tarball and zips into build/, each sha256 checked
 tools/ci/build.sh --load -t tla-kit:dev    # SOURCE_DATE_EPOCH and the OCI labels from the checked-out commit
 ```
 
@@ -123,7 +130,7 @@ library only (ADR-0008). A client starts it in the image with the project mounte
 
 ```sh
 docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
-  ghcr.io/scottcochran/tla-kit@sha256:948e6d1f275d64e4114950f03c2b5d1236068d1f3fe60885de7625789fc8257f tla-kit mcp
+  ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f tla-kit mcp
 ```
 
 | Tool | Does |
@@ -185,6 +192,24 @@ same project, and in both the agent repaired the step and every check passed
 message can show the server still connecting, so a check looks at the calls it answered. A new release reaches the
 plugin by a TOPAK pull request that moves the digest in its `.mcp.json`.
 
+## Certified proofs (Phase 6)
+
+A certified run counts an obligation proved by SMT only when `ethos` accepts the proof `cvc5` gives for it. TOPAK's
+`spec/proof-cert.sh` reads `CVC5` and `ETHOS`, so it runs in the image as it is:
+
+```sh
+docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" -w /work/spec \
+  ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f \
+  ./proof-cert.sh Alone_proof
+```
+
+Phase 6 is done for `cvc5` and `ethos`: on 2026.11.18, in `v0.4.0`, the self-test's check of the two passed,
+`proof-cert.sh` certified all 263 obligations of TOPAK's `Alone_proof` with the counts by route of TOPAK's record,
+and `defects-run.sh`'s certified step printed counts for all twelve modules
+([`derived/tla-kit-phase6-checks-2026.11.18.md`](derived/tla-kit-phase6-checks-2026.11.18.md)). Compare certified
+runs by those counts: the evidence digest a run prints differs between machines. A project whose prover pin is not
+the image's sets `TLAPM_UNPINNED=1`, as tla-kit's evidence workflow does.
+
 ## Limits
 
 - **Linux x86_64 only.** Upstream publishes no Linux arm64 build of `tlapm`. On Apple Silicon the image runs
@@ -193,7 +218,8 @@ plugin by a TOPAK pull request that moves the digest in its `.mcp.json`.
 - **Base must be Ubuntu 24.04 or newer.** The `tlapm` binary needs glibc 2.38; Debian 12 and Ubuntu 22.04 are
   too old.
 - **One release is supported:** the latest. Older ones stay available and get no fixes (ADR-0014 items 5 and 7).
-- **The scan covers the Ubuntu packages only.** Trivy reported no target for the Java runtime or the jars.
+- **The scan covers the Ubuntu packages only.** Trivy reported no target for the Java runtime or the jars, nor
+  for the static `cvc5` and `ethos`.
 - **The TLAPS tarball's contents are redistributed** on the three conditions of `PLAN.md` D7
   ([`derived/tla-kit-licence-check-2026.11.15.md`](derived/tla-kit-licence-check-2026.11.15.md) §5):
   - the image carries the notices;
@@ -201,8 +227,12 @@ plugin by a TOPAK pull request that moves the digest in its `.mcp.json`.
     tarball beside them, with the source of Poly/ML, GMP and `libsha1`;
   - the GMP release and `libsha1`'s licence are settled
     ([`derived/tla-kit-copyleft-sources-2026.11.16.md`](derived/tla-kit-copyleft-sources-2026.11.16.md)).
-- **No certified proof runs yet.** cvc5 and ethos, which TOPAK's `spec/proof-cert.sh` needs, are not in the
-  image.
+- **`cvc5`'s and `ethos`'s builds are redistributed** on the same three conditions
+  ([`derived/tla-kit-licence-check-cvc5-ethos-2026.11.17.md`](derived/tla-kit-licence-check-cvc5-ethos-2026.11.17.md)
+  §5): the image carries the notices; the release
+  [`cvc5-1.4.0`](https://github.com/scottcochran/tla-kit/releases/tag/cvc5-1.4.0) keeps the zips beside the source
+  of the LGPL libraries linked into them; and those libraries' releases are settled from the bytes
+  ([`derived/tla-kit-static-libraries-2026.11.17.md`](derived/tla-kit-static-libraries-2026.11.17.md)).
 
 ## Phase 1c checks, 2026.11.16
 
@@ -262,10 +292,12 @@ run the image under emulation and in GitHub Actions.
 
 [PLAN.md](PLAN.md) is the development plan, and [derived/](derived/) holds dated, frozen records: the session
 that produced the spike, with the raw output of its runs, the licence check of the bundled tools, the settling of
-their copyleft sources, the checks of the first release, and those of Phases 4 and 5. [decisions/](decisions/) holds the architecture decision records drafted from them: ADR-0001 to ADR-0011 and ADR-0013 to ADR-0016 accepted, the rest Proposed. In short:
+their copyleft sources, the checks of the first release, those of Phases 4, 5 and 6, and the licence check of
+`cvc5` and `ethos`. [decisions/](decisions/) holds the architecture decision records drafted from them, all
+seventeen accepted. In short:
 
 - The projects' CI in the image, with each project's pin (Phase 2).
-- cvc5 and ethos for certified runs; Apalache; the TLA+ community modules.
+- Apalache; TLATeX; the TLA+ community modules (the rest of Phase 6).
 - A Linux arm64 build of `tlapm` from source.
 
 ## License

@@ -1,0 +1,6 @@
+67,68c67,68
+<   BadEventually (PROPERTY) · violated · 21038 distinct states found · expected violated · as §8 says
+<   BadLeadsTo (PROPERTY) · violated · 7978 distinct states found · expected violated · as §8 says
+---
+>   BadEventually (PROPERTY) · violated · 20473 distinct states found · expected violated · as §8 says
+>   BadLeadsTo (PROPERTY) · violated · 7422 distinct states found · expected violated · as §8 says

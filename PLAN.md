@@ -1,8 +1,8 @@
 # Development plan
 
 Written 2026.11.15, after the spike the README records, updated the same day for ADR-0013 to ADR-0016, and kept
-up to date since: Phases 1 and 3 are done (2026.11.16), and so are Phases 4 and 5 (2026.11.17). It is a plan, not a
-record: nothing below is built unless the README says so.
+up to date since: Phases 1 and 3 are done (2026.11.16), Phases 4 and 5 (2026.11.17), and Phase 6's cvc5 and ethos
+(2026.11.18). It is a plan, not a record: nothing below is built unless the README says so.
 
 ## Goal
 
@@ -73,7 +73,7 @@ and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006, ADR-0008, ADR-0009 and 
 | Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15, and ADR-0010 2026.11.16. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
 | Phase 3 | ADR-0006, 0008 | Both accepted 2026.11.16. ADR-0008 item 1 was changed first to the standard library, at the custodian's choice. |
 | Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0009 accepted 2026.11.16. Its item 5's comparison was made the same day, and the custodian chose `tlapm` per request; ADR-0016 was brought into line with it and accepted the same day. |
-| Phase 6 | ADR-0012 (D5); then ADR-0017 | ADR-0012 accepted 2026.11.17, with item 8, which places cvc5 and ethos in the base. ADR-0017, which keeps their zips, accepted 2026.11.17, after its rows of `spec/PinLifecycle.tla`. |
+| Phase 6 | ADR-0012 (D5); then ADR-0017 | ADR-0012 accepted 2026.11.17, with item 8, which places cvc5 and ethos in the base. ADR-0017, which keeps their zips, accepted 2026.11.17, after its rows of `spec/PinLifecycle.tla`. Both built, and released in `v0.4.0`, 2026.11.18. |
 
 ## Phases
 
@@ -348,7 +348,8 @@ only after a certified rerun in the image. In this order:
   and its `licenses.tar.gz` holds `main`'s notices. **In pull request #27:** the `Dockerfile` installs the three
   from the kept copies, CI fetches them as it does the prover's tarball, and `PINS.json` gains them, with
   `tools/pins.py` checking that they agree and that a new pin counts as a move. The weekly check compares them
-  and their kept copies with upstream, and the evidence workflow runs TOPAK's certified step for them.
+  and their kept copies with upstream, and the evidence workflow runs TOPAK's certified step for them. **Merged
+  2026.11.18** as `ada119b`.
 - **Run TOPAK's certified step in the candidate image**, at a named TOPAK commit, as the spike ran `defects-run.sh`.
   **Run locally 2026.11.17**, in a candidate built from the branch, at TOPAK `0dfdfcd`:
   - `proof-cert.sh Alone_proof` certified all 263 obligations, with the route counts of TOPAK's own record under
@@ -365,6 +366,27 @@ only after a certified rerun in the image. In this order:
 
 Where the counts differ from TOPAK's records, which were made under `7824dab`, the record lists the differences.
 Explaining them is TOPAK's (its ADR-0077 §5).
+
+**Done 2026.11.18** for cvc5 and ethos, in `v0.4.0` (`derived/tla-kit-phase6-checks-2026.11.18.md`):
+1. **The self-test:** its `smt` check passed in the release workflow, before publishing and on the digest pulled
+   back, and again in `v0.4.0` pulled by digest.
+2. **The certified step:** at TOPAK `0dfdfcd`, `proof-cert.sh Alone_proof` certified all 263 obligations, with the
+   counts by route of TOPAK's record under `7824dab`, and byte for byte the candidate's output.
+3. **The defect run:** `defects-run.sh`'s certified section printed counts for all twelve modules. Nine differ
+   from §8, as in the candidate. Under `tlapm`, 13 lines differ. Under TLC, every statement is
+   violated, as §8 says. The record lists every difference, for TOPAK to explain.
+
+Along the way:
+- **Released:** `v0.4.0`, a MINOR (ADR-0014 item 2) that adds the three checker pins and moves no existing one,
+  was published on 2026.11.18 from `ada119b` as `sha256:6c27b7a0…8f2f`, the digest CI's two runners reproduced,
+  with both attestations verified. Its release links the kept `cvc5-1.4.0`.
+- **A certified run's evidence digest depends on the machine.** On GitHub's runner `tlapm` reused two duplicate
+  obligations that it proved twice here, so CI's digest differs from a local one. The counts by route agree, and
+  are what to compare.
+- **Trivy does not scan the static binaries:** they carry no package metadata, so the scan covers the Ubuntu
+  packages only.
+- **Owed:** the weekly check's first comparison of the kept zips in Actions (Monday 2026.11.23), and the TOPAK pull
+  request that moves the plugin's `.mcp.json` to `v0.4.0`.
 
 Then, each on its own:
 

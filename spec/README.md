@@ -40,8 +40,9 @@ were regenerated in the first published image, as ADR-0015 item 1 asks, and repr
 ([`derived/tla-kit-phase1c-checks-2026.11.16.md`](../derived/tla-kit-phase1c-checks-2026.11.16.md)). CI compares
 them on every pull request that touches `spec/`, `decisions/` or `vendor/`, or moves a checker pin
 (`tools/ci/pinlifecycle.sh`, item 8). `…-2026.11.17.txt`, of the four-pin module, was made directly in the
-published `v0.3.0`, `sha256:948e6d1f…257f`. On a Mac, under emulation with four jobs, all 51 rows took about
-16 minutes.
+published `v0.3.0`, `sha256:948e6d1f…257f`, and reproduced byte for byte in the image CI built from `ada119b`, the
+commit `v0.4.0` was published from (run 44247785902). On a Mac, under emulation with four jobs, all 51 rows took
+about 16 minutes; on GitHub's runner, about 11.
 
 Why `…-2026.11.15b.txt` stopped reproducing: on two liveness rows the generator then printed a state count only
 when TLC's search had ended before it found the counterexample, and whether it ends first depends on the
@@ -105,7 +106,7 @@ module serialises every run.
 image `v0.2.0` (`sha256:5554015f…1e5d`), where they reproduced byte for byte, and again in `v0.3.0`
 (`sha256:948e6d1f…257f`), the release with the tool they describe
 (`derived/tla-kit-phase4-checks-2026.11.17.md`). CI regenerates them on every pull request that touches `spec/` or
-`decisions/` (`tools/ci/pinlifecycle.sh … ProveRequests`).
+`decisions/` (`tools/ci/pinlifecycle.sh … ProveRequests`), and did so on `main` at `ada119b`, `v0.4.0`'s commit.
 
 ## Working on a spec natively
 

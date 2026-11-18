@@ -1,0 +1,19 @@
+pins     ok      1.5s  jar, tlapm, cvc5 and ethos as built; built with the inventory's values, and its 101 installed files as it lists them; 11 skill files as vendored from 5ade81efcc50
+env      ok      0.0s  TLA_JAR=/opt/tla/tla2tools.jar, TLAPM=/opt/tlaps/bin/tlapm, CVC5=/opt/cvc5/bin/cvc5, ETHOS=/opt/ethos/bin/ethos; tlapm, cvc5 and ethos on PATH
+notices  ok      0.0s  38 licence texts named by the notice and tla-kit's own, all present
+sany     ok      1.6s  Counter.tla parsed, and an unknown operator in another module reported
+pcal     ok      1.2s  an algorithm translated, and its translation parsed
+tlc      ok      1.7s  Counter at Limit = 3: no error, 4 distinct states
+setup    ok     23.8s  the skill's setup check: ready for model checking and proofs
+         python   ok      3.12.3
+         java     ok      openjdk version "25.0.5" 2026-10-20 LTS
+         project  ok      project: modules in ., results in ., root /tmp/tla-kit-selftest_lvhrxb54/project
+         checker  ok      /opt/tla/tla2tools.jar v1.7.4 sha256 936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88, as pinned by the skill's default TLC-PIN
+         tlc      ok      TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802): all 11 fixture rows as expected
+         prover   ok      /opt/tlaps/bin/tlapm 1.6.0-pre sha256 6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2, as pinned by tools/TLAPS-PIN
+         tlapm    ok      the fixture's proof: All 19 obligations proved; with its hypothesis flipped it fails, as required
+         setup: ready for model checking and proofs
+mcp      ok      1.8s  14 tools; tlc_run: Bounded HOLDS, 4 distinct states
+smt      ok      0.4s  a proof of unsat accepted by ethos, and a copy with one rule changed refused
+selftest: ok
+exit 0

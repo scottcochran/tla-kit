@@ -1,14 +1,14 @@
 ---------------------------- MODULE PinLifecycle ----------------------------
-(* tla-kit's pin and release process, as ADR-0005, ADR-0013 and ADR-0014 describe it (ADR-0015).
+(* tla-kit's pin and release process, as ADR-0005, ADR-0013, ADR-0014 and ADR-0017 describe it (ADR-0015).
 
    The parties act each at its own time, and each action names the record item it comes from:
      upstream          stops serving a pin value                            ADR-0005 Context; ADR-0013 item 4
      the custodian     opens a pull request that moves one pin, merges it,  ADR-0013 item 2; ADR-0014 items 1, 2
-                       pushes a release tag, uploads a kept tarball         ADR-0005 item 2
+                       pushes a release tag, uploads a kept copy            ADR-0005 item 2; ADR-0017 item 1
      CI                builds a pull request's candidate and runs its       ADR-0013 item 3; ADR-0014 item 1
                        evidence
-     the release       builds from the tag, publishes, attaches the kept    ADR-0005 item 2; ADR-0014 items 3, 4
-     workflow          tarball
+     the release       builds from the tag, publishes, attaches the kept    ADR-0005 item 2; ADR-0014 items 3, 4;
+     workflow          copies                                               ADR-0017 item 2
      the weekly check  reports what upstream stopped serving, and opens a   ADR-0013 items 4 and 7
                        served-state pull request for a pin's current value
      the registry      holds every published digest; withdraws one only     ADR-0014 item 5
@@ -17,21 +17,23 @@
 
    Abstracted (ADR-0015 item 3): an image is the tuple of its pin values; time is not modelled, and the weekly
    cadence is fairness; a version is the kind of move a release holds; the scan, the SBOM, the attestation, the
-   licence notices and the copyleft parts' source are left out. Three pins: "prover" and "jar" are checker pins,
-   "base" is the runtime pin (the base digest and the apt snapshot move together, ADR-0013 item 2). The prover has
-   a kept copy here (ADR-0005 item 2); the jar and the base do not. Each pin has two values: 1, pinned when the
-   process starts, and 2, a later build upstream already serves. Upstream may stop serving a pin's value 1, once
-   and for good; that is also what a rolling tag rebuilt under the same name does to the build it named. The
-   prover's value 1 is kept from the start.
+   licence notices and the copyleft parts' source are left out. Four pins: "prover", "jar" and "smt" are checker
+   pins, and "base" is the runtime pin (the base digest and the apt snapshot move together, ADR-0013 item 2).
+   "smt" is cvc5, ethos and cvc5's CPC signature, which move together (ADR-0017 item 4). The prover and smt have
+   kept copies here (ADR-0005 item 2; ADR-0017 items 1 and 2); the jar and the base do not. Each pin has two
+   values: 1, pinned when the process starts, and 2, a later build upstream already serves. Upstream may stop
+   serving a pin's value 1, once and for good; that is also what a rolling tag rebuilt under the same name does to
+   the build it named. The kept pins' value 1 is kept from the start.
 
    Mut = "none" is the records with ADR-0015's four fixes. Each mutation removes one fix, and must break the
    property beside it and no other:
      M_NOF1  F1 removed: a pull request merges on a pass against any main, not the main it merges into.
                                                                               EvidenceFitsRelease (gap 1)
-     M_NOF2  F2 removed: a prover move is opened before its kept copy is uploaded; the copy is kept only when a
-             release attaches it.                                             BuildsFromKept (gap 2)
+     M_NOF2  F2 removed: a move of a kept pin is opened before its kept copy is uploaded; the copy is kept only
+             when a release attaches it.                                      BuildsFromKept (gap 2)
      M_NOF3  F3 removed: no upstream is named as keeping what it serves, so the base's and the jar's upstreams
-             may stop serving too. (With F3 only the prover's upstream may.)  ReleasesRebuildable (gap 3)
+             may stop serving too. (With F3 only the kept pins' upstreams may.)
+                                                                              ReleasesRebuildable (gap 3)
      M_NOF4  F4 removed: a served-state log entry is filed under its pin's value at the merge, not the value it
              is about. With F4 the entry names its value, and when that value is no longer the pin's current
              one, nothing is filed (ADR-0013 item 7).                         LogFiledRight (gap 4)
@@ -45,7 +47,8 @@
 
    Properties:
      EvidenceFitsRelease   every release's evidence was run on the image it publishes             gap 1
-     BuildsFromKept        no build of a prover value takes it from upstream (ADR-0005 item 2)    gap 2
+     BuildsFromKept        no build of a kept pin's value takes it from upstream                  gap 2
+                           (ADR-0005 item 2; ADR-0017 item 2)
      ReleasesRebuildable   every release's pins are still served, or kept here                   gap 3
      LogFiledRight         every served-state log entry is filed under the value it is about     gap 4
      CitationsResolve      every digest a project pinned is in the registry, or was withdrawn
@@ -61,12 +64,12 @@
    Liveness, under weak fairness of the weekly check and of merging its pull request: whatever upstream stops
    serving is eventually reported (UpstreamReported).
 
-   Witnesses, each to be VIOLATED under none: NeverTwoOpen, NeverBothMerged, NeverProverMoved, NeverTwoReleases,
-   NeverMajor, NeverUpstreamGone, NeverLogged, NeverPinned, NeverRegistryWithdrawn, NeverDropped (F4's closing of a
+   Witnesses, each to be VIOLATED under none: NeverTwoOpen, NeverBothMerged, NeverProverMoved, NeverSmtMoved,
+   NeverTwoReleases, NeverMajor, NeverUpstreamGone, NeverLogged, NeverPinned, NeverRegistryWithdrawn, NeverDropped (F4's closing of a
    served-state pull request whose value is no longer current happens).
 
-   Without F2, CI that finds no kept copy of a prover value builds it from upstream: the Dockerfile has no copy to
-   build from, and BuildsFromKept records that the build used another source. *)
+   Without F2, CI that finds no kept copy of a kept pin's value builds it from upstream: the Dockerfile has no copy
+   to build from, and BuildsFromKept records that the build used another source. *)
 EXTENDS Naturals, Sequences, FiniteSets
 
 CONSTANTS Mut
@@ -78,23 +81,25 @@ F2 == Mut \notin {"M_NOF2", "M_ASWRITTEN"}
 F3 == Mut \notin {"M_NOF3", "M_ASWRITTEN"}
 F4 == Mut \notin {"M_NOF4", "M_ASWRITTEN"}
 
-Pins  == {"prover", "jar", "base"}
+Pins  == {"prover", "jar", "base", "smt"}
+KeptPins == {"prover", "smt"}           \* kept here: ADR-0005 item 2; ADR-0017 item 1
+CheckerPins == {"prover", "jar", "smt"} \* ADR-0013 item 1
 Vals  == {1, 2}
 Ids   == {1, 2}            \* two pull requests that move a pin, open at once if the custodian likes
 Images == [Pins -> Vals]
 Start == [p \in Pins |-> 1]
 MaxReleases == 2
 
-\* F3: the upstreams taken to keep what they serve. The prover's is never among them.
+\* F3: the upstreams taken to keep what they serve. The kept pins' are never among them.
 DurablePins == IF F3 THEN {"jar", "base"} ELSE {}
 
 VARIABLES gone,        \* pins whose value 1 upstream no longer serves
           reported,    \* the pins in gone that the weekly check has reported
-          kept,        \* prover values with a kept copy here
+          kept,        \* for each kept pin, the values with a kept copy here
           main,        \* the pins on main
           prs,         \* pin-moving pull requests
           evidence,    \* the image the evidence of the last merge to main was run on
-          fromUpstream,\* a build took a prover value from upstream, not from its kept copy
+          fromUpstream,\* a build took a kept pin's value from upstream, not from its kept copy
           releases,    \* the releases, in order
           registry,    \* published images still in the registry
           withdrawn,   \* images withdrawn from the registry, each with a record
@@ -117,7 +122,7 @@ RelRec == [image : Images, evidence : Images, kind : Kinds]
 TypeOK ==
   /\ gone \subseteq Pins
   /\ reported \subseteq gone
-  /\ kept \subseteq Vals
+  /\ kept \in [KeptPins -> SUBSET Vals]
   /\ main \in Images
   /\ prs \in [Ids -> PRRec]
   /\ evidence \in Images
@@ -131,19 +136,21 @@ TypeOK ==
   /\ dropped \in BOOLEAN
 
 Served(p, v) == v = 2 \/ p \notin gone
-\* A value can be built when upstream serves it, or, for the prover, when it is kept here.
-Available(p, v) == Served(p, v) \/ (p = "prover" /\ v \in kept)
+\* A value can be built when upstream serves it, or, for a kept pin, when it is kept here.
+Available(p, v) == Served(p, v) \/ (p \in KeptPins /\ v \in kept[p])
+\* Some kept pin's value in img has no kept copy, so a build takes it from upstream.
+NotKept(img) == \E p \in KeptPins : img[p] \notin kept[p]
 Buildable(img) == \A p \in Pins : Available(p, img[p])
 Moved(img, p) == [img EXCEPT ![p] = 2]
 
 KindOf(old, new) ==
-  IF old["prover"] # new["prover"] \/ old["jar"] # new["jar"] THEN "major"
+  IF \E p \in CheckerPins : old[p] # new[p] THEN "major"
   ELSE IF old["base"] # new["base"] THEN "minor" ELSE "patch"
 
 Init ==
   /\ gone = {}
   /\ reported = {}
-  /\ kept = {1}
+  /\ kept = [p \in KeptPins |-> {1}]
   /\ main = Start
   /\ prs = [i \in Ids |-> NoPR]
   /\ evidence = Start           \* the starting image's evidence is taken as run (Phase 1c's first release)
@@ -163,32 +170,32 @@ StopServing(p) ==
   /\ gone' = gone \cup {p}
   /\ UNCHANGED <<reported, kept, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
-(* ---- the custodian: ADR-0005 item 2; ADR-0013 item 2; ADR-0014 items 1 and 2 ---- *)
+(* ---- the custodian: ADR-0005 item 2; ADR-0013 item 2; ADR-0014 items 1 and 2; ADR-0017 item 1 ---- *)
 \* F2: the kept copy is uploaded before the pull request that names it. Without F2, a copy is kept only when a
 \* release attaches it (Release).
-KeepCopy ==
+KeepCopy(p) ==
   /\ F2
-  /\ 2 \notin kept
-  /\ kept' = kept \cup {2}
+  /\ 2 \notin kept[p]
+  /\ kept' = [kept EXCEPT ![p] = @ \cup {2}]
   /\ UNCHANGED <<gone, reported, main, prs, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 OpenPR(i, p) ==
   /\ prs[i].status = "none"
   /\ main[p] = 1
   /\ \A j \in Ids : prs[j].status = "open" => prs[j].pin # p
-  /\ (F2 /\ p = "prover") => 2 \in kept
+  /\ (F2 /\ p \in KeptPins) => 2 \in kept[p]
   /\ prs' = [prs EXCEPT ![i] = [status |-> "open", pin |-> p, tested |-> FALSE, on |-> Start]]
   /\ UNCHANGED <<gone, reported, kept, main, evidence, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 \* CI builds the candidate, main as it is now with the pull request's move, and runs its evidence on it. It may
-\* run again on a later main. Without a kept copy of a prover value, it builds that value from upstream.
+\* run again on a later main. Without a kept copy of a kept pin's value, it builds that value from upstream.
 CI(i) ==
   LET cand == Moved(main, prs[i].pin) IN
   /\ prs[i].status = "open"
   /\ ~(prs[i].tested /\ prs[i].on = cand)
   /\ Buildable(cand)
   /\ prs' = [prs EXCEPT ![i].tested = TRUE, ![i].on = cand]
-  /\ fromUpstream' = (fromUpstream \/ cand["prover"] \notin kept)
+  /\ fromUpstream' = (fromUpstream \/ NotKept(cand))
   /\ UNCHANGED <<gone, reported, kept, main, evidence, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
 \* main merges only on a pass (ADR-0014 item 1). F1: the pass was against main as it is now.
@@ -201,14 +208,14 @@ Merge(i) ==
   /\ prs' = [prs EXCEPT ![i].status = "merged"]
   /\ UNCHANGED <<gone, reported, kept, fromUpstream, releases, registry, withdrawn, pinned, logPR, log, dropped>>
 
-(* ---- the release workflow: ADR-0005 item 2; ADR-0014 items 2 to 4 ---- *)
-\* A tag on main: build main, publish it, record the evidence of what was merged, attach the kept tarball.
+(* ---- the release workflow: ADR-0005 item 2; ADR-0014 items 2 to 4; ADR-0017 item 2 ---- *)
+\* A tag on main: build main, publish it, record the evidence of what was merged, attach the kept copies.
 Release ==
   /\ Len(releases) < MaxReleases
   /\ IF releases = << >> THEN TRUE ELSE releases[Len(releases)].image # main
   /\ Buildable(main)
-  /\ fromUpstream' = (fromUpstream \/ main["prover"] \notin kept)
-  /\ kept' = kept \cup {main["prover"]}
+  /\ fromUpstream' = (fromUpstream \/ NotKept(main))
+  /\ kept' = [p \in KeptPins |-> kept[p] \cup {main[p]}]
   /\ releases' = Append(releases, [image |-> main, evidence |-> evidence,
                                    kind |-> IF releases = << >> THEN "initial"
                                             ELSE KindOf(releases[Len(releases)].image, main)])
@@ -253,7 +260,7 @@ MergeLog ==
 
 Next ==
   \/ \E p \in Pins : StopServing(p)
-  \/ KeepCopy
+  \/ \E p \in KeptPins : KeepCopy(p)
   \/ \E i \in Ids, p \in Pins : OpenPR(i, p)
   \/ \E i \in Ids : CI(i) \/ Merge(i)
   \/ Release
@@ -286,6 +293,7 @@ NoBehaviour == <>FALSE
 NeverTwoOpen == ~(\A i \in Ids : prs[i].status = "open")
 NeverBothMerged == ~(\A i \in Ids : prs[i].status = "merged")
 NeverProverMoved == main["prover"] = 1
+NeverSmtMoved == main["smt"] = 1
 NeverTwoReleases == Len(releases) < 2
 NeverMajor == \A n \in 1..Len(releases) : releases[n].kind # "major"
 NeverUpstreamGone == gone = {}

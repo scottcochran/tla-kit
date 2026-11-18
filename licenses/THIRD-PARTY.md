@@ -44,6 +44,33 @@ lists Isabelle, Z3 and LS4, and says that Isabelle contains other software under
 | `libsha1.so` (`backends/Isabelle-install/poly`) | GNU coreutils 8.4's `sha1.c`, as built for Isabelle2025's `polyml-5.9.1` component | GPL-3.0-or-later (Free Software Foundation) | `/usr/share/common-licenses/GPL-3` | `libsha1-src.tar.gz`, in this repository's release `tlapm-ff40755`: the component's `sha1/` directory |
 | A second TLA+ tools jar, used by `tlapm` (`backends/bin/tla2tools.jar`) | upstream build of 2026-11-06, `d8fb231`; not the image's checker | MIT, with the licences of the libraries it bundles inside it | `/opt/tlaps/lib/tlapm/backends/bin/tla2tools.jar` (`License.txt` and the other licence files inside the jar) | `https://github.com/tlaplus/tlaplus`, at `d8fb231` |
 
+## cvc5 and ethos
+
+`cvc5` 1.4.0 and `ethos` 0.2.4, with cvc5 1.4.0's CPC signature, are in the base from the pull request that
+installs them (ADR-0012 item 8). An image built before it does not hold them. Each is upstream's static Linux
+x86_64 build, kept in this repository's release `cvc5-1.4.0` (ADR-0017). Both link the libraries below into the
+binary. The libraries' releases were settled from the bytes (`derived/tla-kit-licence-check-cvc5-ethos-2026.11.17.md`
+and `derived/tla-kit-static-libraries-2026.11.17.md` in the repository). The release `cvc5-1.4.0` holds the two zips,
+cvc5's and ethos's source, and the source of every copyleft part below.
+
+| Part | Version | Licence | Licence text in the image | Source |
+|---|---|---|---|---|
+| `cvc5` | 1.4.0, `b432cd7`, upstream's `cvc5-Linux-x86_64-static.zip` | BSD-3-Clause (the authors of cvc5 and their institutions) | `/opt/tla-kit/licenses/cvc5-COPYING.txt` | `https://github.com/cvc5/cvc5`, tag `cvc5-1.4.0`; `cvc5-1.4.0-src.tar.gz` in release `cvc5-1.4.0` |
+| MiniSat's code, in `cvc5` | as in cvc5 1.4.0 | MIT (Niklas Eén, Niklas Sörensson) | `/opt/tla-kit/licenses/cvc5-minisat-LICENSE.txt` | cvc5's source, `src/prop/minisat` |
+| cvc5's CPC signature | as at tag `cvc5-1.4.0`, `proofs/eo/cpc/` | BSD-3-Clause, as cvc5 | `/opt/tla-kit/licenses/cvc5-COPYING.txt` | cvc5's source |
+| `ethos` | 0.2.4, `8dc85c4`, upstream's `ethos-linux-x86_64.zip` | BSD-3-Clause (the authors of ethos and their institutions) | `/opt/tla-kit/licenses/ethos-COPYING.txt` | `https://github.com/cvc5/ethos`, tag `ethos-0.2.4`; `ethos-0.2.4-src.tar.gz` in release `cvc5-1.4.0` |
+| GMP, in `cvc5` | 6.3.0 | LGPL-3.0-or-later or GPL-2.0-or-later | `/usr/share/common-licenses/LGPL-3` and `/usr/share/common-licenses/GPL-2` | `gmp-6.3.0.tar.bz2`, with its signature, in release `cvc5-1.4.0`, and at `https://ftp.gnu.org/gnu/gmp/` |
+| GMP, in `ethos` | 6.2.1, as Ubuntu 22.04's `2:6.2.1+dfsg-3ubuntu1` | LGPL-3.0-or-later or GPL-2.0-or-later | `/opt/tla-kit/licenses/gmp-6.2.1-ubuntu-copyright.txt`, `/usr/share/common-licenses/LGPL-3` and `/usr/share/common-licenses/GPL-2` | Ubuntu's source package `gmp_6.2.1+dfsg-3ubuntu1`, in release `cvc5-1.4.0` |
+| MPFR, in `cvc5` | 4.2.2 | LGPL-3.0-or-later | `/usr/share/common-licenses/LGPL-3` | `mpfr-4.2.2.tar.xz`, with its signature, in release `cvc5-1.4.0`, and at `https://ftp.gnu.org/gnu/mpfr/` |
+| LibPoly, in `cvc5` | 0.2.1 | LGPL-3.0 | `/usr/share/common-licenses/LGPL-3` | `https://github.com/SRI-CSL/libpoly`, tag `v0.2.1`; `libpoly-0.2.1.tar.gz` in release `cvc5-1.4.0` |
+| CaDiCaL, in `cvc5` | `rel-2.1.3-elevate` | MIT (Armin Biere and others) | `/opt/tla-kit/licenses/cadical-LICENSE.txt` | `https://github.com/arminbiere/cadical`, tag `rel-2.1.3-elevate` |
+| symfpu, in `cvc5` | `40bdec00e99f` | BSD-3-Clause, taken here from its choice of BSD-3-Clause or GPL-3.0 | `/opt/tla-kit/licenses/symfpu-LICENSE.txt` and `/opt/tla-kit/licenses/symfpu-LICENSE-BSD.txt` | `https://github.com/martin-cs/symfpu`, at `40bdec00e99f` |
+| `libedit`, in `cvc5` | Ubuntu 22.04's `3.1-20210910-1build1` | BSD-3-Clause | `/opt/tla-kit/licenses/libedit-copyright.txt` | Ubuntu's source package `libedit_3.1-20210910-1build1` |
+| `libbsd`, in `cvc5` | Ubuntu 22.04's `0.11.5-1` | BSD-2-Clause, BSD-3-Clause, BSD-4-Clause, ISC, Expat, Beerware and public domain, file by file, as its copyright file lists | `/opt/tla-kit/licenses/libbsd-copyright.txt` | Ubuntu's source package `libbsd_0.11.5-1` |
+| `libtinfo` (`ncurses`), in `cvc5` | Ubuntu 22.04's `6.3-2ubuntu0.2` or `0.3`, whose `libtinfo.a` is the same | X11 (MIT), and BSD-3-Clause for some files, as its copyright file lists | `/opt/tla-kit/licenses/ncurses-copyright.txt` (from `0.3`) | Ubuntu's source package `ncurses_6.3-2ubuntu0.3` |
+| glibc, in both | Ubuntu 22.04's `2.35-0ubuntu3.14` | LGPL-2.1-or-later, with the other licences its copyright file lists | `/opt/tla-kit/licenses/glibc-2.35-copyright.txt` and `/usr/share/common-licenses/LGPL-2.1` | Ubuntu's source package `glibc_2.35-0ubuntu3.14`, in release `cvc5-1.4.0` |
+| `libstdc++` and `libgcc`, in both | GCC 11.4.0, Ubuntu 22.04's | GPL-3.0 with the GCC Runtime Library Exception 3.1 | `/usr/share/common-licenses/GPL-3` and `/opt/tla-kit/licenses/gcc-runtime-exception-3.1.txt` | Ubuntu's source package `gcc-11`; the exception asks no source of the combined work |
+
 ## tla-kit's own files in the image
 
 `/usr/local/bin` (the wrappers, `tla-kit-info`, `tla-kit-selftest`) is tla-kit's code, under Apache-2.0. The

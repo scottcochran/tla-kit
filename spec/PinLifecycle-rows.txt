@@ -1,6 +1,6 @@
 # Rows for tlc_rows.py: name mut spec kind property expected [KEY=value ...]
 # module: PinLifecycle
-# title: PinLifecycle.tla - the pin and release process of ADR-0005, ADR-0013 and ADR-0014 (ADR-0015)
+# title: PinLifecycle.tla - the pin and release process of ADR-0005, ADR-0013, ADR-0014 and ADR-0017 (ADR-0015)
 # expected: Mut = "none", the records with ADR-0015's four fixes, HOLDS on every property and every action property.
 # expected: M_NOF1 to M_NOF4 each remove one fix and are COUNTEREXAMPLE on that fix's property only:
 # expected: EvidenceFitsRelease (gap 1), BuildsFromKept (gap 2), ReleasesRebuildable (gap 3), LogFiledRight (gap 4).
@@ -55,6 +55,7 @@ m-aswritten-onemove   M_ASWRITTEN  Spec    PROPERTY   OneMovePerPR           HOL
 w-two-open          none         Spec      INVARIANT  NeverTwoOpen           COUNTEREXAMPLE
 w-both-merged       none         Spec      INVARIANT  NeverBothMerged        COUNTEREXAMPLE
 w-prover-moved      none         Spec      INVARIANT  NeverProverMoved       COUNTEREXAMPLE
+w-smt-moved         none         Spec      INVARIANT  NeverSmtMoved          COUNTEREXAMPLE
 w-two-releases      none         Spec      INVARIANT  NeverTwoReleases       COUNTEREXAMPLE
 w-major             none         Spec      INVARIANT  NeverMajor             COUNTEREXAMPLE
 w-upstream-gone     none         Spec      INVARIANT  NeverUpstreamGone      COUNTEREXAMPLE

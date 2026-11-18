@@ -56,7 +56,7 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 | D2 | Where do the skill's scripts live for the server to call? | Chosen 2026.11.15: vendor them here at a named TOPAK commit, checked by digest in CI. The skill stays usable without Docker. ADR-0007 records it, accepted 2026.11.15. | Nothing now. The vendoring is Phase 1a work, because Phase 1b's results come from the skill's generator (ADR-0015 items 1 and 8). |
 | D3 | Registry and visibility for the image. | Chosen 2026.11.16: `ghcr.io/scottcochran/tla-kit`, public, published from a tag. ADR-0010 records it, accepted 2026.11.16. | Nothing now |
 | D4 | Licence for this repository. | Chosen 2026.11.15: Apache-2.0 for code and CC BY 4.0 for documentation, as in TOPAK. `LICENSE`, `LICENSE-DOCS` and `NOTICE` are added. ADR-0011 records it, accepted 2026.11.15. | Nothing now |
-| D5 | One image, or a small one with variants for the large optional tools? | One base image; variants by tag for Apalache and TLATeX. | Phase 6 |
+| D5 | One image, or a small one with variants for the large optional tools? | Chosen 2026.11.17: one base image; variants by tag for Apalache and TLATeX; cvc5 and ethos in the base. ADR-0012 records it, with its item 8, accepted 2026.11.17. | Nothing now |
 | D6 | Take `marco6/tlapm-mcp` as a design to follow, a dependency, or neither? (session record, §9 item 6) | Chosen 2026.11.16: a design to follow, with named changes, and no dependency on it. ADR-0009 records it, accepted 2026.11.16. | Nothing now |
 | D7 | May tla-kit redistribute what the TLAPS tarball bundles (Isabelle, Poly/ML, GMP, `libsha1`, Z3, Zenon, LS4)? | Settled 2026.11.15, as `derived/tla-kit-licence-check-2026.11.15.md` recommends: yes, on three conditions. (1) Every redistribution carries the notices: the image does, in `licenses/`. (2) The release offers the source of Poly/ML, GMP and `libsha1` beside the kept tarball. (3) The bundled GMP release and `libsha1`'s licence are settled before the first public release. | Nothing now. Condition 3 was settled on 2026.11.16 (`derived/tla-kit-copyleft-sources-2026.11.16.md`): GMP 6.1.2, and `libsha1` under GPL-3.0-or-later. Condition 2's release, `tlapm-ff40755`, was made by `tools/keep-tlapm.sh` on 2026.11.15, before anything was published |
 
@@ -64,7 +64,7 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 
 This is the order in which the phases need the records. The Phase 1a and 1b rows were accepted on 2026.11.15,
 and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006, ADR-0008, ADR-0009 and ADR-0016 were accepted on
-2026.11.16. Every other record is Proposed.
+2026.11.16, and ADR-0012 and ADR-0017 on 2026.11.17. No record is Proposed.
 
 | Before | Accept | Why then |
 |---|---|---|
@@ -73,7 +73,7 @@ and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006, ADR-0008, ADR-0009 and 
 | Phase 1c | ADR-0005, 0013, 0014; ADR-0010 (D3) | ADR-0015 item 7: the first three are accepted only when every row of Phase 1b has its expected outcome, and they will probably change before then. ADR-0005, 0013 and 0014 accepted 2026.11.15, and ADR-0010 2026.11.16. ADR-0010 item 5 now says "always", as ADR-0014 item 5 does, where it first said "while any project's pin names them". |
 | Phase 3 | ADR-0006, 0008 | Both accepted 2026.11.16. ADR-0008 item 1 was changed first to the standard library, at the custodian's choice. |
 | Phase 4 | ADR-0009 (D6); then ADR-0016 | ADR-0009 accepted 2026.11.16. Its item 5's comparison was made the same day, and the custodian chose `tlapm` per request; ADR-0016 was brought into line with it and accepted the same day. |
-| Phase 6 | ADR-0012 (D5) | |
+| Phase 6 | ADR-0012 (D5); then ADR-0017 | ADR-0012 accepted 2026.11.17, with item 8, which places cvc5 and ethos in the base. ADR-0017, which keeps their zips, accepted 2026.11.17, after its rows of `spec/PinLifecycle.tla`. |
 
 ## Phases
 
@@ -310,8 +310,53 @@ Along the way:
 
 Each is optional, pinned like the rest, and added only with a check that uses it.
 
-- cvc5 and ethos, so that TOPAK's certified runs (`spec/proof-cert.sh`) and the rest of `defects-run.sh` work.
-- The TLA+ community modules.
+**cvc5 and ethos come first,** so that TOPAK's certified runs (`spec/proof-cert.sh`) and the rest of
+`defects-run.sh` work. TOPAK's ADR-0077 waits on them: the custodian chose there (Q2) to move TOPAK's prover pin
+only after a certified rerun in the image. In this order:
+
+- **Place them.** ADR-0012 item 8, added 2026.11.17, puts them in the base: `cvc5` 1.4.0, `ethos` 0.2.4 at
+  `8dc85c4`, and cvc5 1.4.0's CPC signature, all from upstream's releases and source by digest. Both binaries ran
+  in `v0.3.0`, and `ethos` accepted a proof `cvc5` gave and refused a changed one. **Done 2026.11.17:** the
+  custodian accepted ADR-0012 (D5) with item 8, and ADR-0013 item 1's table gained the three pins by a History row.
+- **Check the licences.** Both link LGPL-3.0 libraries statically (GMP, MPFR, LibPoly). A record like
+  `derived/tla-kit-licence-check-2026.11.15.md` says what redistribution needs, and whether tla-kit keeps copies
+  of the archives and of the libraries' source (ADR-0005 item 2 does this for the prover). **Written 2026.11.17**
+  (`derived/tla-kit-licence-check-cvc5-ethos-2026.11.17.md`), for the custodian to decide on. It recommends
+  upstream's builds on D7's three conditions: the notices, a kept release with the copyleft parts' source, and
+  two facts settled from the bytes, which glibc and `ncurses` patch releases are linked in. It also recommends
+  keeping the two zips, which needs a new record (ADR-0013 item 8). **The custodian chose option A and to keep
+  the zips, 2026.11.17.** Condition 3 is met the same day (`derived/tla-kit-static-libraries-2026.11.17.md`): both
+  binaries contain glibc `2.35-0ubuntu3.14`, and `cvc5` the `libtinfo.a` that `ncurses` `6.3-2ubuntu0.2` and `0.3`
+  share, which owes no source. ADR-0017 keeps the zips with the copyleft parts' source in one release. At the
+  custodian's choice, `spec/PinLifecycle.tla` models them as a fourth pin, `smt`, and ADR-0017 was accepted on
+  2026.11.17 once its 51 rows were as expected.
+- **Keep them.** `tools/keep-cvc5.sh` assembles the release `cvc5-1.4.0`, and the custodian creates it with
+  `--create`, before the pull request that pins them. It holds the two zips, cvc5's and ethos's source, the
+  copyleft parts' source at the releases the bytes show, and `licenses/`, which gains the notices the zips leave out
+  (`licenses/THIRD-PARTY.md`, "cvc5 and ethos"). Every asset is checked by sha256, and the CPC signature in cvc5's
+  source by the tree digest TOPAK's results print, `633f74115700ad32`. **Script written 2026.11.17**: it assembles
+  17 assets, 78 MB, with every digest as recorded. The GNU and Ubuntu signatures are kept and were not checked: no
+  `gpg` where it ran.
+- **Pin and install them**, in one pull request:
+  - the `Dockerfile` installs them by digest;
+  - `PINS.json` gains them as checkers, and ADR-0013 item 1's table gains them by a History row;
+  - `licenses/` gains their notices;
+  - the self-test gains ADR-0012 item 8's check.
+
+  The image sets `CVC5` and `ETHOS`, which TOPAK's `proof-cert.sh` already reads (ADR-0004, by a History row).
+- **Run TOPAK's certified step in the candidate image**, at a named TOPAK commit, as the spike ran `defects-run.sh`.
+
+**Done when**, in the published image:
+- the self-test's check of `cvc5` and `ethos` passes;
+- TOPAK's `spec/proof-cert.sh` certifies one of its proof modules with the image's tools;
+- `defects-run.sh`'s certified step prints counts, not empty ones.
+
+Where the counts differ from TOPAK's records, which were made under `7824dab`, the record lists the differences.
+Explaining them is TOPAK's (its ADR-0077 §5).
+
+Then, each on its own:
+
+- The TLA+ community modules. ADR-0012 does not place them yet.
 - Apalache: type checking and symbolic checking. The skill gives no guidance for it, so exploratory.
 - TLATeX, which needs a LaTeX installation.
 - A Linux arm64 `tlapm` built from source, for Apple Silicon without emulation. A second platform is a second

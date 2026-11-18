@@ -1,0 +1,311 @@
+binary full/ethos/ethos: 2154716 bytes of code
+  ubuntu-6.2.1: 154 of 485 searchable sections present (519 sections)
+  cvc5-6.3.0: 7 of 512 searchable sections present (519 sections)
+sections whose code differs between candidates, and whose code is present:
+  add_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  addaddmul_1msb0.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  addlsh1_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  addlsh2_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  addlsh_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  addmul_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  and.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  and_n.o .text: present = ubuntu-6.2.1 cvc5-6.3.0
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  andn_n.o .text: present = ubuntu-6.2.1 cvc5-6.3.0
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  aors.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  assert.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  bdiv_dbm1c.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  bdiv_q.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  bdiv_q_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  binvert.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  canonicalize.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  cfdiv_q_2exp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  cfdiv_r_2exp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  com.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  compute_powtab.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  copyd.o .text: present = ubuntu-6.2.1 cvc5-6.3.0
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  copyi.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  dcpi1_bdiv_q.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  dcpi1_bdiv_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  dcpi1_div_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  dcpi1_divappr_q.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  dive_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  divegcd.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  divexact.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  divrem_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  divrem_2.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  equal.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  fdiv_q.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  fdiv_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  fdiv_r.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  gcd.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  gcd_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  gcd_11.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  gcd_22.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  gcd_subdiv_step.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  hgcd.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  hgcd2.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  hgcd_appr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  hgcd_matrix.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  hgcd_reduce.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  hgcd_step.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  invert_limb.o .text: present = ubuntu-6.2.1 cvc5-6.3.0
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  invertappr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  ior.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  ior_n.o .text: present = ubuntu-6.2.1 cvc5-6.3.0
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lshift.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lshiftc.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt103-divexact.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt2-add.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt20-get_str.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt26-iset.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt30-iset_ui.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt31-mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt32-mul_2exp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt37-pow_ui.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt39-set.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt43-set_str.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt44-set_ui.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt47-sub.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt48-sub_ui.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt53-clear.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt55-cmp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt58-div.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt6-cmp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt60-get_str.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt61-init.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt64-mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt67-set.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt69-set_str.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt70-set_ui.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt71-set_z.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt78-com.o .text: present = ubuntu-6.2.1 cvc5-6.3.0
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt82-mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt88-get_str.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt89-set_str.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt9-cmp_ui.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt97-gcd.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  lt99-tdiv_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  matrix22_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  matrix22_mul1_inverse_vector.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  memory.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mod_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mod_1_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mod_1_2.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mod_1_4.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mode1o.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mu_bdiv_q.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mu_div_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mul_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mul_2.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mul_basecase.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mul_fft.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mul_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mullo_basecase.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mullo_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  mulmod_bnm1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  n_pow_ui.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  nussbaumer_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  realloc.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  rsblsh1_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  rsh1add_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  rsh1sub_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  rshift.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sbpi1_bdiv_q.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sbpi1_bdiv_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sbpi1_div_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sbpi1_divappr_q.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  setbit.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sizeinbase.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sqr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sqr_basecase.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sqrmod_bnm1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sub_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  sublsh1_n.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  submul_1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  tal-reent.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  tdiv_q_2exp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  tdiv_qr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  tdiv_r.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom22_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom2_sqr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom32_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom33_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom3_sqr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom42_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom43_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom44_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom4_sqr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom53_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom63_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom6h_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom8_sqr.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom8h_mul.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_couple_handling.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_eval_dgr3_pm1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_eval_dgr3_pm2.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_eval_pm1.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_eval_pm2.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_eval_pm2exp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_eval_pm2rexp.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_interpolate_12pts.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_interpolate_16pts.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_interpolate_5pts.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_interpolate_6pts.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_interpolate_7pts.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  toom_interpolate_8pts.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  xor.o .text: present = ubuntu-6.2.1
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+  xor_n.o .text: present = ubuntu-6.2.1 cvc5-6.3.0
+      variants: ubuntu-6.2.1 | cvc5-6.3.0
+consistent with every differing section present: ubuntu-6.2.1

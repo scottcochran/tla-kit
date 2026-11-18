@@ -1,0 +1,7 @@
+binary full/ethos/ethos: 2154716 bytes of code
+  6.3-2: 0 of 42 searchable sections present (51 sections)
+  6.3-2ubuntu0.1: 0 of 42 searchable sections present (51 sections)
+  6.3-2ubuntu0.2: 0 of 42 searchable sections present (51 sections)
+  6.3-2ubuntu0.3: 0 of 42 searchable sections present (51 sections)
+sections whose code differs between candidates, and whose code is present:
+consistent with every differing section present: 6.3-2 6.3-2ubuntu0.1 6.3-2ubuntu0.2 6.3-2ubuntu0.3

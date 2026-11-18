@@ -1,0 +1,64 @@
+binary full/ethos/ethos: 2154716 bytes of code
+  0ubuntu3: 490 of 1454 searchable sections present (2000 sections)
+  0ubuntu3.1: 491 of 1454 searchable sections present (2000 sections)
+  0ubuntu3.2: 494 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.3: 494 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.4: 500 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.5: 500 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.6: 500 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.7: 500 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.8: 500 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.9: 502 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.10: 503 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.11: 503 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.12: 504 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.13: 505 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.14: 508 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.15: 507 of 1453 searchable sections present (2000 sections)
+  0ubuntu3.18: 504 of 1453 searchable sections present (2000 sections)
+sections whose code differs between candidates, and whose code is present:
+  assert.o .text: present = 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8 | 0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  dcigettext.o .text: present = 0ubuntu3 0ubuntu3.1 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15 | 0ubuntu3.18
+  divrem.o .text: present = 0ubuntu3.1 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3 | 0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  dl-deps.o .text: present = 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1 | 0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  dl-load.o .text: present = 0ubuntu3 0ubuntu3.1 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15 | 0ubuntu3.18
+  dl-sort-maps.o .text: present = 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1 | 0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  dl-support.o .text: present = 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9 | 0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  dl-tunables.o .text: present = 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3 | 0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  fileops.o .text: present = 0ubuntu3 0ubuntu3.1 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15 | 0ubuntu3.18
+  gconv_simple.o .text: present = 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3 | 0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  getsysstats.o .text: present = 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11 | 0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  libc-start.o .text: present = 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1 | 0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  libc_fatal.o .text: present = 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8 | 0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  malloc.o .text: present = 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12 | 0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  printf-parsewc.o .text: present = 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3 | 0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  printf_fp.o .text: present = 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3 | 0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  strtod_l.o .text: present = 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3 | 0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  strtof_l.o .text: present = 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3 | 0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  tsearch.o .text: present = 0ubuntu3 0ubuntu3.1 0ubuntu3.2 0ubuntu3.3 0ubuntu3.4 0ubuntu3.5 0ubuntu3.6 0ubuntu3.7 0ubuntu3.8 0ubuntu3.9 0ubuntu3.10 0ubuntu3.11 0ubuntu3.12 0ubuntu3.13 0ubuntu3.14
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13,0ubuntu3.14 | 0ubuntu3.15,0ubuntu3.18
+  vfscanf-internal.o .text: present = 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13 | 0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  vfscanf-internal.o .text.unlikely: present = 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13 | 0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+  wgenops.o .text: present = 0ubuntu3.14 0ubuntu3.15 0ubuntu3.18
+      variants: 0ubuntu3,0ubuntu3.1,0ubuntu3.2,0ubuntu3.3,0ubuntu3.4,0ubuntu3.5,0ubuntu3.6,0ubuntu3.7,0ubuntu3.8,0ubuntu3.9,0ubuntu3.10,0ubuntu3.11,0ubuntu3.12,0ubuntu3.13 | 0ubuntu3.14,0ubuntu3.15,0ubuntu3.18
+consistent with every differing section present: 0ubuntu3.14

@@ -1,0 +1,15 @@
+binary full/cvc5-Linux-x86_64-static/bin/cvc5: 27834001 bytes of code
+  6.3-2: 26 of 42 searchable sections present (51 sections)
+  6.3-2ubuntu0.1: 28 of 42 searchable sections present (51 sections)
+  6.3-2ubuntu0.2: 29 of 42 searchable sections present (51 sections)
+  6.3-2ubuntu0.3: 29 of 42 searchable sections present (51 sections)
+sections whose code differs between candidates, and whose code is present:
+  access.o .text: present = 6.3-2 6.3-2ubuntu0.1 6.3-2ubuntu0.2 6.3-2ubuntu0.3
+      variants: 6.3-2 | 6.3-2ubuntu0.1,6.3-2ubuntu0.2,6.3-2ubuntu0.3
+  db_iterator.o .text: present = 6.3-2ubuntu0.1 6.3-2ubuntu0.2 6.3-2ubuntu0.3
+      variants: 6.3-2 | 6.3-2ubuntu0.1,6.3-2ubuntu0.2,6.3-2ubuntu0.3
+  lib_tparm.o .text: present = 6.3-2ubuntu0.2 6.3-2ubuntu0.3
+      variants: 6.3-2,6.3-2ubuntu0.1 | 6.3-2ubuntu0.2,6.3-2ubuntu0.3
+  read_entry.o .text: present = 6.3-2ubuntu0.1 6.3-2ubuntu0.2 6.3-2ubuntu0.3
+      variants: 6.3-2 | 6.3-2ubuntu0.1,6.3-2ubuntu0.2,6.3-2ubuntu0.3
+consistent with every differing section present: 6.3-2ubuntu0.2 6.3-2ubuntu0.3

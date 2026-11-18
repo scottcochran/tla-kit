@@ -1,0 +1,6 @@
+binary full/cvc5-Linux-x86_64-static/bin/cvc5: 27834001 bytes of code
+  gmp-6.3.0: 275 of 512 searchable sections present (519 sections)
+  mpfr-4.2.2: 22 of 248 searchable sections present (252 sections)
+  libpoly-0.2.1: 32 of 35 searchable sections present (43 sections)
+  libpolyxx-0.2.1: 49 of 50 searchable sections present (72 sections)
+  cadical: 323 of 381 searchable sections present (511 sections)

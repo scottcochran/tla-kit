@@ -133,6 +133,17 @@ docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
   ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f tla-kit mcp
 ```
 
+To try the tools by hand, the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) starts the same
+command and opens a web page that lists them and calls each one. It needs Node `^22.23.4`, `^24.22.1` or
+`>=26.12.1`. Everything after `--` goes to `docker`, so the flags of `docker run` stay its own:
+
+```sh
+npx @modelcontextprotocol/inspector@2.13.0 docker -- run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
+  ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f tla-kit mcp
+```
+
+With `--cli --method tools/list` before `docker`, it lists the tools in the terminal instead.
+
 | Tool | Does |
 |---|---|
 | `info` | What the image holds, with the digests a results file would cite (`tla-kit-info --json`) |

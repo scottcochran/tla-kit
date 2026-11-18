@@ -19,6 +19,9 @@ import sys
 
 JAR = os.environ.get("TLA_JAR", "/opt/tla/tla2tools.jar")
 TLAPM = os.environ.get("TLAPM", "/opt/tlaps/bin/tlapm")
+CVC5 = os.environ.get("CVC5", "/opt/cvc5/bin/cvc5")
+ETHOS = os.environ.get("ETHOS", "/opt/ethos/bin/ethos")
+CPC = "/opt/cvc5/cpc"
 SKILL = os.environ.get("TLA_KIT_SKILL", "/opt/tla-kit/skill")
 BUILD_ARGS = "/opt/tla-kit/build-args"
 PINS = "/opt/tla-kit/PINS.json"
@@ -70,6 +73,13 @@ def facts():
     backends = re.findall(r'^(\S[^=\n]*) version == "(.*)"$', run([TLAPM, "--config"]), re.M)
     pin = key_values(os.path.join(SKILL, "VENDOR-PIN"))
     args = key_values(BUILD_ARGS)
+    cvc5 = run([CVC5, "--version"]).strip().splitlines() if os.path.isfile(CVC5) else []
+    eo = sorted(os.path.join(r, f) for r, _, fs in os.walk(CPC) for f in fs if f.endswith(".eo"))
+    # The signature's tree digest as TOPAK's proof-cert.sh computes it: sha256 over `sha256sum` of each .eo file,
+    # by its path from the signature's directory, in byte order.
+    lines = "".join(f"{sha256(f)}  ./{os.path.relpath(f, CPC)}\n"
+                    for f in sorted(eo, key=lambda f: os.path.relpath(f, CPC).encode()))
+    tree = hashlib.sha256(lines.encode()).hexdigest()[:16] if eo else None
     try:
         with open(PINS, encoding="utf-8") as f:
             inventory = json.load(f)["pins"]
@@ -86,6 +96,11 @@ def facts():
         "prover": {"path": TLAPM, "sha256": sha256(TLAPM) if os.path.isfile(TLAPM) else None,
                    "version": version[-1] if version else None},
         "backends": [{"name": n, "version": v} for n, v in backends],
+        "smt": {"cvc5": {"path": CVC5, "sha256": sha256(CVC5) if os.path.isfile(CVC5) else None,
+                         "version": cvc5[0] if cvc5 else None},
+                "ethos": {"path": ETHOS, "sha256": sha256(ETHOS) if os.path.isfile(ETHOS) else None,
+                          "version": args.get("ethos_version")},
+                "cpc": {"path": CPC, "files": len(eo), "tree": tree}},
         "skill": {"path": SKILL, "source": pin.get("source"), "commit": pin.get("commit")},
         "packages": key_values("/opt/tla-kit/packages"),
         "image": {"source": "https://github.com/scottcochran/tla-kit", "revision": args.get("revision"),
@@ -111,6 +126,10 @@ def main(argv):
     print(f"tlapm     {f['prover']['version']}")
     for b in f["backends"]:
         print(f"backend   {b['name']} version == \"{b['version']}\"")
+    smt = f["smt"]
+    print(f"cvc5      {smt['cvc5']['path']} sha256 {smt['cvc5']['sha256']}, {smt['cvc5']['version']}")
+    print(f"ethos     {smt['ethos']['path']} sha256 {smt['ethos']['sha256']}, {smt['ethos']['version']}")
+    print(f"cpc       {smt['cpc']['path']}, {smt['cpc']['files']} files, tree {smt['cpc']['tree']}")
     print(f"skill     {f['skill']['path']}, from {f['skill']['source']} at {f['skill']['commit']}")
     for k, v in f["packages"].items():
         print(f"package   {k} {v}")

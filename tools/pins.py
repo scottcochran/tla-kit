@@ -3,15 +3,18 @@
 
     tools/pins.py check             the Dockerfile and PINS.json agree, and PINS.json agrees with itself
     tools/pins.py readme [--check]  write the README's table of pins from PINS.json, or fail if it differs
-    tools/pins.py moved BASE        the pins whose values differ between PINS.json at git BASE and here, one per
-                                    line as `<kind> <tool>`; nothing if none moved
+    tools/pins.py moved BASE        the pins whose values differ between PINS.json at git BASE and here, or that
+                                    are new here, one per line as `<kind> <tool>`; nothing if none moved
 
 `check` fails when:
   - a build argument's default in the Dockerfile differs from the value PINS.json gives it;
   - the Dockerfile declares a build argument that is neither a pin's nor listed under `not_pins`, since no input
     to the build is left free (ADR-0013 item 1);
   - a pin's digests disagree with each other (the tarball's sha256 and TLAPM_SHA256, the binary's and
-    TLAPM_BINARY_SHA256, the jar's and TLA2TOOLS_SHA256), or a served log does not name the current value;
+    TLAPM_BINARY_SHA256, the jar's and TLA2TOOLS_SHA256, and cvc5's, ethos's and the CPC signature's archives and
+    binaries with their build arguments), or a served log does not name the current value;
+  - a kept pin's copy is not in its kept release, or cvc5, ethos and the signature are not in one release
+    (ADR-0017 items 1 and 4);
   - the method pin's version is not the commit its VENDOR-PIN names.
 
 Standard library only. Changes nothing except, with `readme`, README.md between its two markers.
@@ -101,6 +104,30 @@ def check():
         if not (tlapm.get("kept_copy") or "").endswith(f"/download/{tlapm.get('kept_release')}/"
                                                        + os.path.basename(tlapm["upstream"])):
             problems.append("tlapm: kept_copy is not the upstream file in the kept_release")
+    smt = {t: by_tool.get(t) for t in ("cvc5", "ethos", "CPC signature")}
+    for tool, pin, archive, binary, path in (
+            ("cvc5", smt["cvc5"], "CVC5_ZIP_SHA256", "CVC5_BINARY_SHA256", "/opt/cvc5/bin/cvc5"),
+            ("ethos", smt["ethos"], "ETHOS_ZIP_SHA256", "ETHOS_BINARY_SHA256", "/opt/ethos/bin/ethos"),
+            ("CPC signature", smt["CPC signature"], "CVC5_SRC_SHA256", None, None)):
+        if pin is None:
+            continue
+        if pin["download_sha256"] != pin["set_by"].get(archive):
+            problems.append(f"{tool}: download_sha256 differs from {archive}")
+        if binary and pin["installed"].get(path) != pin["set_by"].get(binary):
+            problems.append(f"{tool}: the installed binary's sha256 differs from {binary}")
+    if any(smt.values()):
+        if not all(smt.values()):
+            problems.append("cvc5, ethos and the CPC signature are pinned together or not at all (ADR-0017 item 4)")
+        elif len({p["kept_release"] for p in smt.values()}) != 1:
+            problems.append("cvc5, ethos and the CPC signature name different kept releases (ADR-0017 item 1)")
+        else:
+            kept = smt["cvc5"]["set_by"].get("CVC5_KEPT", "")
+            release = smt["cvc5"]["kept_release"]
+            if not kept.endswith(f"/download/{release}"):
+                problems.append(f"cvc5: CVC5_KEPT is not release {release}")
+            for tool, pin in smt.items():
+                if not pin.get("kept_copy", "").startswith(kept + "/"):
+                    problems.append(f"{tool}: kept_copy is not in release {release} (ADR-0017 item 2)")
     for pin in inv["pins"]:
         if "vendor_pin" in pin:
             with open(os.path.join(ROOT, pin["vendor_pin"]), encoding="utf-8") as f:
@@ -131,6 +158,15 @@ def table():
             held = (f"tarball sha256 {short(p['download_sha256'])}, binary sha256 {short(sb['TLAPM_BINARY_SHA256'])}, "
                     f"and every one of its {len(p['installed'])} files by sha256")
             source = f"the kept copy, release `{p['kept_release']}` here; upstream `tlaplus/tlapm` `{sb['TLAPM_TAG']}`"
+        elif p["tool"] in ("cvc5", "ethos"):
+            binary = next(iter(p["installed"].values()))
+            held = f"zip sha256 {short(p['download_sha256'])}, binary sha256 {short(binary)}"
+            repo = "cvc5/cvc5" if p["tool"] == "cvc5" else "cvc5/ethos"
+            source = f"the kept copy, release `{p['kept_release']}` here; upstream `{repo}`"
+        elif p["tool"] == "CPC signature":
+            held = (f"cvc5's source archive sha256 {short(p['download_sha256'])}, the tree "
+                    f"`{p['set_by']['CVC5_CPC_TREE']}`, and each of its {len(p['installed'])} files by sha256")
+            source = f"the kept copy, release `{p['kept_release']}` here; upstream `cvc5/cvc5`"
         elif p["tool"] == "tla2tools.jar":
             held = f"sha256 {short(p['download_sha256'])}"
             source = f"upstream `tlaplus/tlaplus` `{sb['TLA2TOOLS_VERSION']}`"
@@ -149,7 +185,7 @@ def table():
             source = "vendored in this repository"
         else:
             held, source = "", ""
-        name = f"`{p['tool']}`" if p["tool"] in ("tla2tools.jar", "tlapm", "apt") else p["tool"]
+        name = f"`{p['tool']}`" if p["tool"] in ("tla2tools.jar", "tlapm", "apt", "cvc5", "ethos") else p["tool"]
         version = f" {p['version']}" if p.get("version") and p["tool"] not in ("Temurin JRE",) else ""
         rows.append(f"| {name}{version} | {p['kind']} | {p['describes']} | {held} | {source} |")
     return "\n".join(rows)
@@ -185,7 +221,8 @@ def moved(base):
     old = {p["tool"]: p for p in load(old_text)["pins"]}
     for p in load()["pins"]:
         o = old.get(p["tool"])
-        if o is not None and (o.get("set_by") != p.get("set_by") or o.get("version") != p.get("version")):
+        # A pin new at this commit is a move too: it changes what the image holds (ADR-0013 item 3).
+        if o is None or o.get("set_by") != p.get("set_by") or o.get("version") != p.get("version"):
             print(f"{p['kind']} {p['tool']}")
     return 0
 

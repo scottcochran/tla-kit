@@ -5,11 +5,13 @@
 
 One line per check, `ok` or `FAIL`, with the seconds it took:
 
-  pins     the jar and the tlapm binary have the sha256 of the build arguments (/opt/tla-kit/build-args); the
+  pins     the jar, the tlapm binary, cvc5 and ethos have the sha256 of the build arguments
+           (/opt/tla-kit/build-args); the
            build arguments are the values the inventory gives them, and every file the inventory lists has its
            sha256 (/opt/tla-kit/PINS.json, ADR-0013 item 7); every vendored file of the skill has the sha256 its
            VENDOR-PIN names
-  env      TLA_JAR and TLAPM name those files, and the tlapm on PATH is the same binary (ADR-0004)
+  env      TLA_JAR, TLAPM, CVC5 and ETHOS name those files, and the tlapm, cvc5 and ethos on PATH are the same
+           binaries (ADR-0004)
   notices  every licence text the image's notice of third-party software names exists, and every jar it names
            holds a License.txt (/opt/tla-kit/licenses/THIRD-PARTY.md, ADR-0011 item 4)
   sany     the sany wrapper parses the skill's fixture module, and reports an error in a module that has one
@@ -20,6 +22,8 @@ One line per check, `ok` or `FAIL`, with the seconds it took:
            failing as required
   mcp      the MCP server (tla-kit mcp) starts over stdio on a copy of the fixture, lists its tools, and its
            tlc_run finds the fixture's Bounded to hold in 4 states (ADR-0008)
+  smt      cvc5 proves a small unsatisfiable query and gives its proof in the CPC format; ethos, with cvc5's CPC
+           signature, accepts the proof, and refuses a copy with one step's rule changed (ADR-0012 item 8)
 
 Exits non-zero if any check fails.
 """
@@ -38,13 +42,21 @@ import zipfile
 SANY_ERROR = re.compile(r"\*\*\* ?(Errors?|Parse Error|Abort)|^Fatal errors|^Semantic errors:", re.M)
 JAR = os.environ.get("TLA_JAR", "")
 TLAPM = os.environ.get("TLAPM", "")
+CVC5 = os.environ.get("CVC5", "")
+ETHOS = os.environ.get("ETHOS", "")
+CPC = "/opt/cvc5/cpc/Cpc.eo"
 SKILL = os.environ.get("TLA_KIT_SKILL", "/opt/tla-kit/skill")
 FIXTURE = os.path.join(SKILL, "assets", "selftest")
 PINS = "/opt/tla-kit/PINS.json"
 # The build-args keys and the inventory's build arguments they record.
 RECORDED = {"base_image": "BASE_IMAGE", "apt_snapshot": "APT_SNAPSHOT", "tla2tools_version": "TLA2TOOLS_VERSION",
             "tla2tools_sha256": "TLA2TOOLS_SHA256", "tlapm_tag": "TLAPM_TAG", "tlapm_tarball_sha256": "TLAPM_SHA256",
-            "tlapm_binary_sha256": "TLAPM_BINARY_SHA256"}
+            "tlapm_binary_sha256": "TLAPM_BINARY_SHA256", "cvc5_version": "CVC5_VERSION",
+            "cvc5_zip_sha256": "CVC5_ZIP_SHA256", "cvc5_binary_sha256": "CVC5_BINARY_SHA256",
+            "cvc5_src_sha256": "CVC5_SRC_SHA256", "cvc5_cpc_tree": "CVC5_CPC_TREE", "ethos_version": "ETHOS_VERSION",
+            "ethos_zip_sha256": "ETHOS_ZIP_SHA256", "ethos_binary_sha256": "ETHOS_BINARY_SHA256"}
+# An unsatisfiable query, for the smt check: x > 2 and x < 1.
+SMT_QUERY = "(set-logic QF_LIA)\n(declare-const x Int)\n(assert (> x 2))\n(assert (< x 1))\n(check-sat)\n"
 failed = []
 
 PCAL = """---- MODULE Pcal ----
@@ -98,7 +110,8 @@ def check_pins():
     start = time.time()
     args, _ = key_values("/opt/tla-kit/build-args")
     problems = []
-    for label, path, want in (("jar", JAR, args.get("tla2tools_sha256")), ("tlapm", TLAPM, args.get("tlapm_binary_sha256"))):
+    for label, path, want in (("jar", JAR, args.get("tla2tools_sha256")), ("tlapm", TLAPM, args.get("tlapm_binary_sha256")),
+                              ("cvc5", CVC5, args.get("cvc5_binary_sha256")), ("ethos", ETHOS, args.get("ethos_binary_sha256"))):
         got = sha256(path) if os.path.isfile(path) else None
         if got != want:
             problems.append(f"{label} {path} is sha256 {got}, the build arguments say {want}")
@@ -127,18 +140,21 @@ def check_pins():
         if not os.path.isfile(path) or sha256(path) != want:
             problems.append(f"skill file {name} differs from VENDOR-PIN")
     report("pins", start, not problems and listed > 0, "; ".join(problems[:5]) or
-           f"jar and tlapm as built; built with the inventory's values, and its {listed} installed files as it "
+           f"jar, tlapm, cvc5 and ethos as built; built with the inventory's values, and its {listed} installed files as it "
            f"lists them; {len(files)} skill files as vendored from {pin.get('commit', '?')[:12]}")
     return args
 
 
 def check_env():
     start = time.time()
-    on_path = shutil.which("tlapm")
-    problems = [f"{v} is not set to a file" for v, p in (("TLA_JAR", JAR), ("TLAPM", TLAPM)) if not os.path.isfile(p)]
-    if not on_path or os.path.realpath(on_path) != os.path.realpath(TLAPM):
-        problems.append(f"tlapm on PATH is {on_path}, not TLAPM")
-    report("env", start, not problems, "; ".join(problems) or f"TLA_JAR={JAR}, TLAPM={TLAPM}, tlapm on PATH")
+    problems = [f"{v} is not set to a file" for v, p in (("TLA_JAR", JAR), ("TLAPM", TLAPM), ("CVC5", CVC5),
+                                                         ("ETHOS", ETHOS)) if not os.path.isfile(p)]
+    for cmd, var, path in (("tlapm", "TLAPM", TLAPM), ("cvc5", "CVC5", CVC5), ("ethos", "ETHOS", ETHOS)):
+        on_path = shutil.which(cmd)
+        if not on_path or os.path.realpath(on_path) != os.path.realpath(path):
+            problems.append(f"{cmd} on PATH is {on_path}, not {var}")
+    report("env", start, not problems, "; ".join(problems) or
+           f"TLA_JAR={JAR}, TLAPM={TLAPM}, CVC5={CVC5}, ETHOS={ETHOS}; tlapm, cvc5 and ethos on PATH")
 
 
 def check_notices():
@@ -244,6 +260,34 @@ def check_mcp(tmp):
     report("mcp", start, ok, detail, "" if ok else err)
 
 
+def check_smt(tmp):
+    start = time.time()
+    query = os.path.join(tmp, "q.smt2")
+    with open(query, "w", encoding="utf-8") as f:
+        f.write(SMT_QUERY)
+    code, out = run([CVC5, "--produce-proofs", "--dump-proofs", "--proof-format-mode=cpc",
+                     "--proof-granularity=dsl-rewrite", query], tmp)
+    lines = out.strip().splitlines()
+    ok = code == 0 and len(lines) > 3 and lines[0] == "unsat" and lines[1] == "(" and lines[-1] == ")"
+    detail = f"cvc5 exit {code}"
+    if ok:  # the proof is the lines between "unsat (" and ")", checked against the signature
+        proof = f'(include "{CPC}")\n' + "\n".join(lines[2:-1]) + "\n"
+        changed = re.sub(r":rule \S+", ":rule refl", proof, count=1)
+        results = []
+        for name, text in (("p.eo", proof), ("changed.eo", changed)):
+            with open(os.path.join(tmp, name), "w", encoding="utf-8") as f:
+                f.write(text)
+            results.append(run([ETHOS, name], tmp))
+        (code, out), (bad_code, bad_out) = results
+        accepted = code == 0 and out.strip().splitlines()[-1:] == ["correct"]
+        refused = bad_code != 0 and "correct" not in bad_out.split()
+        ok = accepted and refused and changed != proof
+        detail = ("a proof of unsat accepted by ethos, and a copy with one rule changed refused" if ok else
+                  f"ethos on the proof: exit {code}; on the changed copy: exit {bad_code}")
+        out = out if not accepted else bad_out
+    report("smt", start, ok, detail, out)
+
+
 def main():
     args = check_pins()
     check_env()
@@ -253,6 +297,7 @@ def main():
         check_wrappers(tmp)
         check_setup(tmp, args)
         check_mcp(tmp)
+        check_smt(tmp)
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
     print("selftest: " + ("ok" if not failed else f"FAILED ({', '.join(failed)})"))

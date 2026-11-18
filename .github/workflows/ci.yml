@@ -1,6 +1,6 @@
 # Every pull request is built and tested, and main merges only on a pass (ADR-0014 item 1). CI pushes nothing.
 #   records     the inventory against the Dockerfile and the README, and the vendored scripts against their pin
-#   image       the image built as the release builds it, from the kept prover tarball; its self-test; the MCP
+#   image       the image built as the release builds it, from the kept copies; its self-test; the MCP
 #               client test, every tool of the server against the fixture, and, when the change touches the
 #               server, the prove tool's tests (ADR-0016 item 7) and each tool compared with its command on
 #               TOPAK's Alone and Coupling (ADR-0008); and the
@@ -69,7 +69,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Fetch the kept prover tarball (ADR-0005 item 2)
+      - name: Fetch the kept copies (ADR-0005 item 2; ADR-0017 item 2)
         env:
           GH_TOKEN: ${{ github.token }}
         run: tools/ci/fetch-kept.sh
@@ -118,7 +118,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Fetch the kept prover tarball
+      - name: Fetch the kept copies
         env:
           GH_TOKEN: ${{ github.token }}
         run: tools/ci/fetch-kept.sh

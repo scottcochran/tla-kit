@@ -115,6 +115,145 @@
       ]
     },
     {
+      "tool": "cvc5",
+      "kind": "checker",
+      "version": "1.4.0",
+      "describes": "The SMT solver whose proofs a certified run checks: upstream's static Linux x86_64 build without GPL libraries (`b432cd7`), with GMP 6.3.0, MPFR 4.2.2, LibPoly 0.2.1 and glibc 2.35-0ubuntu3.14 linked in",
+      "set_by": {
+        "CVC5_VERSION": "1.4.0",
+        "CVC5_ZIP_SHA256": "61d13483ec9c4e8d05c7f3d532225255b2183a0c03b161d37d942d1ba089ec6d",
+        "CVC5_BINARY_SHA256": "d4c534360e602f07adcbb2aafbe833e73ce1e7c6f2572cb7eee03de73d6e2e5b",
+        "CVC5_KEPT": "https://github.com/scottcochran/tla-kit/releases/download/cvc5-1.4.0"
+      },
+      "upstream": "https://github.com/cvc5/cvc5/releases/download/cvc5-1.4.0/cvc5-Linux-x86_64-static.zip",
+      "kept_release": "cvc5-1.4.0",
+      "kept_copy": "https://github.com/scottcochran/tla-kit/releases/download/cvc5-1.4.0/cvc5-Linux-x86_64-static.zip",
+      "download_sha256": "61d13483ec9c4e8d05c7f3d532225255b2183a0c03b161d37d942d1ba089ec6d",
+      "installed": {
+        "/opt/cvc5/bin/cvc5": "d4c534360e602f07adcbb2aafbe833e73ce1e7c6f2572cb7eee03de73d6e2e5b"
+      },
+      "note": "cvc5, ethos and the CPC signature move together, in one pull request (ADR-0017 item 4). CVC5_KEPT, the kept release they all come from, is set here.",
+      "pinned": {
+        "date": "2026.11.17",
+        "by": "pull request #27"
+      },
+      "served": [
+        {
+          "from": "2026.11.17",
+          "sha256": "61d13483ec9c4e8d05c7f3d532225255b2183a0c03b161d37d942d1ba089ec6d",
+          "upstream": true
+        }
+      ]
+    },
+    {
+      "tool": "ethos",
+      "kind": "checker",
+      "version": "0.2.4 at 8dc85c4",
+      "describes": "The proof checker that accepts or refuses cvc5's CPC proofs: upstream's static Linux x86_64 build of the commit cvc5 1.4.0 names, with GMP 6.2.1 and glibc 2.35-0ubuntu3.14 linked in",
+      "set_by": {
+        "ETHOS_VERSION": "0.2.4",
+        "ETHOS_ZIP_SHA256": "1582fd32d7ef8ae7b8d82b3da92fcc542939a4941402a9a71cf8b33a06a3d8bc",
+        "ETHOS_BINARY_SHA256": "97e95d36dcb596e6439d935af68e9005a508620f667af546d92d6d3700f26538"
+      },
+      "upstream": "https://github.com/cvc5/ethos/releases/download/ethos-0.2.4/ethos-linux-x86_64.zip",
+      "kept_release": "cvc5-1.4.0",
+      "kept_copy": "https://github.com/scottcochran/tla-kit/releases/download/cvc5-1.4.0/ethos-linux-x86_64.zip",
+      "download_sha256": "1582fd32d7ef8ae7b8d82b3da92fcc542939a4941402a9a71cf8b33a06a3d8bc",
+      "installed": {
+        "/opt/ethos/bin/ethos": "97e95d36dcb596e6439d935af68e9005a508620f667af546d92d6d3700f26538"
+      },
+      "pinned": {
+        "date": "2026.11.17",
+        "by": "pull request #27"
+      },
+      "served": [
+        {
+          "from": "2026.11.17",
+          "sha256": "1582fd32d7ef8ae7b8d82b3da92fcc542939a4941402a9a71cf8b33a06a3d8bc",
+          "upstream": true
+        }
+      ]
+    },
+    {
+      "tool": "CPC signature",
+      "kind": "checker",
+      "version": "cvc5 1.4.0",
+      "describes": "The rules ethos checks a cvc5 proof against: `proofs/eo/cpc/` of cvc5's source at tag `cvc5-1.4.0`, 51 files, tree `633f74115700ad32` as TOPAK's proof-cert.sh computes it",
+      "set_by": {
+        "CVC5_SRC_SHA256": "06c65b30693d1abf7c1393b497c799950de2833457920b9433da8e418bce9113",
+        "CVC5_CPC_TREE": "633f74115700ad32"
+      },
+      "upstream": "https://github.com/cvc5/cvc5/archive/refs/tags/cvc5-1.4.0.tar.gz",
+      "kept_release": "cvc5-1.4.0",
+      "kept_copy": "https://github.com/scottcochran/tla-kit/releases/download/cvc5-1.4.0/cvc5-1.4.0-src.tar.gz",
+      "download_sha256": "06c65b30693d1abf7c1393b497c799950de2833457920b9433da8e418bce9113",
+      "installed": {
+        "/opt/cvc5/cpc/Cpc.eo": "14aa33ad6d486957b2fd8f6489de62077413e011b84790194b99bb14e33f6a51",
+        "/opt/cvc5/cpc/expert/CpcExpert.eo": "bdb08d6f35db596d9c74447511cb0a67c656a040623c22a055121e1aeb21006f",
+        "/opt/cvc5/cpc/expert/rules/ArithExt.eo": "5496695cf3b5f4db8f03588fc8c76574066fd97d66826bd9fa60921a114215c8",
+        "/opt/cvc5/cpc/expert/rules/ArraysExt.eo": "8b3e505ebf74ddace2777c41316b880081118ae126e209116a8ae1649fd413a8",
+        "/opt/cvc5/cpc/expert/rules/QuantifiersExpert.eo": "55bfe2e1ac3bcc96dfcbc73daa48de217fb7bf9db383bfbb37d2d921deaadc97",
+        "/opt/cvc5/cpc/expert/rules/RewritesExpert.eo": "b4ad110fd2ab313fc6b4dc1db81b92e7fa37eef40ec4fb394982cf939c1a62ec",
+        "/opt/cvc5/cpc/expert/rules/SetsExt.eo": "9e8a07e9da6314dd5b8e6ca81f070d28b204c9dcfd010fcdc29f8ad193ba437e",
+        "/opt/cvc5/cpc/expert/rules/Transcendentals.eo": "9687bb7650677fdd6600ec8a6dde27d78783dee4cf64ff2d57933bd30d18ee57",
+        "/opt/cvc5/cpc/expert/theories/ArithExt.eo": "14054b1b4b4f22d518a2674b347ef7fce4d3600d03905f46c201e1f809bb9535",
+        "/opt/cvc5/cpc/expert/theories/ArraysExt.eo": "737f110ef55aa396566f743ca2427c6d23e322973e9f1b6bb68dcbd5ff3f6c77",
+        "/opt/cvc5/cpc/expert/theories/Bags.eo": "7da90f0ff72bc451ec1c0a3cf11781d15ab70643e4c483fe81dd8f80a6dc8ee3",
+        "/opt/cvc5/cpc/expert/theories/FiniteFields.eo": "c5b127e46b191f00c75d1d85fc614530dc9caece8c21a7a860cb3dcb28a3221a",
+        "/opt/cvc5/cpc/expert/theories/FloatingPoints.eo": "e0b909f29c8a731ec5a3db478e6d05dec0d0cd9a66c3b0fe543abc47555eb943",
+        "/opt/cvc5/cpc/expert/theories/Nullables.eo": "e22e8f0c3130d36197920958857dd8c294072caf72af0adb21a053d84c1c8bc3",
+        "/opt/cvc5/cpc/expert/theories/SepLogic.eo": "febd3a64b754fad27bdc9852b714e87645ae366e6cd734c534d8747be9c1bc1d",
+        "/opt/cvc5/cpc/expert/theories/SetsExt.eo": "90eb8f7663dcf68d9763697253d214cc7244e12777b63240bb168d047c6b8fa3",
+        "/opt/cvc5/cpc/expert/theories/Transcendentals.eo": "162ef90f20abe9c9fe1b2a5e3cd8758633ebc43aecc3d4d92417865b2b6735ec",
+        "/opt/cvc5/cpc/programs/AciNorm.eo": "6bf02510d3a34667219d6f06b4c2c9f5663ca3dc285fd4d6d388e69021c97311",
+        "/opt/cvc5/cpc/programs/Arith.eo": "310797ba7bf64527260a6f7f4c3a1ec7e9dac6ce66ffe74772d84ebf5b8abcdc",
+        "/opt/cvc5/cpc/programs/BitVectors.eo": "b34ad2d7f7eba5156ebe2b084530eedb5ae6b41829683e65c74cc1de91dc3001",
+        "/opt/cvc5/cpc/programs/Bitblasting.eo": "3683c1de70301c59ed3f7c7f33958b6467f4ca347bac05a975e6227c117cfde9",
+        "/opt/cvc5/cpc/programs/Datatypes.eo": "c5ef74f3ba4c816fd6751078f6bf6384b0d21705d63b613450b9db5e5b9af927",
+        "/opt/cvc5/cpc/programs/DistinctValues.eo": "167ba50fdc6fff24ea8f1ebb527be479a8285aadf64a61024714e877c7fd22de",
+        "/opt/cvc5/cpc/programs/Nary.eo": "97ea668298d3031e13a83caf00783887f372f4b9f29f01a5a1ebaa5595376037",
+        "/opt/cvc5/cpc/programs/PolyNorm.eo": "cb8814f081df2f5b095a3ae2f79c589db9c5e8007bf4a93e0051392634a590a4",
+        "/opt/cvc5/cpc/programs/Quantifiers.eo": "c41d95e60e295f8511ec6386fb05bbbdfd9a5cd9e432bf4cc294f01a77725bc6",
+        "/opt/cvc5/cpc/programs/Strings.eo": "038857b7e4679d3bc552ee0eaee02d758ec329fc57eb99b6771ce5ca59039000",
+        "/opt/cvc5/cpc/programs/Utils.eo": "675b9f6bdf33cf07698aa3549ca6e60321110b037276371a28cdd04ab349cad8",
+        "/opt/cvc5/cpc/rules/Arith.eo": "5fdefc0ad23d121b493ae393e06b1e3646c4880a8a8cc7e43a5138ae2503e418",
+        "/opt/cvc5/cpc/rules/ArithBvConv.eo": "1c627b18388b5ab1d5aa6004d95af2ec218fc00515d852bd1df8cbc1c246a10c",
+        "/opt/cvc5/cpc/rules/Arrays.eo": "5988db18635883502e5b3ca9cac8e98fac2ff5b98007e058d841f737c7f97bff",
+        "/opt/cvc5/cpc/rules/BitVectors.eo": "11e884d6c37826945188521c3e799c5f53eef554882839bb65b92f506393436e",
+        "/opt/cvc5/cpc/rules/Booleans.eo": "1bb3e856929a7f0546d7ef786a5f90130ead417a6a63525f72bce0e09e12dcac",
+        "/opt/cvc5/cpc/rules/Builtin.eo": "761ca8623adf0eb52017eb1576bd295a3a3ab1f8d7dd1a480d77e70bec5a9967",
+        "/opt/cvc5/cpc/rules/Datatypes.eo": "ac0b07502374c10897751aee08affb0f373a6356020496c5945b6fcdd3390b54",
+        "/opt/cvc5/cpc/rules/Quantifiers.eo": "d6ee701cf34186f812a2dd9842cce6a4d9806c0c27020644900888860ea8d012",
+        "/opt/cvc5/cpc/rules/Rewrites.eo": "b16049e167f3118a507d8c32cc7856e1ae44d3c5685fd726d1881a87677b93a1",
+        "/opt/cvc5/cpc/rules/Sets.eo": "76021d1be361d4d06cefbe35449b3772c74eccb3f5406b495ba1df7cf487121a",
+        "/opt/cvc5/cpc/rules/Strings.eo": "cdc7deba5ab7e1b5aea3e8f5b96ad01657cfe5a567d77d4a7402a94e25a124e1",
+        "/opt/cvc5/cpc/rules/Uf.eo": "060361ad515fdce9fd9b424889fda92cef6e96288a07b4834ee4b6b584788358",
+        "/opt/cvc5/cpc/theories/Arith.eo": "2d3ab633bf28e8eb8f39f463eb3a9dc4f2bf4fa71dc53f87d70f42171131ce57",
+        "/opt/cvc5/cpc/theories/ArithBvConv.eo": "8c2064108bbf078b473711870ce64abda746d23dfb95be4cf450821dc3c7946b",
+        "/opt/cvc5/cpc/theories/Arrays.eo": "c919cd489c739bf8797c07a63268e98ef34d775a3de8a4cea7fe949ae988920a",
+        "/opt/cvc5/cpc/theories/BitVectors.eo": "13c9c3cff218d1e0c29e3a117877b37271038f0ad52eb0f936c7409846707d1e",
+        "/opt/cvc5/cpc/theories/Builtin.eo": "2a00e44bd207366b6307f84ca3aa0320b5a97725b2b7967eb2a13437a049b99e",
+        "/opt/cvc5/cpc/theories/Datatypes.eo": "1cbc19da95e5079c46ca7a21f25917712deedfa2e20657ca84d5d7a4193aa73d",
+        "/opt/cvc5/cpc/theories/Ints.eo": "5dd9a17dbde47cfdfe0488035847503d6da5ae6d4096fd9691995e8a5983c66f",
+        "/opt/cvc5/cpc/theories/Quantifiers.eo": "1b781101dec087bb5963a36639409d42963540ad1de53a4714e871533c465278",
+        "/opt/cvc5/cpc/theories/Reals.eo": "dd5d2626c5bd67d42ce99c31d67360e6b483f836005762f95f7eb47a9f2bc584",
+        "/opt/cvc5/cpc/theories/Sets.eo": "e55367c07aae84fe5189ef63b28f022b25d5d6ece14acaa3346343cb9c8c2f39",
+        "/opt/cvc5/cpc/theories/Strings.eo": "881402504d103c50a80a52cbecb06aabe8eb31846865f7331aa48daa1820383a"
+      },
+      "note": "GitHub makes the source archive on request, so its bytes could change without the tag moving; the tree digest is the check that matters.",
+      "pinned": {
+        "date": "2026.11.17",
+        "by": "pull request #27"
+      },
+      "served": [
+        {
+          "from": "2026.11.17",
+          "sha256": "06c65b30693d1abf7c1393b497c799950de2833457920b9433da8e418bce9113",
+          "upstream": true
+        }
+      ]
+    },
+    {
       "tool": "Temurin JRE",
       "kind": "checker",
       "version": "25 (25.0.5+8 in the pinned base)",

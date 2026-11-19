@@ -399,7 +399,7 @@ Then, each on its own:
 ## Risks
 
 - **The prover tag moves.** Three builds in six weeks across the three projects. The answer is the copy of the
-  tarball kept in release `tlapm-ff40755` since Phase 1c, which D7 allows on its conditions. CI and the release
+  tarball kept in a release `tlapm-<commit>` since Phase 1c, which D7 allows on its conditions. CI and the release
   build from it, so a moved tag no longer fails a rebuild. The weekly check reports the move.
 - **A newer prover changes what proves.** It did, for the defect modules. Every prover move needs the full
   proof run and the defect run before a pin moves.

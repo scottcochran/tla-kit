@@ -26,7 +26,7 @@ each jar it names holds a `License.txt`.
 
 ## The TLAPS tarball (`/opt/tlaps`)
 
-`tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz`, built by upstream from `tlaplus/tlapm` at `ff40755`. The tarball carries
+`tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz`, built by upstream from `tlaplus/tlapm` at `9a52faf`. The tarball carries
 the licence of `tlapm` only. The texts of the other parts are added here from their sources, at the versions the
 tarball was built from. TLAPS's own licence page (`doc/web/content/Download/License.html` in `tlaplus/tlapm`)
 lists Isabelle, Z3 and LS4, and says that Isabelle contains other software under its own licences. Poly/ML, GMP and
@@ -34,15 +34,15 @@ lists Isabelle, Z3 and LS4, and says that Isabelle contains other software under
 
 | Part | Version | Licence | Licence text in the image | Source |
 |---|---|---|---|---|
-| `tlapm`, `tlapm_lsp`, `translate`, `ptl_to_trp`, and the Isabelle/TLA+ theories behind the `TLA+` heap | `ff40755` | BSD-2-Clause (Inria, Microsoft Corporation, Linux Foundation) | `/opt/tlaps/doc/tlapm/LICENSE` | `https://github.com/tlaplus/tlapm`, at `ff40755` |
-| Zenon (`backends/bin/zenon`) | 0.8.4 [a268] | BSD-3-Clause (Inria) | `/opt/tla-kit/licenses/zenon-LICENSE.txt` | `tlaplus/tlapm` at `ff40755`, `zenon/` |
+| `tlapm`, `tlapm_lsp`, `translate`, `ptl_to_trp`, and the Isabelle/TLA+ theories behind the `TLA+` heap | `9a52faf` | BSD-2-Clause (Inria, Microsoft Corporation, Linux Foundation) | `/opt/tlaps/doc/tlapm/LICENSE` | `https://github.com/tlaplus/tlapm`, at `9a52faf` |
+| Zenon (`backends/bin/zenon`) | 0.8.4 [a268] | BSD-3-Clause (Inria) | `/opt/tla-kit/licenses/zenon-LICENSE.txt` | `tlaplus/tlapm` at `9a52faf`, `zenon/` |
 | Z3 (`backends/bin/z3`) | 4.8.9 | MIT (Microsoft Corporation) | `/opt/tla-kit/licenses/z3-LICENSE.txt` | `https://github.com/Z3Prover/z3`, tag `z3-4.8.9` (upstream's `x64-ubuntu-16.04` binary) |
 | LS4 (`backends/bin/ls4`) | 1.0, with `tlapm`'s `deps/ls4/ls4.patch` | MIT, as MiniSat (Martin Suda; Niklas Eén, Niklas Sörensson) | `/opt/tla-kit/licenses/ls4-LICENSE.txt` | `https://github.com/quickbeam123/ls4`, tag `v1.0` |
 | Isabelle: the `Pure`, `TLA+` and `Options` heaps (`backends/Isabelle-install`) | Isabelle2025 | BSD-3-Clause (University of Cambridge, Technische Universität München, and contributors) | `/opt/tla-kit/licenses/isabelle-COPYRIGHT.txt` | `https://isabelle.in.tum.de/website-Isabelle2025/` |
-| Poly/ML: `poly`, `polyc`, `polyimport`, `libpolyml`, `libpolymain` (`backends/Isabelle-install/poly`) | 5.9.1, as packaged in Isabelle2025's `polyml-5.9.1` component | LGPL-2.1 | `/opt/tla-kit/licenses/polyml-COPYING.txt` | `https://github.com/polyml/polyml`, tag `v5.9.1`; `polyml-5.9.1-src.tar.gz`, in this repository's release `tlapm-ff40755` |
-| GMP: `libgmp.so.10` (`backends/Isabelle-install/poly`) | 6.1.2, as built for Isabelle2025's `polyml-5.9.1` component | LGPL-3.0-or-later or GPL-2.0-or-later | `/usr/share/common-licenses/LGPL-3` and `/usr/share/common-licenses/GPL-2` | `gmp-6.1.2.tar.xz`, in this repository's release `tlapm-ff40755`, and at `https://ftp.gnu.org/gnu/gmp/` |
-| `libsha1.so` (`backends/Isabelle-install/poly`) | GNU coreutils 8.4's `sha1.c`, as built for Isabelle2025's `polyml-5.9.1` component | GPL-3.0-or-later (Free Software Foundation) | `/usr/share/common-licenses/GPL-3` | `libsha1-src.tar.gz`, in this repository's release `tlapm-ff40755`: the component's `sha1/` directory |
-| A second TLA+ tools jar, used by `tlapm` (`backends/bin/tla2tools.jar`) | upstream build of 2026-11-06, `d8fb231`; not the image's checker | MIT, with the licences of the libraries it bundles inside it | `/opt/tlaps/lib/tlapm/backends/bin/tla2tools.jar` (`License.txt` and the other licence files inside the jar) | `https://github.com/tlaplus/tlaplus`, at `d8fb231` |
+| Poly/ML: `poly`, `polyc`, `polyimport`, `libpolyml`, `libpolymain` (`backends/Isabelle-install/poly`) | 5.9.1, as packaged in Isabelle2025's `polyml-5.9.1` component | LGPL-2.1 | `/opt/tla-kit/licenses/polyml-COPYING.txt` | `https://github.com/polyml/polyml`, tag `v5.9.1`; `polyml-5.9.1-src.tar.gz`, in this repository's release `tlapm-9a52faf` |
+| GMP: `libgmp.so.10` (`backends/Isabelle-install/poly`) | 6.1.2, as built for Isabelle2025's `polyml-5.9.1` component | LGPL-3.0-or-later or GPL-2.0-or-later | `/usr/share/common-licenses/LGPL-3` and `/usr/share/common-licenses/GPL-2` | `gmp-6.1.2.tar.xz`, in this repository's release `tlapm-9a52faf`, and at `https://ftp.gnu.org/gnu/gmp/` |
+| `libsha1.so` (`backends/Isabelle-install/poly`) | GNU coreutils 8.4's `sha1.c`, as built for Isabelle2025's `polyml-5.9.1` component | GPL-3.0-or-later (Free Software Foundation) | `/usr/share/common-licenses/GPL-3` | `libsha1-src.tar.gz`, in this repository's release `tlapm-9a52faf`: the component's `sha1/` directory |
+| A second TLA+ tools jar, used by `tlapm` (`backends/bin/tla2tools.jar`) | upstream build of 2026-11-15, `bc1b506`; not the image's checker | MIT, with the licences of the libraries it bundles inside it | `/opt/tlaps/lib/tlapm/backends/bin/tla2tools.jar` (`License.txt` and the other licence files inside the jar) | `https://github.com/tlaplus/tlaplus`, at `bc1b506` |
 
 ## cvc5 and ethos
 

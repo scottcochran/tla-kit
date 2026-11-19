@@ -25,8 +25,8 @@ ARG BASE_IMAGE=eclipse-temurin:25-jre-noble@sha256:5b5a79b85aeb03a859d4b5196482a
 # `tlapm-tarball` instead, so that a missing release fails with a message that says so;
 # the fetch stage below checks its sha256 either way.
 FROM scratch AS tlapm-tarball
-ARG TLAPM_SHA256=99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc
-ARG TLAPM_URL=https://github.com/scottcochran/tla-kit/releases/download/tlapm-ff40755/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz
+ARG TLAPM_SHA256=d9c06a04eb6b1b4192d3e22d5378143d09c9801414b9ad7ff6e918d34093c1f0
+ARG TLAPM_URL=https://github.com/scottcochran/tla-kit/releases/download/tlapm-9a52faf/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz
 ADD --checksum=sha256:${TLAPM_SHA256} ${TLAPM_URL} /tlapm.tar.gz
 
 # cvc5's and ethos's zips and cvc5's source, from the kept copies (ADR-0017 items 1 and 2). CI downloads them with
@@ -45,8 +45,8 @@ ADD --checksum=sha256:${ETHOS_ZIP_SHA256} ${CVC5_KEPT}/ethos-linux-x86_64.zip /e
 FROM --platform=linux/amd64 ${BASE_IMAGE} AS fetch
 ARG TLA2TOOLS_VERSION=v1.7.4
 ARG TLA2TOOLS_SHA256=936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
-ARG TLAPM_SHA256=99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc
-ARG TLAPM_BINARY_SHA256=6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2
+ARG TLAPM_SHA256=d9c06a04eb6b1b4192d3e22d5378143d09c9801414b9ad7ff6e918d34093c1f0
+ARG TLAPM_BINARY_SHA256=faa92f2606242ce239584e665978f33c7378ba23991c6f318a74525dcb892cc0
 ADD --checksum=sha256:${TLA2TOOLS_SHA256} \
     https://github.com/tlaplus/tlaplus/releases/download/${TLA2TOOLS_VERSION}/tla2tools.jar \
     /fetch/tla2tools.jar
@@ -63,8 +63,8 @@ ARG BASE_IMAGE
 ARG TLA2TOOLS_VERSION=v1.7.4
 ARG TLA2TOOLS_SHA256=936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
 ARG TLAPM_TAG=1.6.0-pre
-ARG TLAPM_SHA256=99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc
-ARG TLAPM_BINARY_SHA256=6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2
+ARG TLAPM_SHA256=d9c06a04eb6b1b4192d3e22d5378143d09c9801414b9ad7ff6e918d34093c1f0
+ARG TLAPM_BINARY_SHA256=faa92f2606242ce239584e665978f33c7378ba23991c6f318a74525dcb892cc0
 ARG CVC5_VERSION=1.4.0
 ARG CVC5_ZIP_SHA256=61d13483ec9c4e8d05c7f3d532225255b2183a0c03b161d37d942d1ba089ec6d
 ARG CVC5_SRC_SHA256=06c65b30693d1abf7c1393b497c799950de2833457920b9433da8e418bce9113

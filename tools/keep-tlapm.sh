@@ -11,6 +11,9 @@
 #       Poly/ML 5.9.1 (LGPL-2.1), GMP 6.1.2 (LGPL-3.0-or-later or GPL-2.0-or-later), and libsha1, GNU coreutils
 #       8.4's sha1.c as Isabelle builds it (GPL-3.0-or-later);
 #   - SHA256SUMS over all of them.
+# That record settled the copyleft parts from the bytes of the tarball at ff40755. A later tarball is kept with the
+# same source only if its Poly/ML, GMP and libsha1 are those bytes, which the script checks. If one differs it
+# stops, and that part is settled again before the tarball is kept.
 # Every download is checked against the sha256 below or in PINS.json, and the script stops on any difference.
 # The tag is protected once made, and the release is never deleted (ADR-0014 items 2 and 5).
 set -euo pipefail
@@ -18,12 +21,14 @@ export COPYFILE_DISABLE=1  # no macOS metadata in the archives
 cd "$(dirname "$0")/.."
 create=false; [ "${1:-}" = --create ] && create=true
 
-read -r release asset tarball_sha upstream < <(python3 - <<'EOF'
+read -r release asset tarball_sha upstream commit served < <(python3 - <<'EOF'
 import json, os
 p = next(p for p in json.load(open("PINS.json"))["pins"] if p["tool"] == "tlapm")
-print(p["kept_release"], os.path.basename(p["kept_copy"]), p["download_sha256"], p["upstream"])
+print(p["kept_release"], os.path.basename(p["kept_copy"]), p["download_sha256"], p["upstream"],
+      p["version"].split(" at ")[1], p["served"][0]["from"])
 EOF
 )
+[ "$release" = "tlapm-$commit" ] || { echo "keep-tlapm: PINS.json keeps $commit in $release" >&2; exit 1; }
 
 # name | url | sha256, as downloaded on 2026.11.16
 sources=(
@@ -33,6 +38,16 @@ sources=(
 )
 component_url=https://isabelle.in.tum.de/components/polyml-5.9.1.tar.gz
 component_sha=f633d451b76962099b5ae184fd574ff20d69205d74f2d41e1b514f249cb7e871
+# file in the tarball's lib/tlapm/backends/Isabelle-install/poly | sha256, as in the tarball at ff40755
+poly=tlapm/lib/tlapm/backends/Isabelle-install/poly
+copyleft=(
+  "poly|b64da72c014ea243e500bc881fa3050a997eb7a5e3e398961e56a54c064d3ff2"
+  "polyimport|8446955386acd3b0849cd3ee74b035c50b724be24593917d9b23752c9b98a239"
+  "libpolyml.a|9a29020aa2438ced3d41d5e658b38174f8c27707a8c4e616586a343d89d8de02"
+  "libpolymain.a|5066933ee4cd222f6ec9d916aac87f0c124a8e9687db451faf4305a4b926eaf4"
+  "libgmp.so.10|0afb61ed94ddc86f27874cf86f2c93a782fef1890bc62e6f5f5bb9581e3c72ad"
+  "libsha1.so|9bd74bee2dcb0248e0602e574fb27a65d6b099b513c8dff6323a8df92a0c697c"
+)
 
 out=build/kept-tlapm; mkdir -p "$out"; tmp=$(mktemp -d); trap 'rm -rf "$tmp"' EXIT
 sha() { shasum -a 256 "$1" | cut -d' ' -f1; }
@@ -44,6 +59,14 @@ fetch() {  # name url want
 }
 echo "keep-tlapm: assembling $release in $out"
 fetch "$asset" "$upstream" "$tarball_sha"
+tar -xzf "$out/$asset" -C "$tmp" "$poly"
+for c in "${copyleft[@]}"; do
+  IFS='|' read -r n w <<< "$c"; got=$(sha "$tmp/$poly/$n")
+  if [ "$got" != "$w" ]; then
+    echo "keep-tlapm: the tarball's poly/$n is sha256 $got, not the $w its source was settled for" >&2; exit 1
+  fi
+done
+echo "  Poly/ML, GMP and libsha1 in it: the bytes their source was settled for"
 for s in "${sources[@]}"; do IFS='|' read -r n u w <<< "$s"; fetch "$n" "$u" "$w"; done
 # libsha1's source is the sha1/ directory of Isabelle2025's polyml-5.9.1 component, from which the tarball's
 # libsha1.so and libgmp.so.10 are copied byte for byte.
@@ -65,7 +88,7 @@ and 5). No image is published from it: the version releases link to it.
 
 | Asset | What it is |
 |---|---|
-| \`$asset\` | Upstream's tarball, built from \`tlaplus/tlapm\` at \`ff40755\`, byte for byte as served on 2026.11.15 (sha256 \`$tarball_sha\`) |
+| \`$asset\` | Upstream's tarball, built from \`tlaplus/tlapm\` at \`$commit\`, byte for byte as served on $served (sha256 \`$tarball_sha\`) |
 | \`licenses.tar.gz\` | tla-kit's notice of the third-party software in the tarball and the image, with the licence texts the tarball leaves out (\`licenses/THIRD-PARTY.md\`) |
 | \`polyml-5.9.1-src.tar.gz\` | The source of Poly/ML 5.9.1 (LGPL-2.1), \`polyml/polyml\` at \`90c0dbb2514e\`, tag \`v5.9.1\`, which Isabelle2025's \`polyml-5.9.1\` component is built from |
 | \`gmp-6.1.2.tar.xz\`, \`.sig\` | The source of GMP 6.1.2 (LGPL-3.0-or-later or GPL-2.0-or-later), the release the tarball's \`libgmp.so.10\` reports, from the GNU mirror, with its signature |
@@ -73,6 +96,7 @@ and 5). No image is published from it: the version releases link to it.
 | \`SHA256SUMS\` | The sha256 of every asset above |
 
 How each part's release and licence were settled: \`derived/tla-kit-copyleft-sources-2026.11.16.md\` in the repository.
+That record read the tarball at \`ff40755\`. This tarball's Poly/ML, GMP and \`libsha1\` are the same bytes.
 EOF
 echo
 cat "$out/SHA256SUMS"

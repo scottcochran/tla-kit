@@ -139,7 +139,7 @@ checker or runtime pin: TLC, the prover and the runtime are the same bytes in al
 | Pin | Kind | What it is | Held to | Served from |
 |---|---|---|---|---|
 | `tla2tools.jar` v1.7.4 | checker | TLC, SANY and the PlusCal translator (TLC2 2.19, rev 5a47802) | sha256 `936a2620…0e88` | upstream `tlaplus/tlaplus` `v1.7.4` |
-| `tlapm` 1.6.0-pre at ff40755 | checker | The TLAPS proof manager, from the rolling `1.6.0-pre` tag as served on 2026.11.15, with its backends: Z3 4.8.9, Zenon 0.8.4 [a268], Isabelle2025 (Isabelle/TLA+ heap) on Poly/ML 5.9.1, LS4 1.0, and a second TLA+ tools jar (`d8fb231`) that `tlapm` uses | tarball sha256 `99db29f1…6bcc`, binary sha256 `6182df63…5bb2`, and every one of its 47 files by sha256 | the kept copy, release `tlapm-ff40755` here; upstream `tlaplus/tlapm` `1.6.0-pre` |
+| `tlapm` 1.6.0-pre at 9a52faf | checker | The TLAPS proof manager, from the rolling `1.6.0-pre` tag as served on 2026.11.19, with its backends: Z3 4.8.9, Zenon 0.8.4 [a268], Isabelle2025 (Isabelle/TLA+ heap) on Poly/ML 5.9.1, LS4 1.0, and a second TLA+ tools jar (`bc1b506`) that `tlapm` uses | tarball sha256 `d9c06a04…c1f0`, binary sha256 `faa92f26…2cc0`, and every one of its 47 files by sha256 | the kept copy, release `tlapm-9a52faf` here; upstream `tlaplus/tlapm` `1.6.0-pre` |
 | `cvc5` 1.4.0 | checker | The SMT solver whose proofs a certified run checks: upstream's static Linux x86_64 build without GPL libraries (`b432cd7`), with GMP 6.3.0, MPFR 4.2.2, LibPoly 0.2.1 and glibc 2.35-0ubuntu3.14 linked in | zip sha256 `61d13483…ec6d`, binary sha256 `d4c53436…2e5b` | the kept copy, release `cvc5-1.4.0` here; upstream `cvc5/cvc5` |
 | `ethos` 0.2.4 at 8dc85c4 | checker | The proof checker that accepts or refuses cvc5's CPC proofs: upstream's static Linux x86_64 build of the commit cvc5 1.4.0 names, with GMP 6.2.1 and glibc 2.35-0ubuntu3.14 linked in | zip sha256 `1582fd32…d8bc`, binary sha256 `97e95d36…6538` | the kept copy, release `cvc5-1.4.0` here; upstream `cvc5/ethos` |
 | CPC signature cvc5 1.4.0 | checker | The rules ethos checks a cvc5 proof against: `proofs/eo/cpc/` of cvc5's source at tag `cvc5-1.4.0`, 51 files, tree `633f74115700ad32` as TOPAK's proof-cert.sh computes it | cvc5's source archive sha256 `06c65b30…9113`, the tree `633f74115700ad32`, and each of its 51 files by sha256 | the kept copy, release `cvc5-1.4.0` here; upstream `cvc5/cvc5` |
@@ -197,7 +197,7 @@ using the local one.
 Every input is held to a digest or a date: the base by digest, the `apt` sources pointed at Ubuntu's snapshot for
 `APT_SNAPSHOT` and at nothing else, both downloads by sha256, and the `tlapm` binary and every file of its tarball
 by sha256. Upstream rebuilds the `1.6.0-pre` TLAPS tag under the same name, so the tarball is taken from the copy
-kept in this repository's release `tlapm-ff40755`, beside its licence notices and the source of its copyleft parts
+kept in this repository's release `tlapm-9a52faf`, beside its licence notices and the source of its copyleft parts
 (ADR-0005 item 2). A new prover build is a decision: a release of its own first, then a pull request that moves
 `TLAPM_SHA256` and `PINS.json` together. `cvc5`'s and `ethos`'s zips, and cvc5's source with the CPC signature, are
 taken the same way from the release `cvc5-1.4.0`, beside the source of the libraries linked into them, and the
@@ -332,7 +332,7 @@ the image's sets `TLAPM_UNPINNED=1`, as tla-kit's evidence workflow does.
 - **The TLAPS tarball's contents are redistributed** on the three conditions of `PLAN.md` D7
   ([`derived/tla-kit-licence-check-2026.11.15.md`](derived/tla-kit-licence-check-2026.11.15.md) §5):
   - the image carries the notices;
-  - the release [`tlapm-ff40755`](https://github.com/scottcochran/tla-kit/releases/tag/tlapm-ff40755) keeps the
+  - the release [`tlapm-9a52faf`](https://github.com/scottcochran/tla-kit/releases/tag/tlapm-9a52faf) keeps the
     tarball beside them, with the source of Poly/ML, GMP and `libsha1`;
   - the GMP release and `libsha1`'s licence are settled
     ([`derived/tla-kit-copyleft-sources-2026.11.16.md`](derived/tla-kit-copyleft-sources-2026.11.16.md)).

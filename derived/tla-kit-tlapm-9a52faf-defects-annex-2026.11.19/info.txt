@@ -1,0 +1,45 @@
+platform  Linux x86_64, Ubuntu 26.04.1 LTS
+user      uid 1000, gid 1000
+java      openjdk version "25.0.5" 2026-10-20 LTS
+python    Python 3.14.4
+checker   /opt/tla/tla2tools.jar sha256 936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
+tlc       TLC2 Version 2.19 of 08 August 2024 (rev: 5a47802)
+prover    /opt/tlaps/bin/tlapm sha256 faa92f2606242ce239584e665978f33c7378ba23991c6f318a74525dcb892cc0
+tlapm     9a52faf
+backend   Isabelle version == "Isabelle2025"
+backend   zenon version == "zenon version 0.8.4 [a268] 2017-11-14"
+backend   Z3 version == "Z3 version 4.8.9 - 64 bit"
+backend   SMT version == "Z3 version 4.8.9 - 64 bit"
+backend   LS4 version == "unknown"
+cvc5      /opt/cvc5/bin/cvc5 sha256 d4c534360e602f07adcbb2aafbe833e73ce1e7c6f2572cb7eee03de73d6e2e5b, cvc5 1.4.0 [git b432cd7 on branch HEAD]
+ethos     /opt/ethos/bin/ethos sha256 97e95d36dcb596e6439d935af68e9005a508620f667af546d92d6d3700f26538, 0.2.4
+cpc       /opt/cvc5/cpc, 51 files, tree 633f74115700ad32
+skill     /opt/tla-kit/skill, from https://github.com/scottcochran/TOPAK at 6a263109521306d09b93d2ecc33e17bc338aed7e
+package   git 1:2.53.0-1ubuntu1.1
+package   perl 5.40.1-7ubuntu0.4
+package   python3 3.14.3-0ubuntu2
+image     https://github.com/scottcochran/tla-kit at c92220b63fe3027003787a25b2b86f15fb586b3c, committed 2026-11-19T19:50:01Z
+build     base_image eclipse-temurin:25-jre-resolute@sha256:fa681c5833ecc085202c0923e909f9de888d80d22a7f38d6c51268ae5978c1d7
+build     apt_snapshot 20261119T000000Z
+build     tla2tools_version v1.7.4
+build     tla2tools_sha256 936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
+build     tlapm_tag 1.6.0-pre
+build     tlapm_tarball_sha256 d9c06a04eb6b1b4192d3e22d5378143d09c9801414b9ad7ff6e918d34093c1f0
+build     tlapm_binary_sha256 faa92f2606242ce239584e665978f33c7378ba23991c6f318a74525dcb892cc0
+build     cvc5_version 1.4.0
+build     cvc5_zip_sha256 61d13483ec9c4e8d05c7f3d532225255b2183a0c03b161d37d942d1ba089ec6d
+build     cvc5_binary_sha256 d4c534360e602f07adcbb2aafbe833e73ce1e7c6f2572cb7eee03de73d6e2e5b
+build     cvc5_src_sha256 06c65b30693d1abf7c1393b497c799950de2833457920b9433da8e418bce9113
+build     cvc5_cpc_tree 633f74115700ad32
+build     ethos_version 0.2.4
+build     ethos_zip_sha256 1582fd32d7ef8ae7b8d82b3da92fcc542939a4941402a9a71cf8b33a06a3d8bc
+build     ethos_binary_sha256 97e95d36dcb596e6439d935af68e9005a508620f667af546d92d6d3700f26538
+pin       checker  tla2tools.jar v1.7.4, from https://github.com/tlaplus/tlaplus/releases/download/v1.7.4/tla2tools.jar
+pin       checker  tlapm 1.6.0-pre at 9a52faf, from https://github.com/scottcochran/tla-kit/releases/download/tlapm-9a52faf/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz
+pin       checker  cvc5 1.4.0, from https://github.com/scottcochran/tla-kit/releases/download/cvc5-1.4.0/cvc5-Linux-x86_64-static.zip
+pin       checker  ethos 0.2.4 at 8dc85c4, from https://github.com/scottcochran/tla-kit/releases/download/cvc5-1.4.0/ethos-linux-x86_64.zip
+pin       checker  CPC signature cvc5 1.4.0, from https://github.com/scottcochran/tla-kit/releases/download/cvc5-1.4.0/cvc5-1.4.0-src.tar.gz
+pin       checker  Temurin JRE 25 (25.0.5+8 in the pinned base)
+pin       runtime  base, from docker.io/library/eclipse-temurin
+pin       runtime  apt, from https://snapshot.ubuntu.com/ubuntu/20261119T000000Z
+pin       method   writing-tla-specs-and-proofs scripts TOPAK 6a26310, from vendor/writing-tla-specs-and-proofs/ in this repository (ADR-0007)

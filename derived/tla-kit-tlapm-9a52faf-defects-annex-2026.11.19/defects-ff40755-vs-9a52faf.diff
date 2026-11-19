@@ -1,0 +1,10 @@
+2c2
+< Runner: defects-run.sh (sha256 76a60927940df503) · tlapm ff40755 (binary sha256 6182df63c4513b09) · zenon version 0.8.4 [a268] 2017-11-14 · Isabelle2025 · LS4 for PTL · proof-cert.sh (sha256 315fa3d07b7a42de) · TLC Version 2.19 of 08 August 2024 (jar sha256 936a262061c91469) · openjdk version "25.0.5" 2026-10-20 LTS
+---
+> Runner: defects-run.sh (sha256 52fc78580df3b7e4) · tlapm 9a52faf (binary sha256 faa92f2606242ce2) · zenon version 0.8.4 [a268] 2017-11-14 · Isabelle2025 · LS4 for PTL · proof-cert.sh (sha256 315fa3d07b7a42de) · TLC Version 2.19 of 08 August 2024 (jar sha256 936a262061c91469) · openjdk version "25.0.5" 2026-10-20 LTS
+67,68c67,68
+<   BadEventually (PROPERTY) · violated · 20473 distinct states found · expected violated · as §8 says
+<   BadLeadsTo (PROPERTY) · violated · 7422 distinct states found · expected violated · as §8 says
+---
+>   BadEventually (PROPERTY) · violated · 20929 distinct states found · expected violated · as §8 says
+>   BadLeadsTo (PROPERTY) · violated · 8456 distinct states found · expected violated · as §8 says

@@ -36,29 +36,29 @@
     {
       "tool": "tlapm",
       "kind": "checker",
-      "version": "1.6.0-pre at ff40755",
-      "describes": "The TLAPS proof manager, from the rolling `1.6.0-pre` tag as served on 2026.11.15, with its backends: Z3 4.8.9, Zenon 0.8.4 [a268], Isabelle2025 (Isabelle/TLA+ heap) on Poly/ML 5.9.1, LS4 1.0, and a second TLA+ tools jar (`d8fb231`) that `tlapm` uses",
+      "version": "1.6.0-pre at 9a52faf",
+      "describes": "The TLAPS proof manager, from the rolling `1.6.0-pre` tag as served on 2026.11.19, with its backends: Z3 4.8.9, Zenon 0.8.4 [a268], Isabelle2025 (Isabelle/TLA+ heap) on Poly/ML 5.9.1, LS4 1.0, and a second TLA+ tools jar (`bc1b506`) that `tlapm` uses",
       "set_by": {
         "TLAPM_TAG": "1.6.0-pre",
-        "TLAPM_SHA256": "99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc",
-        "TLAPM_BINARY_SHA256": "6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2",
-        "TLAPM_URL": "https://github.com/scottcochran/tla-kit/releases/download/tlapm-ff40755/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz"
+        "TLAPM_SHA256": "d9c06a04eb6b1b4192d3e22d5378143d09c9801414b9ad7ff6e918d34093c1f0",
+        "TLAPM_BINARY_SHA256": "faa92f2606242ce239584e665978f33c7378ba23991c6f318a74525dcb892cc0",
+        "TLAPM_URL": "https://github.com/scottcochran/tla-kit/releases/download/tlapm-9a52faf/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz"
       },
       "upstream": "https://github.com/tlaplus/tlapm/releases/download/1.6.0-pre/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz",
-      "kept_release": "tlapm-ff40755",
-      "kept_copy": "https://github.com/scottcochran/tla-kit/releases/download/tlapm-ff40755/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz",
-      "download_sha256": "99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc",
+      "kept_release": "tlapm-9a52faf",
+      "kept_copy": "https://github.com/scottcochran/tla-kit/releases/download/tlapm-9a52faf/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz",
+      "download_sha256": "d9c06a04eb6b1b4192d3e22d5378143d09c9801414b9ad7ff6e918d34093c1f0",
       "installed": {
-        "/opt/tlaps/bin/tlapm": "6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2",
-        "/opt/tlaps/bin/tlapm_lsp": "e9cd1355d5fac3ca364dfe60d88f7c2e8893d64dddde028917401581ce167b3d",
-        "/opt/tlaps/bin/translate": "fbcb8a422ed4a8d25f07700de7986c9b2748ff8812e4fafb6749232f0e49ba78",
+        "/opt/tlaps/bin/tlapm": "faa92f2606242ce239584e665978f33c7378ba23991c6f318a74525dcb892cc0",
+        "/opt/tlaps/bin/tlapm_lsp": "62667962d6ecccedebe089e2ebcf87fb3b83cf50c49ce46d617b819c44462de8",
+        "/opt/tlaps/bin/translate": "f1b3ee27e5330a999c3d9122083df875839b4d31972e977862422ead4b23063c",
         "/opt/tlaps/doc/tlapm/LICENSE": "a6e4dd639b035596eed1764b6f6f33a610f1d449f5cb632138b9fde65d5e8826",
         "/opt/tlaps/doc/tlapm/README.md": "162516f628fe3e86415bbe5bf11076d128c874e0f1ae337aff6418ed1c6c68a5",
         "/opt/tlaps/lib/tlapm/META": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/etc/ISABELLE_IDENTIFIER": "3eab10280f4cf63dbca888a7de0715eba22b92194503faf1b595614631cb25a7",
-        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/Options": "ebce30a88ab80db137f539487e83a623ad1aa63abf38e16a588ad5f86300cc56",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/Options": "8e812d72ac526d8cd0e37d95ca59bcd3dfc77746b894387b420d3d0ef3a2185b",
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/Pure": "98e7fc218afb4c3047b8c8f66b77ceded884ed1c87b1110df4729e0c84b6e1cf",
-        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/TLA+": "2aa02e2d4caede91c917eb4828825b722641fc4cc32b96762b6afba42c10173d",
+        "/opt/tlaps/lib/tlapm/backends/Isabelle-install/heaps/TLA+": "889062ad19396509e6cb8fccf18736d8fa9537de6e62d442d12d51eaa4bbf1be",
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libgmp.so.10": "0afb61ed94ddc86f27874cf86f2c93a782fef1890bc62e6f5f5bb9581e3c72ad",
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libpolymain.a": "5066933ee4cd222f6ec9d916aac87f0c124a8e9687db451faf4305a4b926eaf4",
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/libpolymain.la": "a223924a5516f6c07070130e749b6e233d254563e7117815cdcf245a7526e272",
@@ -70,12 +70,12 @@
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/polyc": "4d173c9f21d33a3affa1dcca7c4977c7a78132c3a31426aa10f4a8708f5f37e1",
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/polyimport": "8446955386acd3b0849cd3ee74b035c50b724be24593917d9b23752c9b98a239",
         "/opt/tlaps/lib/tlapm/backends/Isabelle-install/poly/polyml/modules/IntInfAsInt": "1e54fdbc2869ffe8bc16f67feccb56d3b7df44330607bce12f5e445f2c99a205",
-        "/opt/tlaps/lib/tlapm/backends/bin/ls4": "77c2ef25a03645f0a1b8f2286dc3fe9dc7ad777134086898803e12e0046e0f6c",
-        "/opt/tlaps/lib/tlapm/backends/bin/ptl_to_trp": "fbcb8a422ed4a8d25f07700de7986c9b2748ff8812e4fafb6749232f0e49ba78",
-        "/opt/tlaps/lib/tlapm/backends/bin/tla2tools.jar": "e1f11b75c4b5bc4478ba0ac5cb6ae28e40a01b0016bc33e0aa97da22dfdbcd7f",
+        "/opt/tlaps/lib/tlapm/backends/bin/ls4": "7f9d2f543a419eec6dcc4fe34d36eac9174c214e91d9415285f571e8a6fa1f47",
+        "/opt/tlaps/lib/tlapm/backends/bin/ptl_to_trp": "f1b3ee27e5330a999c3d9122083df875839b4d31972e977862422ead4b23063c",
+        "/opt/tlaps/lib/tlapm/backends/bin/tla2tools.jar": "7e53aa636dac8a3cb0533f343115c0548e03fc0ce5edc7739becf58d3d0fb84f",
         "/opt/tlaps/lib/tlapm/backends/bin/z3": "4321b0c0db1574a1e90881d9e097f12b8753d0c3e78b21a0155c77005a631436",
-        "/opt/tlaps/lib/tlapm/backends/bin/zenon": "2aa214cb532c9e1b834ad9152ab33fcd6ff54614f1a6543893ff97655ff43096",
-        "/opt/tlaps/lib/tlapm/dune-package": "36bbd06d6fe4b6c7e1852a46de7466d39943b00f5d5fdb9e5a7ca314b4ae2bd6",
+        "/opt/tlaps/lib/tlapm/backends/bin/zenon": "3673300ace809a4d5b57a4027ffa7dbe29a67d86d121bd738e86ff4739605791",
+        "/opt/tlaps/lib/tlapm/dune-package": "d97cb20debb64ddfbf8cdd67d495b844c66193a9282497626fc2eb8b1c633a18",
         "/opt/tlaps/lib/tlapm/emacs/tla-mode/tla-mode.el": "7b5c611bff443174bb22cd27ee4f1cd3e537a42bbd4bbb6e487db4f3b74079db",
         "/opt/tlaps/lib/tlapm/opam": "d615d2c37af027f59c2d816a7ea2d2647474d63decfcd19e2e90a09a7c428b00",
         "/opt/tlaps/lib/tlapm/stdlib/Bags.tla": "b655ca5e4866f2c81caa43b18a02d0eaa3517784ebc0025259ae4901fd40b814",
@@ -98,19 +98,14 @@
         "/opt/tlaps/lib/tlapm/stdlib/WellFoundedInduction_proofs.tla": "f3af7b047663143f50d33c2587ca96cfeb27d47a80f365701cc0f1f7f569584c"
       },
       "pinned": {
-        "date": "2026.11.15",
-        "by": "commit 770daf2"
+        "date": "2026.11.19",
+        "by": "pull request #34"
       },
       "served": [
         {
-          "from": "2026.11.15",
-          "sha256": "99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc",
+          "from": "2026.11.19",
+          "sha256": "d9c06a04eb6b1b4192d3e22d5378143d09c9801414b9ad7ff6e918d34093c1f0",
           "upstream": true
-        },
-        {
-          "from": "2026.11.16",
-          "sha256": "99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc",
-          "upstream": false
         }
       ]
     },

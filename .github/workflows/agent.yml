@@ -31,6 +31,12 @@ env:
   CLAUDE_CODE_VERSION: 2.1.312
   CLAUDE_CODE_INTEGRITY: sha512-/gx8byG8VOm4YoNuT5tal/Ov5Z5oydJzZkmHCJcBFLbNGGpyYDbKA/CNdB+iIKwcLQC8pVwBoj6Dt7H3L2J5bw==
 
+# Every run step is bash -eo pipefail. GitHub's default shell, bash -e, has no pipefail, so a step such as
+# `cmd | tee file` passed when cmd failed.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   repair:
     runs-on: ubuntu-24.04

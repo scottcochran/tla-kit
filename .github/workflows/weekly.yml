@@ -12,6 +12,12 @@ permissions:
   contents: read
   issues: write
 
+# Every run step is bash -eo pipefail. GitHub's default shell, bash -e, has no pipefail, so a step such as
+# `cmd | tee file` passed when cmd failed.
+defaults:
+  run:
+    shell: bash
+
 jobs:
   check:
     runs-on: ubuntu-24.04

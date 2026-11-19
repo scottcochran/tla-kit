@@ -1,11 +1,78 @@
 # tla-kit
 
-One container image of the TLA+ tool family, so that the checker and the prover are the same build on a
-laptop and in CI, and an MCP server over those tools to pair with the
-[`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
-skill.
+TLA+ is a language for describing how a system is meant to behave, and its tools check the description. TLC tries
+every state of a small model, and shows the steps that lead to any state that breaks a property. TLAPS checks a
+written proof that the property holds at every size. tla-kit is those tools in one container image, with an MCP
+server over them, so that an agent such as Claude Code can check a specification, read a counterexample and repair
+a proof by calling tools. The machine needs Docker and nothing else: no Java, no prover, no solvers.
 
-**Status: Phases 1, 3, 4 and 5 of [PLAN.md](PLAN.md) are done, and so is Phase 6's cvc5 and ethos.** The latest
+The image is the same build on a laptop and in CI, and every tool in it is held to a digest, so a result can name
+exactly what checked it. The server pairs with the
+[`writing-tla-specs-and-proofs`](https://github.com/scottcochran/TOPAK/tree/main/skills/writing-tla-specs-and-proofs)
+skill, which gives the agent the method.
+
+## Use it with Claude Code
+
+The image is `linux/amd64` and a little under 1 GB. On Apple Silicon it runs under emulation ([Limits](#limits)).
+Pull it first, so that a session's first start does not wait for the download:
+
+```sh
+image=ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f
+docker pull "$image"
+```
+
+**The server alone.** In the root of the project that holds the specifications:
+
+```sh
+claude mcp add tla-kit -- docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" "$image" tla-kit mcp
+```
+
+A session started there has the [fourteen tools](#the-mcp-server-phases-3-and-4) as `mcp__tla-kit__<tool>`. The
+server sees that directory, mounted as the project, and refuses a path outside it. `claude mcp get tla-kit` says
+whether it connected, and `claude mcp remove tla-kit -s local` takes it out again.
+
+**The server with the skill.** The plugin is in TOPAK's repository and no marketplace lists it yet, so a session
+loads it from a checkout:
+
+```sh
+git clone https://github.com/scottcochran/TOPAK
+claude --plugin-dir TOPAK/skills/writing-tla-specs-and-proofs
+```
+
+This needs no `claude mcp add`: the plugin's `.mcp.json` names the image by digest and mounts the repository's
+root. It needs a POSIX shell beside Docker, and the tools are then
+`mcp__plugin_writing-tla-specs-and-proofs_tla-kit__<tool>` ([Phase 5](#an-agent-with-the-skills-plugin-phase-5)).
+
+**Another MCP client** starts the server with the `docker run` command under
+[The MCP server](#the-mcp-server-phases-3-and-4).
+
+### Try it: a broken proof to repair
+
+`examples/agent-repair/make-project.sh` makes a small project: the specification of a counter and its proof, with
+one step of the proof broken. With `image` set as above:
+
+```sh
+git clone https://github.com/scottcochran/tla-kit
+tla-kit/examples/agent-repair/make-project.sh /tmp/counter
+cd /tmp/counter
+claude mcp add tla-kit -- docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" "$image" tla-kit mcp
+claude
+```
+
+Then ask:
+
+> spec/Counter_proof.tla no longer checks: one step of it was deliberately broken. Find the failing step with the
+> tla-kit tools and repair it, changing only proofs.
+
+`prove` on the module reports that 1 of its 18 obligations failed, at line 15, with the obligation's text and why
+each backend failed. The agent reads the two modules, changes that one line, and `prove` then reports all 19
+obligations of the repaired module proved. One such session, on Linux x86_64, took 23 seconds. The record of the
+first, with its transcript, is
+[`derived/tla-kit-phase4-checks-2026.11.17.md`](derived/tla-kit-phase4-checks-2026.11.17.md).
+
+## Status
+
+**Phases 1, 3, 4 and 5 of [PLAN.md](PLAN.md) are done, and so is Phase 6's cvc5 and ethos.** The latest
 release, [`v0.4.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.4.0), is published and attested:
 
 ```

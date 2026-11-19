@@ -43,8 +43,7 @@ This needs no `claude mcp add`: the plugin's `.mcp.json` names the image by dige
 root. It needs a POSIX shell beside Docker, and the tools are then
 `mcp__plugin_writing-tla-specs-and-proofs_tla-kit__<tool>` ([Phase 5](#an-agent-with-the-skills-plugin-phase-5)).
 
-**Another MCP client** starts the server with the `docker run` command under
-[The MCP server](#the-mcp-server-phases-3-and-4).
+**Another MCP client** takes the entry under [Use it with another MCP client](#use-it-with-another-mcp-client).
 
 ### Try it: a broken proof to repair
 
@@ -69,6 +68,34 @@ each backend failed. The agent reads the two modules, changes that one line, and
 obligations of the repaired module proved. One such session, on Linux x86_64, took 23 seconds. The record of the
 first, with its transcript, is
 [`derived/tla-kit-phase4-checks-2026.11.17.md`](derived/tla-kit-phase4-checks-2026.11.17.md).
+
+## Use it with another MCP client
+
+A client configured by an `mcpServers` block, as Claude Desktop and Cursor are, takes this entry. Such a file has
+no `$PWD`, so the project is named by its absolute path, and the server serves that one project:
+
+```json
+{
+  "mcpServers": {
+    "tla-kit": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm", "-v", "/absolute/path/to/project:/work",
+        "ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f",
+        "tla-kit", "mcp"
+      ]
+    }
+  }
+}
+```
+
+The entry has no `--user`, so the server runs as the image's uid, 1000. Docker Desktop on macOS maps ownership
+itself. On Linux, in a project owned by another uid, the tools that read still answer, `prove` among them, and the
+two that write a results file, `tlc_rows` and `proof_results`, are refused by the file system. For those, add
+`"--user", "UID:GID"` after `"--rm"`, with the numbers `id -u` and `id -g` print.
+
+The server started from this entry's command and arguments answers as it does from the commands above. The entry
+has not been tried in those two clients.
 
 ## Status
 
@@ -209,6 +236,7 @@ npx @modelcontextprotocol/inspector@2.13.0 docker -- run -i --rm --user "$(id -u
   ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f tla-kit mcp
 ```
 
+The page shows the server disconnected. Its switch starts the container, and the Tools tab then lists the tools.
 With `--cli --method tools/list` before `docker`, it lists the tools in the terminal instead.
 
 | Tool | Does |

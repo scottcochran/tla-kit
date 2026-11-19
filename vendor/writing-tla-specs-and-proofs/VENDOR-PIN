@@ -4,9 +4,9 @@
 # sha256, and with --upstream, with the file at `commit`. The files keep the licence they have in TOPAK:
 # Apache-2.0 for the scripts, the pin and the fixture (ADR-0011 item 5).
 source https://github.com/scottcochran/TOPAK
-commit 5ade81efcc50bd9dd4de555b208dc890d5746606
+commit 6a263109521306d09b93d2ecc33e17bc338aed7e
 path skills/writing-tla-specs-and-proofs/skills/writing-tla-specs-and-proofs
-vendored 2026.11.16
+vendored 2026.11.19
 file 58241a27802a605c4d577ec3ac8e3ee54eb6444e2a861f12d91a96783d3bfa71 assets/selftest/Counter-rows.txt
 file e5a36d0a90b25a32b3ee76d611a7ded205963b4d8f239460255ca455e69951f6 assets/selftest/Counter.tla
 file 23ba386ed31797d4cdda0af6e05bec25ad27f1d5b296e3b7e60ad19906bd5f75 assets/selftest/Counter_proof.tla
@@ -15,6 +15,6 @@ file 513b6fb15802ccc250e07f7660c23352cfb9453e5a982a36381e01c6a7fe5bb8 scripts/fl
 file 964a189c3eb87d1c8d407936d98f14e029da08a2f07fe34ec9db19006c62bcac scripts/proof_results.py
 file 461b422a2a4759590a0c753e973f926843a1a0228afe90da371756e71625da7e scripts/proof_sync.py
 file 837a0b56b1881bfe9cdcc542179cc0b012ea5bcd9a949c9354945e9ddd4f6151 scripts/setup_check.py
-file 371021a00612ef089c5ca870b43c856189cd923dd1785f56ceacd965f2651e7a scripts/tla_common.py
+file 140e05ddaf976adef91bb40f6ba8ca224d60db5434101b32bc7b798e203aedc8 scripts/tla_common.py
 file 116ecad1b9a6ff885a1727fc19e86aa06bfdcc9a6d2026189c7e588bdbd507cc scripts/tlc_rows.py
 file d06a7206cb86d0b03d8b6dd3ea079bb503eea52f00e5560a17c5ca76424f60d6 scripts/tlc_run.py

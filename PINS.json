@@ -324,16 +324,16 @@
     {
       "tool": "writing-tla-specs-and-proofs scripts",
       "kind": "method",
-      "version": "TOPAK 5ade81e",
+      "version": "TOPAK 6a26310",
       "describes": "The skill's `scripts/` and `assets/selftest/`",
       "set_by": {},
       "vendor_pin": "vendor/writing-tla-specs-and-proofs/VENDOR-PIN",
-      "upstream": "https://github.com/scottcochran/TOPAK/tree/5ade81efcc50bd9dd4de555b208dc890d5746606/skills/writing-tla-specs-and-proofs/skills/writing-tla-specs-and-proofs",
+      "upstream": "https://github.com/scottcochran/TOPAK/tree/6a263109521306d09b93d2ecc33e17bc338aed7e/skills/writing-tla-specs-and-proofs/skills/writing-tla-specs-and-proofs",
       "kept_copy": "vendor/writing-tla-specs-and-proofs/ in this repository (ADR-0007)",
       "installed": "each file's sha256 is in the VENDOR-PIN, which the image carries at /opt/tla-kit/skill/VENDOR-PIN",
       "pinned": {
-        "date": "2026.11.16",
-        "by": "pull request #7"
+        "date": "2026.11.19",
+        "by": "pull request #32"
       }
     }
   ]

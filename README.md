@@ -17,7 +17,7 @@ The image is `linux/amd64` and a little under 1 GB. On Apple Silicon it runs und
 Pull it first, so that a session's first start does not wait for the download:
 
 ```sh
-image=ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f
+image=ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f
 docker pull "$image"
 ```
 
@@ -81,7 +81,7 @@ no `$PWD`, so the project is named by its absolute path, and the server serves t
       "command": "docker",
       "args": [
         "run", "-i", "--rm", "-v", "/absolute/path/to/project:/work",
-        "ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f",
+        "ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f",
         "tla-kit", "mcp"
       ]
     }
@@ -100,18 +100,21 @@ has not been tried in those two clients.
 ## Status
 
 **Phases 1, 3, 4 and 5 of [PLAN.md](PLAN.md) are done, and so is Phase 6's cvc5 and ethos.** The latest
-release, [`v0.4.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.4.0), is published and attested:
+release, [`v0.5.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.5.0), is published and attested:
 
 ```
-ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f
+ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f
 ```
 
-It adds `cvc5` and `ethos`, for certified proofs, to
+It moves the vendored scripts to TOPAK `6a26310`, whose results-file writers say in one line why a file could not
+be written, in place of a traceback. It changes nothing else in
+[`v0.4.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.4.0) (`sha256:6c27b7a0…8f2f`), which added
+`cvc5` and `ethos`, for certified proofs, to
 [`v0.3.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.3.0) (`sha256:948e6d1f…257f`). That release
 added the server's proof tools to [`v0.2.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.2.0)
 (`sha256:5554015f…1e5d`), which added the server to the first release,
-[`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0) (`sha256:454328cd…50c6`). None moved an
-existing pin: TLC, the prover and the runtime are the same bytes in all four.
+[`v0.1.0`](https://github.com/scottcochran/tla-kit/releases/tag/v0.1.0) (`sha256:454328cd…50c6`). None moved a
+checker or runtime pin: TLC, the prover and the runtime are the same bytes in all five.
 
 - **How it is built:** from a base pinned by digest, packages pinned by date, and the prover's tarball and
   `cvc5`'s and `ethos`'s builds, kept in this repository's releases. Every build of one commit gives one digest.
@@ -168,8 +171,8 @@ listed in [`licenses/THIRD-PARTY.md`](licenses/THIRD-PARTY.md), which the image 
 A project cites the published image by its digest. The tag names the same image, for reading:
 
 ```sh
-docker pull ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f
-gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f --repo scottcochran/tla-kit
+docker pull ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f
+gh attestation verify oci://ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f --repo scottcochran/tla-kit
 ```
 
 To build it here:
@@ -224,7 +227,7 @@ library only (ADR-0008). A client starts it in the image with the project mounte
 
 ```sh
 docker run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
-  ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f tla-kit mcp
+  ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f tla-kit mcp
 ```
 
 To try the tools by hand, the [MCP Inspector](https://github.com/modelcontextprotocol/inspector) starts the same
@@ -233,7 +236,7 @@ command and opens a web page that lists them and calls each one. It needs Node `
 
 ```sh
 npx @modelcontextprotocol/inspector@2.13.0 docker -- run -i --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" \
-  ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f tla-kit mcp
+  ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f tla-kit mcp
 ```
 
 The page shows the server disconnected. Its switch starts the container, and the Tools tab then lists the tools.
@@ -305,7 +308,7 @@ A certified run counts an obligation proved by SMT only when `ethos` accepts the
 
 ```sh
 docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" -w /work/spec \
-  ghcr.io/scottcochran/tla-kit@sha256:6c27b7a007d723b55c126eedd4a6f295ecefdfb98a1c27c34580eaab862b8f2f \
+  ghcr.io/scottcochran/tla-kit@sha256:5ee10d3e9b761f91020be2c6b11a16a459966a9a4cf5a105c964ae31a49ab59f \
   ./proof-cert.sh Alone_proof
 ```
 

@@ -259,7 +259,7 @@
       "version": "25 (25.0.5+8 in the pinned base)",
       "describes": "The Java runtime TLC runs on: Temurin 25.0.5+8",
       "set_by": {
-        "BASE_IMAGE": "eclipse-temurin:25-jre-noble@sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5"
+        "BASE_IMAGE": "eclipse-temurin:25-jre-resolute@sha256:fa681c5833ecc085202c0923e909f9de888d80d22a7f38d6c51268ae5978c1d7"
       },
       "note": "The major version is the base image's tag. A move of the major is a checker move; a patch release that comes with a base refresh is a runtime move (ADR-0013 item 1).",
       "pinned": {
@@ -270,26 +270,26 @@
     {
       "tool": "base",
       "kind": "runtime",
-      "describes": "Ubuntu 24.04.5 with Temurin JRE 25 (amd64)",
+      "describes": "Ubuntu 26.04.1 with Temurin JRE 25 (amd64)",
       "set_by": {
-        "BASE_IMAGE": "eclipse-temurin:25-jre-noble@sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5"
+        "BASE_IMAGE": "eclipse-temurin:25-jre-resolute@sha256:fa681c5833ecc085202c0923e909f9de888d80d22a7f38d6c51268ae5978c1d7"
       },
       "upstream": "docker.io/library/eclipse-temurin",
       "kept_copy": null,
       "resolved": {
-        "tag": "eclipse-temurin:25-jre-noble",
-        "digest": "sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5",
+        "tag": "eclipse-temurin:25-jre-resolute",
+        "digest": "sha256:fa681c5833ecc085202c0923e909f9de888d80d22a7f38d6c51268ae5978c1d7",
         "platform": "linux/amd64",
-        "date": "2026.11.15"
+        "date": "2026.11.19"
       },
       "pinned": {
-        "date": "2026.11.15",
-        "by": "pull request #4 (8b01d1c)"
+        "date": "2026.11.19",
+        "by": "pull request #36"
       },
       "served": [
         {
-          "from": "2026.11.15",
-          "sha256": "5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5",
+          "from": "2026.11.19",
+          "sha256": "fa681c5833ecc085202c0923e909f9de888d80d22a7f38d6c51268ae5978c1d7",
           "upstream": true
         }
       ]
@@ -297,26 +297,26 @@
     {
       "tool": "apt",
       "kind": "runtime",
-      "describes": "Python 3.12.3, perl 5.38.2 (`shasum`), git 2.43.0, from Ubuntu's snapshot of 2026-11-15T00:00:00Z",
+      "describes": "Python 3.14.4, perl 5.40.1 (`shasum`), git 2.53.0, from Ubuntu's snapshot of 2026-11-19T00:00:00Z",
       "set_by": {
-        "APT_SNAPSHOT": "20261115T000000Z"
+        "APT_SNAPSHOT": "20261119T000000Z"
       },
-      "upstream": "https://snapshot.ubuntu.com/ubuntu/20261115T000000Z",
+      "upstream": "https://snapshot.ubuntu.com/ubuntu/20261119T000000Z",
       "kept_copy": null,
       "packages": {
-        "git": "1:2.43.0-1ubuntu7.4",
-        "perl": "5.38.2-3.2ubuntu0.7",
-        "python3": "3.12.3-0ubuntu2.1"
+        "git": "1:2.53.0-1ubuntu1.1",
+        "perl": "5.40.1-7ubuntu0.4",
+        "python3": "3.14.3-0ubuntu2"
       },
       "note": "Moves with the base, as one runtime refresh (ADR-0013 item 2). A snapshot has no single digest, so its served log names it by its date.",
       "pinned": {
-        "date": "2026.11.15",
-        "by": "pull request #4 (8b01d1c)"
+        "date": "2026.11.19",
+        "by": "pull request #36"
       },
       "served": [
         {
-          "from": "2026.11.15",
-          "snapshot": "20261115T000000Z",
+          "from": "2026.11.19",
+          "snapshot": "20261119T000000Z",
           "upstream": true
         }
       ]

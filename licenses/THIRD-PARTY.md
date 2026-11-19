@@ -15,7 +15,7 @@ each jar it names holds a `License.txt`.
 
 | Part | Version | Licence | Licence text in the image | Source |
 |---|---|---|---|---|
-| Ubuntu 24.04 base, and the packages the image adds (`python3`, `perl`, `git` and what they depend on) | Ubuntu 24.04.5 LTS; packages from Ubuntu's archive as of 2026-11-15T00:00:00Z | Each package's own; the copyleft ones include GPL-2.0 (`git`), GPL-1.0+ or Artistic (`perl`) | `/usr/share/doc` (one `copyright` file per package) and `/usr/share/common-licenses` | Ubuntu's source packages, at `https://snapshot.ubuntu.com/ubuntu/20261115T000000Z` for the added packages; the base layers are `ubuntu:24.04` as the Temurin image records it (`sha256:77eb101c…57ec`) |
+| Ubuntu 26.04 base, and the packages the image adds (`python3`, `perl`, `git` and what they depend on) | Ubuntu 26.04.1 LTS; packages from Ubuntu's archive as of 2026-11-19T00:00:00Z | Each package's own; the copyleft ones include GPL-2.0 (`git`), GPL-1.0+ or Artistic (`perl`) | `/usr/share/doc` (one `copyright` file per package) and `/usr/share/common-licenses` | Ubuntu's source packages, at `https://snapshot.ubuntu.com/ubuntu/20261119T000000Z` for the added packages; the base layers are `ubuntu:26.04` as the Temurin image records it (`sha256:0d5255be…63c6`) |
 | Eclipse Temurin JRE | 25.0.5+8 | GPL-2.0 with the Classpath Exception, and the notices of its own third-party parts | `/opt/java/openjdk/legal` | `https://github.com/adoptium/jdk25u`, at `7ec19fb1eda7` |
 
 ## The TLA+ tools

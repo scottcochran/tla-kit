@@ -17,13 +17,14 @@
 # Linux x86_64 only (ADR-0003): upstream publishes no Linux arm64 build of tlapm. The platform is fixed in the
 # FROM lines, so a plain `docker build .` on an arm64 machine builds the x86_64 image, to run under emulation.
 
-# tlapm is built against glibc 2.38, so the base has to be Ubuntu 24.04 or newer (Debian 12 is too old).
-# The tag is kept beside the digest to say what the digest was resolved from (2026.11.15); Docker uses the digest.
-ARG BASE_IMAGE=eclipse-temurin:25-jre-noble@sha256:5b5a79b85aeb03a859d4b5196482a08d39ec2714102aecae2c66223323bdf2e5
+# tlapm needs glibc 2.38 at ff40755 and 2.42 at 9a52faf, so the base is Ubuntu 26.04, with glibc 2.43 (Ubuntu 24.04
+# has 2.39). The tag is kept beside the digest to say what the digest was resolved from (2026.11.19); Docker uses
+# the digest.
+ARG BASE_IMAGE=eclipse-temurin:25-jre-resolute@sha256:fa681c5833ecc085202c0923e909f9de888d80d22a7f38d6c51268ae5978c1d7
 
 # The TLAPS tarball, from the kept copy. CI downloads it with `gh` and passes it as the build context
 # `tlapm-tarball` instead, so that a missing release fails with a message that says so;
-# the fetch stage below checks its sha256 either way.
+# the install step below checks its sha256 either way.
 FROM scratch AS tlapm-tarball
 ARG TLAPM_SHA256=99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc
 ARG TLAPM_URL=https://github.com/scottcochran/tla-kit/releases/download/tlapm-ff40755/tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz
@@ -45,18 +46,12 @@ ADD --checksum=sha256:${ETHOS_ZIP_SHA256} ${CVC5_KEPT}/ethos-linux-x86_64.zip /e
 FROM --platform=linux/amd64 ${BASE_IMAGE} AS fetch
 ARG TLA2TOOLS_VERSION=v1.7.4
 ARG TLA2TOOLS_SHA256=936a262061c914694dfd669a543be24573c45d5aa0ff20a8b96b23d01e050e88
-ARG TLAPM_SHA256=99db29f119cb6f43ffed653b212ba2d005e5bf8e242c53468876cb0d08da6bcc
-ARG TLAPM_BINARY_SHA256=6182df63c4513b09c31c8de12c37f8045ace9cab2517c017a2fa75f466685bb2
 ADD --checksum=sha256:${TLA2TOOLS_SHA256} \
     https://github.com/tlaplus/tlaplus/releases/download/${TLA2TOOLS_VERSION}/tla2tools.jar \
     /fetch/tla2tools.jar
-COPY --from=tlapm-tarball /tlapm.tar.gz /fetch/tlapm.tar.gz
 # ADD from a URL makes the file readable by root only; the image runs as tla. Its time comes from the server's
 # Last-Modified header, so it is set to a fixed one.
-RUN echo "${TLAPM_SHA256}  /fetch/tlapm.tar.gz" | sha256sum -c - \
- && chmod 0644 /fetch/tla2tools.jar && touch -d 2000-01-01T00:00:00Z /fetch/tla2tools.jar \
- && mkdir /fetch/tlaps && tar -xzf /fetch/tlapm.tar.gz -C /fetch/tlaps --strip-components=1 \
- && echo "${TLAPM_BINARY_SHA256}  /fetch/tlaps/bin/tlapm" | sha256sum -c -
+RUN chmod 0644 /fetch/tla2tools.jar && touch -d 2000-01-01T00:00:00Z /fetch/tla2tools.jar
 
 FROM --platform=linux/amd64 ${BASE_IMAGE}
 ARG BASE_IMAGE
@@ -80,7 +75,7 @@ ARG TLA_KIT_CREATED=
 # pointed at snapshot.ubuntu.com for that moment and at nothing else, and the build fails if any other source is
 # left (apt's own --snapshot also fetches the live archive's indices). Moving the date is a runtime refresh,
 # together with the base (ADR-0013 item 2).
-ARG APT_SNAPSHOT=20261115T000000Z
+ARG APT_SNAPSHOT=20261119T000000Z
 # python3: the skill's scripts (standard library only). perl: shasum, which project scripts call. git:
 # project-root detection and CI planning scripts. Their installed versions are recorded in /opt/tla-kit/packages.
 # apt's and dpkg's logs and caches, which hold the day of the build, are removed.
@@ -105,14 +100,22 @@ RUN userdel --remove ubuntu 2>/dev/null || true \
  && sed -i -E 's/^(tla:[^:]*:)[0-9]*:/\1:/' /etc/shadow \
  && rm -f /etc/shadow- /etc/gshadow- /etc/passwd- /etc/group- /etc/subuid- /etc/subgid-
 COPY --from=fetch /fetch/tla2tools.jar /opt/tla/tla2tools.jar
-COPY --from=fetch /fetch/tlaps /opt/tlaps
+# The archives below are extracted with Python's tarfile, not GNU tar. Ubuntu 26.04's tar opens files with openat2,
+# which Docker Desktop's amd64 emulation on Apple Silicon does not implement, and a plain `docker build .` there has
+# to work (ADR-0003 item 3). The `data` filter leaves files owned by root, as tar's --no-same-owner and COPY did,
+# and keeps the archive's modes and times. The tarball is mounted, not copied, so no layer holds it.
+RUN --mount=type=bind,from=tlapm-tarball,source=/tlapm.tar.gz,target=/kept/tlapm.tar.gz \
+    echo "${TLAPM_SHA256}  /kept/tlapm.tar.gz" | sha256sum -c - \
+ && python3 -m tarfile --filter data -e /kept/tlapm.tar.gz /tmp/tlaps \
+ && mv /tmp/tlaps/tlapm /opt/tlaps && rmdir /tmp/tlaps \
+ && echo "${TLAPM_BINARY_SHA256}  /opt/tlaps/bin/tlapm" | sha256sum -c -
 # cvc5 and ethos, upstream's static builds, and cvc5's CPC signature from its source (ADR-0012 item 8): each archive
 # checked by sha256, each binary by its own, and the signature by the tree digest TOPAK's proof-cert.sh prints over
 # its .eo files. The archives are mounted, not copied, so no layer holds them. Their times are fixed.
 RUN --mount=type=bind,from=kept-cvc5,target=/kept \
     printf '%s  %s\n' "${CVC5_ZIP_SHA256}" /kept/cvc5.zip "${CVC5_SRC_SHA256}" /kept/cvc5-src.tar.gz \
       "${ETHOS_ZIP_SHA256}" /kept/ethos.zip | sha256sum -c - \
- && mkdir -p /opt/cvc5/bin /opt/cvc5/cpc /opt/ethos/bin \
+ && mkdir -p /opt/cvc5/bin /opt/ethos/bin \
  && python3 -c 'import sys, zipfile; open(sys.argv[3], "wb").write(zipfile.ZipFile(sys.argv[1]).read(sys.argv[2]))' \
       /kept/cvc5.zip cvc5-Linux-x86_64-static/bin/cvc5 /opt/cvc5/bin/cvc5 \
  && python3 -c 'import sys, zipfile; open(sys.argv[3], "wb").write(zipfile.ZipFile(sys.argv[1]).read(sys.argv[2]))' \
@@ -120,8 +123,8 @@ RUN --mount=type=bind,from=kept-cvc5,target=/kept \
  && chmod 0755 /opt/cvc5/bin/cvc5 /opt/ethos/bin/ethos \
  && printf '%s  %s\n' "${CVC5_BINARY_SHA256}" /opt/cvc5/bin/cvc5 "${ETHOS_BINARY_SHA256}" /opt/ethos/bin/ethos \
       | sha256sum -c - \
- && tar -xzf /kept/cvc5-src.tar.gz -C /opt/cvc5/cpc --strip-components=4 --no-same-owner \
-      "cvc5-cvc5-${CVC5_VERSION}/proofs/eo/cpc" \
+ && python3 -m tarfile --filter data -e /kept/cvc5-src.tar.gz /tmp/cvc5-src \
+ && mv "/tmp/cvc5-src/cvc5-cvc5-${CVC5_VERSION}/proofs/eo/cpc" /opt/cvc5/cpc && rm -rf /tmp/cvc5-src \
  && tree=$(cd /opt/cvc5/cpc && find . -type f -name '*.eo' | LC_ALL=C sort | xargs sha256sum | sha256sum | cut -c1-16) \
  && { [ "$tree" = "${CVC5_CPC_TREE}" ] || { echo "the CPC signature's tree is $tree, not ${CVC5_CPC_TREE}"; exit 1; }; } \
  && find /opt/cvc5 /opt/ethos -exec touch -h -d 2000-01-01T00:00:00Z {} +
@@ -149,7 +152,7 @@ RUN printf '%s %s\n' \
       > /opt/tla-kit/build-args
 # The image says where and from which commit it was built, and when that commit was made: not when it was built,
 # and not under which version tag, which would make the digest depend on the tag (ADR-0014 item 8). The base's
-# version label is Ubuntu's (24.04), so it is emptied rather than left to read as tla-kit's.
+# version label is Ubuntu's (26.04), so it is emptied rather than left to read as tla-kit's.
 LABEL org.opencontainers.image.source="https://github.com/scottcochran/tla-kit" \
       org.opencontainers.image.revision="${TLA_KIT_REVISION}" \
       org.opencontainers.image.created="${TLA_KIT_CREATED}" \

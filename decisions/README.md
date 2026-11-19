@@ -17,7 +17,7 @@ state is in its History rows, and the State column below follows them.
 |---|---|---|---|---|
 | [ADR-0001](ADR-0001.md) | One image of the TLA+ tool family, cited by digest, with two ways in | Custodian (the idea); assistant (the form) | Built in part | Accepted · 2026.11.15 |
 | [ADR-0002](ADR-0002.md) | Every tool is held to a digest, and every result names the image's digest | Assistant | Built in part | Accepted · 2026.11.15 |
-| [ADR-0003](ADR-0003.md) | The base is Ubuntu 24.04 with Temurin JRE 25, on Linux x86_64 only | Assistant (forced by glibc) | Built | Accepted · 2026.11.15 |
+| [ADR-0003](ADR-0003.md) | The base is Ubuntu 26.04 with Temurin JRE 25, on Linux x86_64 only | Assistant (forced by glibc) | Built | Accepted · 2026.11.15 |
 | [ADR-0004](ADR-0004.md) | The image speaks through the variables the projects already read | Assistant | Built | Accepted · 2026.11.15 |
 | [ADR-0005](ADR-0005.md) | One prover build per image, from a copy of its tarball kept here | Assistant | Built; the weekly comparison has not run yet | Accepted · 2026.11.15 |
 | [ADR-0006](ADR-0006.md) | The MCP server has no way of its own to write a results file | Assistant | Built in part: Phase 3's tools; the proof tools are Phase 4 | Accepted · 2026.11.16 |

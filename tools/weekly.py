@@ -167,7 +167,9 @@ def main(argv):
 
     apt = pins["apt"]
     snap = apt["set_by"]["APT_SNAPSHOT"]
-    st = reachable(f"https://snapshot.ubuntu.com/ubuntu/{snap}/dists/noble/InRelease")
+    # The Ubuntu release is the codename the base's tag ends with (`25-jre-resolute`), so it moves with the base.
+    suite = r["tag"].rsplit("-", 1)[1]
+    st = reachable(f"https://snapshot.ubuntu.com/ubuntu/{snap}/dists/{suite}/InRelease")
     ok = st == "HTTP 200"
     line, e = served_line(apt, ok, "snapshot", snap)
     out.append(f"| apt | snapshot `{snap}` | {'served' if ok else '**not served**: ' + st} | {line} |")

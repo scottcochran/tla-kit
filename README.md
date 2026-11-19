@@ -144,8 +144,8 @@ checker or runtime pin: TLC, the prover and the runtime are the same bytes in al
 | `ethos` 0.2.4 at 8dc85c4 | checker | The proof checker that accepts or refuses cvc5's CPC proofs: upstream's static Linux x86_64 build of the commit cvc5 1.4.0 names, with GMP 6.2.1 and glibc 2.35-0ubuntu3.14 linked in | zip sha256 `1582fd32…d8bc`, binary sha256 `97e95d36…6538` | the kept copy, release `cvc5-1.4.0` here; upstream `cvc5/ethos` |
 | CPC signature cvc5 1.4.0 | checker | The rules ethos checks a cvc5 proof against: `proofs/eo/cpc/` of cvc5's source at tag `cvc5-1.4.0`, 51 files, tree `633f74115700ad32` as TOPAK's proof-cert.sh computes it | cvc5's source archive sha256 `06c65b30…9113`, the tree `633f74115700ad32`, and each of its 51 files by sha256 | the kept copy, release `cvc5-1.4.0` here; upstream `cvc5/cvc5` |
 | Temurin JRE | checker | The Java runtime TLC runs on: Temurin 25.0.5+8 | the base's tag and digest | the base |
-| base | runtime | Ubuntu 24.04.5 with Temurin JRE 25 (amd64) | digest `5b5a79b8…f2e5` (linux/amd64, resolved from `eclipse-temurin:25-jre-noble` on 2026.11.15) | Docker Hub |
-| `apt` | runtime | Python 3.12.3, perl 5.38.2 (`shasum`), git 2.43.0, from Ubuntu's snapshot of 2026-11-15T00:00:00Z | snapshot `20261115T000000Z`; `git` 1:2.43.0-1ubuntu7.4, `perl` 5.38.2-3.2ubuntu0.7, `python3` 3.12.3-0ubuntu2.1 | Ubuntu's snapshot archive |
+| base | runtime | Ubuntu 26.04.1 with Temurin JRE 25 (amd64) | digest `fa681c58…c1d7` (linux/amd64, resolved from `eclipse-temurin:25-jre-resolute` on 2026.11.19) | Docker Hub |
+| `apt` | runtime | Python 3.14.4, perl 5.40.1 (`shasum`), git 2.53.0, from Ubuntu's snapshot of 2026-11-19T00:00:00Z | snapshot `20261119T000000Z`; `git` 1:2.53.0-1ubuntu1.1, `perl` 5.40.1-7ubuntu0.4, `python3` 3.14.3-0ubuntu2 | Ubuntu's snapshot archive |
 | writing-tla-specs-and-proofs scripts TOPAK 6a26310 | method | The skill's `scripts/` and `assets/selftest/` | each file's sha256 in [`vendor/writing-tla-specs-and-proofs/VENDOR-PIN`](vendor/writing-tla-specs-and-proofs/VENDOR-PIN) | vendored in this repository |
 <!-- pins:end -->
 
@@ -214,7 +214,7 @@ With `--output type=oci,dest=…,rewrite-timestamp=true` in place of `--load`, t
 publishes for that commit.
 
 `BASE_IMAGE` is a build argument, for a registry mirror or a base with a private CA:
-`--build-arg BASE_IMAGE=public.ecr.aws/docker/library/eclipse-temurin:25-jre-noble@sha256:5b5a79b8…`. A digest
+`--build-arg BASE_IMAGE=public.ecr.aws/docker/library/eclipse-temurin:25-jre-resolute@sha256:fa681c58…`. A digest
 built with other arguments is for working, not for citing (ADR-0002 item 7).
 
 `vendor/check.py` checks the vendored scripts against their pin, and with `--upstream <TOPAK checkout>` against
@@ -324,8 +324,8 @@ the image's sets `TLAPM_UNPINNED=1`, as tla-kit's evidence workflow does.
 - **Linux x86_64 only.** Upstream publishes no Linux arm64 build of `tlapm`. On Apple Silicon the image runs
   under emulation. On one 12-CPU Mac that was not slow: TOPAK's full proof run took under 7 minutes (the Phase 1a
   checks below).
-- **Base must be Ubuntu 24.04 or newer.** The `tlapm` binary needs glibc 2.38; Debian 12 and Ubuntu 22.04 are
-  too old.
+- **Base must be Ubuntu 26.04 or newer.** The `tlapm` binary needs glibc 2.42 from `9a52faf`, and 2.38 before it;
+  Ubuntu 24.04 has 2.39, and Debian 12 and Ubuntu 22.04 are older.
 - **One release is supported:** the latest. Older ones stay available and get no fixes (ADR-0014 items 5 and 7).
 - **The scan covers the Ubuntu packages only.** Trivy reported no target for the Java runtime or the jars, nor
   for the static `cvc5` and `ethos`.

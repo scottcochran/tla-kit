@@ -143,7 +143,7 @@ existing pin: TLC, the prover and the runtime are the same bytes in all four.
 | Temurin JRE | checker | The Java runtime TLC runs on: Temurin 25.0.5+8 | the base's tag and digest | the base |
 | base | runtime | Ubuntu 24.04.5 with Temurin JRE 25 (amd64) | digest `5b5a79b8…f2e5` (linux/amd64, resolved from `eclipse-temurin:25-jre-noble` on 2026.11.15) | Docker Hub |
 | `apt` | runtime | Python 3.12.3, perl 5.38.2 (`shasum`), git 2.43.0, from Ubuntu's snapshot of 2026-11-15T00:00:00Z | snapshot `20261115T000000Z`; `git` 1:2.43.0-1ubuntu7.4, `perl` 5.38.2-3.2ubuntu0.7, `python3` 3.12.3-0ubuntu2.1 | Ubuntu's snapshot archive |
-| writing-tla-specs-and-proofs scripts TOPAK 5ade81e | method | The skill's `scripts/` and `assets/selftest/` | each file's sha256 in [`vendor/writing-tla-specs-and-proofs/VENDOR-PIN`](vendor/writing-tla-specs-and-proofs/VENDOR-PIN) | vendored in this repository |
+| writing-tla-specs-and-proofs scripts TOPAK 6a26310 | method | The skill's `scripts/` and `assets/selftest/` | each file's sha256 in [`vendor/writing-tla-specs-and-proofs/VENDOR-PIN`](vendor/writing-tla-specs-and-proofs/VENDOR-PIN) | vendored in this repository |
 <!-- pins:end -->
 
 The table is generated from [`PINS.json`](PINS.json), the inventory of every pin with its values, sources and

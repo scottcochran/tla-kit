@@ -161,7 +161,8 @@ Along the way:
   fixed in TOPAK first and then vendored (ADR-0007), and gov-tla's own generator was fixed too.
 - **The repository:** it was made public with the `publishing-private-repos` skill. Its five rulesets are active,
   including the required checks.
-- **Still open:** gov-tla has no evidence run here, because tla-kit has no token to read it. The weekly check
+- **Still open:** gov-tla has no evidence run here. Until 2026.11.20 tla-kit had no token to read it; it is public
+  since then, and `evidence.yml` does not run it yet. The weekly check
   has not run yet; it first runs on its Monday schedule.
 
 ### Phase 2: the image in the projects' CI

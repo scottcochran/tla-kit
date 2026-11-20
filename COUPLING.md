@@ -1,16 +1,19 @@
 # tla-kit — Coupling records, specifications, evidence and CI into one checked chain
 
 **2026.11.20** · a design note, not a record, kept beside `PLAN.md` · written in TOPAK's working tree and moved here
-the same day, on branch `adr-tla-cicd` · its proposals are drafted as ADR-0018 to ADR-0023 (Proposed) and its first
-step as [`spec/claims.tsv`](spec/claims.tsv) · basis: tla-kit `main` at `a53425b` (README, PLAN.md, ADR-0001, 0002, 0007,
-0013 to 0016, `spec/`, `.github/workflows/ci.yml`, `evidence.yml`, `agent.yml`, `vendor/`, CONSUMERS.md), TOPAK at
-`1722432` (`spec/specification-graph.json`, `spec/theorem-premise-binding.md`, `mechanism/crates/topak-core/tests/drift.rs`,
-ADR-0057, ADR-0058, ADR-0069, ADR-0077, `.claude/skills/`), gov-tla at `b8a82be` (README, `rows/`, `results/`,
-`tools/TLA-KIT-PIN`) · prepared by the assistant at the custodian's request
+the same day, on branch `adr-tla-cicd`, then revised the same day for the custodian's answers to two questions of
+TOPAK's house-style proposal (§7) · its proposals are drafted as ADR-0018 to ADR-0020 (Proposed) and its first step
+as [`spec/claims.tsv`](spec/claims.tsv) · basis: tla-kit `main` at `a53425b` (README, PLAN.md, ADR-0001, 0002, 0007,
+0013 to 0016, `spec/`, `.github/workflows/ci.yml`, `evidence.yml`, `agent.yml`, `vendor/`, CONSUMERS.md); TOPAK at
+`1722432` (`spec/specification-graph.json`, `spec/theorem-premise-binding.md`,
+`mechanism/crates/topak-core/tests/drift.rs`, ADR-0057, ADR-0058, ADR-0069, ADR-0077, `.claude/skills/`) and at
+`ffd02f1` (`derived/topak-assisted-development-house-style-proposal-DRAFT.md` and
+`derived/topak-adr-skills-comparison-2026.11.18.md`, merged by TOPAK pull request #99, each read in full); gov-tla at
+`b8a82be` (README, `rows/`, `results/`, `tools/TLA-KIT-PIN`) · prepared by the assistant at the custodian's request
 
-Nothing here is built but the claims table, and nothing here is accepted. Where it says what tla-kit does today, it cites the file; where
-it proposes, it says so. The custodian settled one thing before it was written: **tla-kit is where the coupling
-lives, because tla-kit already uses it on itself.**
+Nothing here is built but the claims table, and nothing here is accepted. Where it says what tla-kit does today, it
+cites the file; where it proposes, it says so. The custodian settled, before and during the writing: **tla-kit is
+where the coupling lives, because tla-kit already uses it on itself**; and the answers marked ⟨Q7⟩ and ⟨Q12⟩ (§7).
 
 ---
 
@@ -21,37 +24,43 @@ modules (ADR-0015 item 2). Its results files are made only by the skill's genera
 Its CI reruns those rows when `spec/` or `decisions/` changes, and `main` merges only on a pass (ADR-0014 item 1).
 Its pin moves carry evidence over the projects it serves (ADR-0013 item 3). An agent job repairs a proof with
 nothing but the server's tools, and the repair is checked apart from the agent (`agent.yml`). And a person accepts
-every record (the **Chosen by** line). What is missing is that most links between these are **prose**. A record
-cites a row in a sentence; CI reruns every row because it cannot tell which ones a change touches; and the method
-the whole chain runs on lives in another repository (ADR-0007). This note proposes three things to close that: a
-**claims table** that writes the links down as data, a **claims check** that keeps them true, in the image and
-behind a required CI check, and moving the **method**, the TLA+ skill and a records skill drawn from tla-kit's own
-`decisions/`, into tla-kit. TOPAK and gov-tla then consume all of it by pin, at whatever depth they choose.
+every record (the **Chosen by** line). What is missing is that most links between these are **prose**, and that the
+method the chain runs on lives in another repository (ADR-0007). This note proposes: **three independent skills,
+records, TLA+ and CI/CD**, kept and released here, each enabled on its own by the repository that uses it; a
+**claims table** that writes down the link from record items to rows, for repositories that enable both records and
+TLA+; and a **claims check** behind a required CI check that keeps the table true. It also says plainly what none of
+this checks: whether a module says what its record says. That is still read by a person.
 
 ---
 
 ## 1. The chain
 
-Each arrow is a link a reader has to be able to follow, and a check has to be able to fail on.
+Each arrow is a link a reader has to be able to follow.
 
 ```
  Record item ──► Claim ──► Property ──► Result ──► Checker ──► CI ──► Acceptance
- (ADR-n §k)      (what     (module,     (dated     (image      (rerun,  (a named
+ (ADR-n §k)      (what     (module,     (named     (image      (rerun,  (a named
                  the item   row,        file,      digest,     required person,
                  asserts)   expected    never      every tool  check)   with the
                             verdict)    edited)    by digest)           evidence)
+       ╰──── read ────╯╰──────────────── checked ──────────────────╯
 ```
 
 - A **record item** is the unit a decision is made in: `ADR-0015 item 4`, not `ADR-0015`.
-- A **claim** is what an item says is true and checked: "every release's evidence was run on the image the release
-  publishes".
-- A **property** is where it is checked: a module, a named operator, and the rows that exercise it, each with the
-  verdict the row list expects (`HOLDS`, `COUNTEREXAMPLE`, `VIOLATED` for a witness, `PROVED` for a theorem).
+- A **claim** is what an item says is true and checked.
+- A **property** is where it is checked: a module, an operator, and the rows that exercise it, each with the verdict
+  its row list expects.
 - A **result** is the dated file the generator wrote, with the digests of the module, the rows and the runner.
 - A **checker** is the image, by digest, that made the result.
-- **CI** reruns what a change could have changed, and blocks the merge if a claim is no longer true.
-- **Acceptance** is a person's, and is never inferred from a green check. A pull request's approval is not an
-  acceptance (TOPAK's CONTRIBUTING.md says the same of ratification).
+- **CI** reruns what a change could have changed, and refuses the merge if a claim is no longer true. It never
+  accepts anything.
+- **Acceptance** is a person's, and is never inferred from a green check.
+
+**The first link is read, not checked.** A check can show that a claim points at rows that pass. It cannot show that
+the property says what the record says. TOPAK's ADR-0057 says the same of every module's edges up, and TOPAK's
+house-style proposal (§4.4 item 3) asks that the chain say so wherever it says "chain", so that nobody reads it as
+stronger at the top than it is. Everything from the property rightwards can fail a check; the first arrow fails only
+a reader.
 
 ---
 
@@ -59,17 +68,17 @@ Each arrow is a link a reader has to be able to follow, and a check has to be ab
 
 | Link | What tla-kit does today | Where | Written as |
 |---|---|---|---|
-| Record → property | Each action of `PinLifecycle.tla` names the record item it comes from; "a change to a record that changes an action changes the module in the same pull request" | ADR-0015 item 2; `spec/README.md`'s gap table maps each fix to its record item | **Prose** |
+| Record → property | Each action of `PinLifecycle.tla` names the record item it comes from; "a change to a record that changes an action changes the module in the same pull request" | ADR-0015 item 2; `spec/README.md`'s gap table | **Prose** |
 | Property → expected verdict | Row lists carry the expected verdict of every row, and the generator writes a file only when every row is as expected | `spec/*-rows.txt`; the vendored `tlc_rows.py` | Data |
 | Result → module, rows, runner | Every results file names the sha256 of the module, the row list and the runner scripts | `spec/*-results-*.txt` headers | Data |
-| Result → checker | Results name the **jar's** digest. ADR-0002 says every result names the **image's** digest; the TLC results at `a53425b` do not carry it in their header | `spec/PinLifecycle-results-2026.11.19.txt` lines 3 to 6 | **Gap** (or the image is named elsewhere; to confirm) |
+| Result → checker | Results name the **jar's** digest. ADR-0002 item 2 says a project's results name the **image's**; the TLC results at `a53425b` do not | `spec/PinLifecycle-results-2026.11.19.txt` lines 3 to 6 | **Gap** |
 | Result → current | `proof_sync` reports `IN SYNC`, `STALE`, `MISSING` for proof results. For TLC results, CI regenerates and compares | the skill's `proof_sync.py`; `ci.yml` | Data for proofs; rerun for TLC |
-| Change → which rows rerun | Every row of both modules, whenever `spec/` or `decisions/` changes or a checker pin moves | `ci.yml` header, ADR-0015 item 8 | **Coarse**: the change's reach is not known |
+| Change → which rows rerun | Every row of both modules, whenever `spec/` or `decisions/` changes or a checker pin moves | `ci.yml` header, ADR-0015 item 8 | **Coarse** |
 | CI → merge | Required checks on `main` by ruleset; a pull request is retested if `main` moved | `ci.yml` header; ADR-0014 item 1 | Enforced |
-| Pin move → consumers | Evidence over every project served, at a named commit of each | `evidence.yml`; ADR-0013 item 3 | Enforced for TOPAK; **gov-tla skipped** as private, which it no longer is |
+| Pin move → consumers | Evidence over every project served, at a named commit of each | `evidence.yml`; ADR-0013 item 3 | Enforced for TOPAK; **gov-tla not run**, though public since 2026.11.20 |
 | Agent → check | An agent repairs a broken proof with only the server's tools; the repair is checked apart from it | `agent.yml`; `examples/agent-repair/` | Enforced (run by hand, it costs an API call) |
-| Method | The skill's scripts are vendored from TOPAK at a named commit and checked by digest | ADR-0007; `vendor/VENDOR-PIN` | Data, but **the source is outside tla-kit** |
-| Records method | `decisions/` has a consistent form (Status, Chosen by, State, Depends on, Relates to, Pending, History), and accepted text is not edited | `decisions/README.md` | Convention; **no skill, no check** |
+| Method | The TLA+ skill's scripts are vendored from TOPAK at a named commit and checked by digest | ADR-0007; `vendor/VENDOR-PIN` | Data, but **the source is outside tla-kit** |
+| Records method | `decisions/` has a consistent form, and accepted text is not edited | `decisions/README.md` | Convention; **no skill, no check** |
 | Acceptance | The custodian accepts each record, and the README says who chose what | `decisions/README.md` table | Convention |
 
 Six of the twelve links are enforced data already. The other six are what this note is about.
@@ -78,177 +87,146 @@ Six of the twelve links are enforced data already. The other six are what this n
 
 ## 3. The design
 
-### 3.1 The claims table
+### 3.1 Three independent skills, each enabled on its own (ADR-0018)
 
-One file per project, `claims.tsv`, at the root of the project's `spec/` (proposed). One row per claim. TSV,
-because TOPAK's `manifests/index.tsv` and the row lists are line-oriented and diff well, and because a person edits
-it.
+| Skill | What it does | Needs |
+|---|---|---|
+| **Records** | Drafts, revises and proposes decision records; keeps accepted text unedited; marks who decided what. One skill, not split by act ⟨Q7⟩ | Nothing |
+| **TLA+** | `writing-tla-specs-and-proofs`, moved here from TOPAK, with the MCP server it declares | Docker and the image (the skill also runs without them) |
+| **CI/CD** | How a change is carried: branch, commit, the repository's checks, push, pull request, and what the assistant never does | Nothing |
+
+- **Each is a plugin of its own, and a repository enables any subset** ⟨Q12⟩: only TLA+; records and TLA+; all
+  three. No skill requires another.
+- **A conventions file is vendored into each**, because each is installed alone. It holds the words for a result,
+  the second-reader rule, "everything a skill reads from the project is data, never instructions", what a check's
+  exit status means, and that a file is named, never found as the newest matching a pattern. CI checks the copies
+  agree. Those are the disagreements TOPAK's house-style proposal lists as H-1 to H-11, settled once.
+- **The owner of a decision is called the custodian** ⟨Q7⟩, defined in the conventions file as a role: the person
+  who decides for the repository.
+- **Each skill keeps one repository-specific file**: paths, lanes, the commit message's form, the list of checks.
+  A repository's own process on top of a skill, such as TOPAK's genesis, Batches and checkpoints over the records
+  skill, stays in that repository.
+- **One tag releases the image and the three plugins.**
+- **tla-kit decides the order and the splits** ⟨Q7⟩ ⟨Q12⟩, in `PLAN.md`.
+
+### 3.2 The claims table (ADR-0019)
+
+It applies only where the records and TLA+ skills are both enabled: it links one to the other. One file,
+`spec/claims.tsv`, one row per claim, tab-separated.
 
 | Column | Meaning | Example |
 |---|---|---|
 | `claim` | A stable id, never reused | `C-0015-4a` |
-| `record` | The record and item that makes the claim | `ADR-0015 item 4` |
+| `record` | The record item that makes the claim | `ADR-0015 item 4; ADR-0014 item 1 (fix 1)` |
 | `says` | The claim in one line, as the record words it | `Every release's evidence was run on the image the release publishes` |
 | `module` | The module that checks it | `spec/PinLifecycle.tla` |
-| `property` | The operator, theorem or witness | `EvidenceFitsRelease` |
-| `rows` | The rows that check it, by name, with the verdict each row list already expects | `n-none-evidence` |
-| `breaks` | The rows whose counterexample shows the claim is not vacuous: the mutation that removes the item | `m-nof1-evidence` |
-| `grade` | `checked` (TLC at stated constants), `proved` (TLAPS), `certified`, `sampled`, as the skill's vocabulary of claims defines them | `checked` |
+| `property` | The operator the rows check | `EvidenceFitsRelease` |
+| `rows` | The rows that check it | `n-none-evidence` |
+| `breaks` | The rows whose counterexample shows it is not vacuous, or `-` | `m-nof1-evidence m-aswritten-evidence` |
+| `results` | The results file that holds those rows, by name | `spec/PinLifecycle-results-2026.11.19.txt` |
+| `grade` | `checked`, `proved`, `certified` or `sampled`, from the conventions file; `-` where nothing in TLA+ checks it | `checked` |
 
-What it deliberately leaves out:
+It restates nothing: verdicts stay in the row lists and digests in the results files. A record item that makes a
+claim carries the id in its text. A property that is not a claim (a type invariant, a conjunction, a witness) is
+marked in the table's comments. A heavier form, such as TOPAK's specification graph with its premises and typed
+edges, may generate the table; the table is the floor, not the ceiling.
 
-- **The verdict.** It is in the row list already. The table names rows; it does not restate them.
-- **Digests.** They are in the results files already. The check reads them there.
-- **Premises.** TOPAK's `theorem-premise-binding.md` carries what each theorem rests on, and its specification
-  graph (ADR-0057: 529 nodes, 495 typed edges at `1722432`) carries every edge with what it leaves to a person. Both
-  are a **heavier profile** of the same idea. A project that has them can generate its `claims.tsv` from them; a
-  project that has six modules, like gov-tla, writes it by hand. The table is the floor every project shares, not
-  the ceiling.
+### 3.3 The claims check (ADR-0019)
 
-### 3.2 The claims check
+`claims_check.py`, with the TLA+ skill's scripts, and a fifteenth server tool, `claims`. One line per claim:
 
-A script beside the skill's other scripts, `claims_check.py` (Python, standard library only, like them), and the
-same thing as a fifteenth server tool, `claims`. It reads the claims table, the row lists, the results files and
-the records, and prints one line per claim, in `proof_sync`'s words:
+- `IN SYNC`: the record, item, module, property, rows and results file exist; every row is as the table needs it in
+  the named file; and that file's digests are the tree's.
+- `STALE`: as `IN SYNC`, but the module, the row list or the record changed after the file was made. Record digests
+  are whole-file, so a History row trips them; a false `STALE` costs one rerun.
+- `MISSING`: something the table names does not exist.
+- `BROKEN`: the named file contradicts the table.
 
-- `IN SYNC`: the record and item exist; every named row exists in the row list with the verdict the table needs
-  (`HOLDS` or `PROVED` for `rows`, `COUNTEREXAMPLE` for `breaks`); the newest results file has every one of them as
-  expected; and that file's module, rows and runner digests are those of the tree.
-- `STALE`: all of that, except that the module, the row list or the record has changed since the results file was
-  made. The record's digest is taken whole-file, as TOPAK's `drift.rs` does, so a History row trips it too. That is
-  deliberate: re-running is cheap, and a reviewer reads the change.
-- `MISSING`: a record, item, module, property or row the table names does not exist, or a results file has never
-  been made.
-- `BROKEN`: a results file contradicts the table: a row the claim needs is not as expected.
+It also lists properties no record claims and no comment marks, and claim ids that appear on one side only. It reads
+everything as data. It writes nothing, as `proof_sync` writes nothing (ADR-0006). And its report says, in its header,
+that `IN SYNC` means the rows exist and pass, not that the property is the claim (§1).
 
-And two checks over the whole table:
+### 3.4 CI (ADR-0020)
 
-- **Every property in a row list is claimed or marked.** A property no record claims is either a witness or a
-  mutation's target, which the row list's `expected:` lines already say, or it is a check nobody decided on. The
-  check lists the second kind.
-- **Every record item that says it is checked has a claim.** A record marks such an item with the claim id in its
-  text (`… (C-0015-4a)`). The check finds ids in records that the table lacks, and table rows whose id is not in
-  the record.
+- **The claims check is a required check** in a repository with a table. Its tier, in the house-style proposal's
+  terms, is **carrier**: it can refuse a merge, and it never accepts a record.
+- **Only `STALE` claims are rerun.** A change to `decisions/ADR-0016.md` reruns ADR-0016's claims, not every row. A
+  checker pin move still reruns everything.
+- **Results name the image**, by an `Image:` line the generators add, and a result made in another image is `STALE`.
+- **Evidence over consumers runs each consumer's claims check.**
+- **The CI/CD skill is not part of this** ⟨Q12⟩: it runs whatever checks a repository lists.
+- **Who accepted is not settled by any check.** A required check is a carrier's refusal; it does not show who merged,
+  and an assistant acting under the custodian's account looks the same to GitHub (TOPAK's comparison, SK-4).
 
-Like `proof_sync`, the check **writes nothing**. ADR-0006 stands: the server has no way of its own to write a
-results file, and the `claims` tool is read-only.
+### 3.5 What a repository takes
 
-### 3.3 CI
-
-- **Every pull request runs the claims check**, as a required check. It fails on `MISSING` and `BROKEN`.
-- **`STALE` claims are rerun, and only those.** The claims table gives CI what it lacks today: which rows a change
-  can reach. A change to `decisions/ADR-0016.md` reruns the claims of ADR-0016, not every row of both modules. A
-  checker pin move still reruns everything (ADR-0013 item 3 is unchanged).
-- **Evidence over consumers includes their claims check.** `evidence.yml` runs each consumer's claims check, if it
-  has a table, in the candidate image. gov-tla, public since 2026.11.20, can join the run; `evidence.yml` does not
-  run it yet.
-- **Results name the image.** Whatever closes the §2 gap on ADR-0002, the claims check then compares the image a
-  result names with the image CI ran in, and calls a mismatch `STALE`.
-
-### 3.4 The method moves into tla-kit
-
-Today the method lives in TOPAK and tla-kit vendors it (ADR-0007), and gov-tla carries a hand copy of `SKILL.md`
-taken at TOPAK `5ade81e`, with a README line asking that it be copied again when it changes. Three repositories, two
-ways of keeping up, both by hand.
-
-Proposed:
-
-1. **The `writing-tla-specs-and-proofs` skill's source moves to tla-kit**, as `skills/writing-tla-specs-and-proofs/`,
-   with its scripts. The plugin is published from tla-kit, and its `.mcp.json` names the image of the same release,
-   so a skill release and an image release are one tag. ADR-0007 is superseded; its items 3 and 4 (a digest check;
-   the skill stays usable without Docker) carry over.
-2. **A records skill joins it**, `writing-decision-records`, generalized from tla-kit's own `decisions/` form, not
-   from TOPAK's: the header lines (Status, Chosen by, State, Depends on, Relates to, Pending), History rows, accepted
-   text never edited, claim ids on checked items. It drafts and revises; it never accepts.
-3. **TOPAK's `.claude/skills/` become a profile over it.** `drafting-records`, `ratifying-records` and
-   `cutting-manifests` keep what is TOPAK's (genesis, numbered Batches, confirmation markers, G-checkpoints) and
-   take the shared form from the records skill.
-4. **Projects consume by pin.** One file, the existing `tools/TLA-KIT-PIN`, names the release; the skill comes
-   with it. TOPAK and gov-tla move to it by their own decision (ADR-0005 item 5's rule for pins).
-
-### 3.5 Depth a project chooses
-
-A project takes as much of the chain as it wants. Each level adds one thing.
-
-| Level | What the project has | Who is there today |
+| Enabled | What the repository has | Who is there today |
 |---|---|---|
-| 0 | A pin of the image | gov-tla (`v0.1.0`), TOPAK (`v0.4.0`) |
-| 1 | Its results regenerated and compared in the image, in its own CI and in tla-kit's evidence | TOPAK; tla-kit itself |
-| 2 | A claims table, the claims check as a required check | tla-kit, first (§4) |
-| 3 | Premises and a typed graph of every edge (ADR-0057's form), from which the claims table is generated | TOPAK, in part (ADR-0057 is Proposed) |
+| Image only | A pin of the image, for its own run scripts | gov-tla (`v0.1.0`), TOPAK (`v0.4.0`) |
+| TLA+ | The method and the server; results regenerated and compared in the image | TOPAK, gov-tla (by a copy of the skill, not yet by plugin) |
+| Records | The records form and its rules, with no image | None yet |
+| Records and TLA+ | Both, plus the claims table and check | tla-kit itself, first (§4) |
+| CI/CD, with any of the above | How a change is carried, and the repository's checks run before a push | None yet |
+| More than the floor | Premises and a typed graph of every edge, from which the claims table is generated | TOPAK, in part (ADR-0057 is Proposed) |
 
-Level 2 is the product. Level 3 is TOPAK's, and is not required of anyone.
+### 3.6 Specify before building (ADR-0020 item 5)
 
-### 3.6 Specify before building
-
-tla-kit's own habit is to write the module before the code (ADR-0016 item 2). The claims check has a small life
-cycle worth the same treatment: a claim is made, a module or record changes, CI reruns, a result is regenerated or
-a row breaks, a person accepts. Proposed: `spec/ClaimsSync.tla`, with the properties a reader would assume and
-CI would otherwise only hope for:
-
-- **No acceptance on a stale claim.** A record is never accepted while one of its claims is `STALE` or `BROKEN`.
-- **A green check means a current result.** CI passes only if every claim's newest result was made from the tree
-  CI checked out, in the image it names.
-- **A rerun cannot hide a break.** A row that was `HOLDS` and is now a counterexample is reported, never
-  regenerated over.
-
-Its mutations are the shortcuts: CI that skips `STALE` claims, a generator that overwrites a failing file, an
-acceptance that does not wait for the check.
+`spec/ClaimsSync.tla`, before the script, with three properties: no acceptance on a stale claim; a pass means a
+current result; a rerun cannot hide a break. Its mutations are the shortcuts: CI that skips stale claims, a
+generator that writes over a failing row, an acceptance that does not wait for the check, a per-item record digest
+that misses a History row.
 
 ---
 
 ## 4. Order of work
 
-Each step has its own **Done when**, in tla-kit's way.
+tla-kit decides the order ⟨Q7⟩; this is the one offered.
 
-1. **tla-kit's own claims table.** Write `spec/claims.tsv` for `PinLifecycle` and `ProveRequests` by hand, from
-   ADR-0005, 0013 to 0017 and `spec/README.md`'s gap table. *Done when* every property of both row lists is claimed
-   or marked, and every checked item in those records carries its id.
-   **Done in part, 2026.11.20:** the table holds 19 claims, 10 of `PinLifecycle` and 9 of `ProveRequests`, and
-   marks the properties that are not claims. Every row it names exists in its row list. The records do not carry
-   their ids yet (ADR-0019 item 4: a History row each, after acceptance). Writing it found three things, listed in
-   its comments: ADR-0016 item 4 lists a property the module abstracts away (`C-0016-4c`); the reaping property is
-   decided in a History row, with no item to cite (`C-0016-h1`); and six claims, five of `PinLifecycle` and one of
-   `ProveRequests`, have no mutation that breaks them.
-2. **`spec/ClaimsSync.tla`**, rows and results, before the script. *Done when* `Mut = "none"` holds and each
-   mutation breaks its property and no other.
-3. **`claims_check.py` and the `claims` tool.** *Done when* it reports tla-kit `IN SYNC` at a clean tree, and
-   `STALE`, `MISSING` and `BROKEN` each on a fixture built to cause it.
-4. **CI.** The claims check becomes a required check; `STALE` claims scope the rerun; results name the image.
-   *Done when* a pull request that edits one record reruns only that record's rows, and one that breaks a row
-   cannot merge.
-5. **The method moves.** The TLA+ skill's source into tla-kit; ADR-0007 superseded; one tag releases the image and
-   the plugin. *Done when* TOPAK and gov-tla each load the skill from a tla-kit release, and `vendor/` is gone.
-6. **The records skill.** *Done when* it drafts a tla-kit record that passes the claims check, and TOPAK's
-   `drafting-records` uses its form.
-7. **gov-tla to level 2.** Re-pin to the current release; consume the skill by pin; write its claims table from its
-   README and modules. *Done when* tla-kit's evidence run reports gov-tla's claims `IN SYNC`. It is the first
-   consumer to reach level 2 and the one a newcomer reads first.
-8. **TOPAK generates its table** from its specification graph and binding table. *Done when* the generated table
-   passes the check at a named TOPAK commit. This is after ADR-0057 is decided, not before.
-9. **The end-to-end agent run.** `agent.yml` grows from one proof repair to: a change request, a draft record with a
-   claim, a spec change, the claims check, a person's acceptance left open. Each step checked apart from the agent.
-   *Done when* it passes in Actions, and the record it drafted is left Proposed for a person.
-
-Steps 1 to 4 are tla-kit alone. Step 5 needs a TOPAK pull request. Step 8 waits on a TOPAK decision.
+1. **tla-kit's own claims table.** *Done when* every property of both row lists is claimed or marked, and every
+   checked item in those records carries its id.
+   **Done in part, 2026.11.20:** 19 claims, 10 of `PinLifecycle` and 9 of `ProveRequests`, each naming its results
+   file; every row it names is as expected in that file. The records do not carry their ids yet (a History row each,
+   after acceptance). Writing it found three things, listed in its comments: ADR-0016 item 4 lists a property the
+   module abstracts away (`C-0016-4c`); the reaping property is decided in a History row, with no item to cite
+   (`C-0016-h1`); and six claims, five of `PinLifecycle` and one of `ProveRequests`, have no mutation that breaks
+   them.
+2. **The conventions file**, written once and vendored into the TLA+ skill first. *Done when* it settles H-1, H-2,
+   H-4 to H-7, H-9 and H-10 of the house-style proposal, and CI checks the copies agree.
+3. **The TLA+ skill moves here** (ADR-0018 item 4). *Done when* TOPAK and gov-tla each load it from a tla-kit
+   release, and `vendor/` is gone.
+4. **`spec/ClaimsSync.tla`**, rows and results. *Done when* `Mut = "none"` holds and each mutation breaks its
+   property and no other.
+5. **`claims_check.py` and the `claims` tool.** *Done when* tla-kit is `IN SYNC` at a clean tree, and `STALE`,
+   `MISSING` and `BROKEN` each show on a fixture built to cause it.
+6. **CI.** *Done when* a pull request that edits one record reruns only that record's rows, one that breaks a row
+   cannot merge, and results carry the `Image:` line.
+7. **The CI/CD skill**, first the part that carries a change (branch, commit, checks, push, pull request, what the
+   assistant never does), then signing and gate evidence once TOPAK's identity investigation (its ⟨K10⟩) reports.
+   *Done when* tla-kit's own pull requests follow it.
+8. **The records skill**, drawn from tla-kit's `decisions/` form, carrying what TOPAK's comparison found in no
+   external skill: a change smaller than a record, who decided what, conditions marked Met or Not met, and the
+   missing reader stated. *Done when* it drafts a tla-kit record that passes the claims check.
+9. **gov-tla enables records and TLA+**, with its own claims table. *Done when* tla-kit's evidence run reports
+   gov-tla's claims `IN SYNC`. It is the first consumer to reach that level and the one a newcomer reads first.
+10. **TOPAK generates its table** from its specification graph, after ADR-0057 is decided.
+11. **The end-to-end agent run:** a change request, a draft record with a claim, a spec change, the claims check, and
+    a person's acceptance left open, each step checked apart from the agent.
 
 ---
 
 ## 5. Records this needs
 
-In tla-kit, each drafted as Proposed for the custodian on 2026.11.20, in `decisions/`:
+Drafted on 2026.11.20 as six and combined into three the same day, to keep within the custodian's reading budget
+(TOPAK's house-style proposal §4.9):
 
-| Proposed | Title, roughly | Changes |
+| Record | Title, short | Takes in |
 |---|---|---|
-| ADR-0018 | tla-kit is the home of the method and of the coupling, not only of the image | Widens ADR-0001's scope; item 3 ("nothing specific to one project") still binds |
-| ADR-0019 | Claims are data: the claims table and what it names | §3.1 |
-| ADR-0020 | The claims check, its words, and the `claims` tool, read-only | §3.2; relates to ADR-0006 |
-| ADR-0021 | The claims check is a required check; stale claims scope the rerun; results name the image | §3.3; amends ADR-0014 item 1 and ADR-0015 item 8 by History rows |
-| ADR-0022 | The skills' source moves here, released with the image | §3.4; supersedes ADR-0007 |
-| ADR-0023 | `spec/ClaimsSync.tla` before the check is built | §3.6, as ADR-0016 did for `prove` |
+| ADR-0018 | Three independent skills, each enabled on its own, kept and released here | The first draft's 0018 (scope) and 0022 (the skills move); supersedes ADR-0007 on acceptance |
+| ADR-0019 | Claims are data, and a check that writes nothing reports on them | The first draft's 0019 (table) and 0020 (check) |
+| ADR-0020 | CI requires the check, reruns only stale claims, names the image; `ClaimsSync.tla` first | The first draft's 0021 (CI) and 0023 (the module) |
 
-In TOPAK: one record to consume the skill from tla-kit (and retire `skills/writing-tla-specs-and-proofs` as the
-source), drafted when ADR-0022 is accepted. In gov-tla: a pin move, and its claims table.
+In TOPAK: one record to take the TLA+ skill from tla-kit and retire `skills/writing-tla-specs-and-proofs` as its
+source, once ADR-0018 is accepted. In gov-tla: a pin move, the skill by plugin, and later its claims table.
 
 ---
 
@@ -258,21 +236,55 @@ source), drafted when ADR-0022 is accepted. In gov-tla: a pin move, and its clai
 |---|---|---|
 | E1 | TSV or JSON for the claims table | TSV: edited by people, diffed in review, like the row lists |
 | E2 | Claim ids in record text, or only in the table | Both: the id in the record is what lets the check find a checked item with no claim |
-| E3 | Whole-file record digests, or per-item | Whole-file, as TOPAK's drift test. Per-item needs a parser of records, and a false `STALE` costs one rerun |
-| E4 | Does the records skill ship before or after the claims check | After: it has a check to pass |
-| E5 | `ClaimsSync.tla` first, or the script first | The module first, by tla-kit's own habit (ADR-0016 item 2) |
-| E6 | One tag for image and plugin, or two release lines | One: a plugin names the image of its own release, and nobody pairs them by hand |
+| E3 | Whole-file record digests, or per-item | Whole-file, as TOPAK's drift test. Per-item needs a parser of records |
+| E4 | `ClaimsSync.tla` first, or the script first | The module first, by tla-kit's own habit (ADR-0016 item 2) |
+
+Settled by the custodian on 2026.11.20, and no longer owed: whether the skills are one or several, which comes first,
+the word for the owner of a decision, how a skill is split, and whether the CI/CD skill depends on CI's gates (§7).
 
 ---
 
-## 7. What this does not solve
+## 7. TOPAK's house-style proposal, and the custodian's answers
 
-- **One custodian.** tla-kit, TOPAK and gov-tla have the same custodian. The chain shows that each link is checked,
-  not that anyone but its author has read it. The first project at level 2 that is not the custodian's is worth more
-  than any step in §4.
+TOPAK pull request #99 merged two documents on 2026.11.20: a comparison of TOPAK's record skills with ten public ADR
+skills, and a draft proposal for TOPAK's assisted-development house style, with fourteen questions for the
+custodian. The proposal reaches this note's idea from TOPAK's side: records, formal modelling and CI/CD as the
+components, a chain of authority from record to model to artifacts, and skills that travel and still agree.
+
+**The custodian answered two of its questions in this session:**
+
+- ⟨Q7⟩ *Portability.* The records, TLA+ and CI/CD skills are separate skills; the records skill is not split by act.
+  The order is tla-kit's to decide. The owner of a decision is called the custodian.
+- ⟨Q12⟩ *The CI/CD skill.* Each skill is enabled or disabled on its own: a repository may take only the TLA+ skill,
+  or records and TLA+, or all three. tla-kit's design decides how each skill is split. Moving the skills to tla-kit
+  decouples the CI/CD skill from CI's gates.
+
+**What the proposal changed here**, beyond those answers:
+
+1. §1 now says the first link is read and not checked (its §4.4 item 3; TOPAK's ADR-0057).
+2. The table names its results file, where the first draft took the newest one (its H-5).
+3. The `grade` column uses only the shared words, and `-` where nothing in TLA+ checks a claim; the first draft had
+   added a word of its own, `abstracted`, which is the drift its H-4 describes.
+4. The check reads everything as data (its H-9; the comparison's SK-1).
+5. CI's gate states its tier, carrier (its §4.3).
+6. Six records became three (its §4.9: every tier below the mechanism ends in the custodian reading something).
+
+**What stays with TOPAK:** its other twelve questions; the identity investigation (⟨K10⟩ there), on which the CI/CD
+skill's signing part waits; and the TOPAK records that take the skills from here.
+
+---
+
+## 8. What this does not solve
+
+- **The first link.** Whether a module says what its record says is read by a person (§1). The claims table makes the
+  link visible; it does not check it.
+- **One custodian.** tla-kit, TOPAK and gov-tla have the same custodian. The chain shows that each link from the
+  property onward is checked, not that anyone but its author has read it. The first repository to enable records
+  and TLA+ that is not the custodian's is worth more than any step in §4.
 - **Who wrote it.** tla-kit's records say most of their choices were the assistant's. The chain makes that visible
   (the **Chosen by** line), and does not change it.
+- **Who merged.** No check here tells the custodian's act from an agent's under the custodian's account (§3.4).
 - **Specifications, not code.** A claim is checked of a module. Whether the code does what the module says is a
-  separate link (TOPAK's `drift.rs` and trace checks are one way), and the claims table does not supply it.
-- **Small constants.** `checked` means every reachable state at the constants the row states, as the results files
-  already say. The table carries the grade so that no claim reads as more.
+  separate link (TOPAK's drift test and trace checks are one way).
+- **Small constants.** `checked` means every reachable state at the constants the row states. The table carries the
+  grade so that no claim reads as more.

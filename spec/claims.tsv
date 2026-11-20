@@ -1,6 +1,7 @@
 # Claims: what each record item says is true, and where it is checked (ADR-0019, Proposed; COUPLING.md §3.1).
-# One row per claim, tab-separated. The verdicts are in the row lists and the digests in the results files; this
-# table names rows and restates neither. Nothing reads this file yet: the claims check is ADR-0020, Proposed.
+# A claims table applies where the records and TLA+ skills are both enabled (ADR-0018 item 3). One row per claim,
+# tab-separated. The verdicts are in the row lists and the digests in the results files; this table names rows and
+# files and restates neither. Nothing reads it yet: the check is ADR-0019 items 6 to 10, and is not built.
 #
 # Columns:
 #   claim     a stable id, never reused: C-<record>-<item><letter>, or C-<record>-h<n> for a claim made in a History row
@@ -8,41 +9,45 @@
 #   says      the claim in one line, as the record words it
 #   module    the module that checks it
 #   property  the operator the rows check
-#   rows      the rows that check it; each row list expects HOLDS of every one
+#   rows      the rows that check it; each row list expects HOLDS of every one (Safe rows check the conjunction)
 #   breaks    the rows whose counterexample shows the claim is not vacuous (expected COUNTEREXAMPLE); - if no row does
-#   grade     checked (TLC, every reachable state at the row's constants), proved, certified, sampled, or abstracted
-#             (the module abstracts it away and says why; nothing checks it in TLA+)
+#   results   the results file that holds those rows, by name
+#   grade     checked (TLC, every reachable state at the row's constants), proved, certified or sampled, as the
+#             conventions file defines them (ADR-0018 item 5); - where nothing in TLA+ checks the claim
 #
-# Not claims, and marked here so that the check of ADR-0020 can tell them from a property no record decided on:
+# What an IN SYNC claim will show: its rows exist and pass at the tree. Whether the property says what the record
+# says is read by a person, not checked (ADR-0019 item 10).
+#
+# Not claims, and marked here so that the check can tell them from a property no record decided on:
 #   PinLifecycle   TypeOK, Safe (the conjunction of the invariants below), NoBehaviour (the fair spec has a behaviour),
 #                  and the witnesses Never* (each state the records rely on is reached)
 #   ProveRequests  Safe, NoBehaviour, and the witnesses Never*
 #
 # Found while writing it (COUPLING.md §4 step 1):
-#   C-0016-4c is abstracted: ADR-0016 item 4 lists it as a property, and ProveRequests.tla's header says it holds by
-#     construction at the module's abstraction. The server's tests exercise it (server/test_prove.py).
+#   C-0016-4c is not checked in TLA+: ADR-0016 item 4 lists it as a property, and ProveRequests.tla's header says it
+#     holds by construction at the module's abstraction. The server's tests exercise it (server/test_prove.py).
 #   C-0016-h1 is made in a History row of ADR-0016 (2026.11.16, the custodian's choice that the server reaps every
 #     child), not in a numbered item, so it has no item to cite.
 #   Five PinLifecycle claims (4d to 4g, 4i) and one ProveRequests claim (4h) have no breaking row: no mutation removes
 #     what they rest on. Their witnesses show the states they constrain are reached; a mutation each would show
 #     they depend on the records.
-claim	record	says	module	property	rows	breaks	grade
-C-0015-4a	ADR-0015 item 4; ADR-0014 item 1 (fix 1)	Every release's evidence was run on the image the release publishes	spec/PinLifecycle.tla	EvidenceFitsRelease	n-none-evidence	m-nof1-evidence m-aswritten-evidence	checked
-C-0015-4b	ADR-0015 item 4; ADR-0005 item 2 (fix 2)	A prover value is built only from its kept copy	spec/PinLifecycle.tla	BuildsFromKept	n-none-kept	m-nof2-kept m-aswritten-kept	checked
-C-0015-4c	ADR-0015 item 4; ADR-0013 item 8 (fix 3)	Every release can be rebuilt: each of its pins is still served, or is kept here	spec/PinLifecycle.tla	ReleasesRebuildable	n-none-rebuild	m-nof3-rebuild m-aswritten-rebuild	checked
-C-0015-4d	ADR-0015 item 4; ADR-0014 item 5	Every digest a project has ever pinned is in the registry, or was withdrawn with a record	spec/PinLifecycle.tla	CitationsResolve	n-none-citations	-	checked
-C-0015-4e	ADR-0015 item 4; ADR-0014 item 2	From its first publish on, a tag names one digest	spec/PinLifecycle.tla	TagsDoNotMove	n-none-tags	-	checked
-C-0015-4f	ADR-0015 item 4; ADR-0014 item 2	A release's version part fits the kind of pin it moved	spec/PinLifecycle.tla	VersionFitsMove	n-none-version	-	checked
-C-0015-4g	ADR-0015 item 4; ADR-0013 item 2	Every merged pull request moves one pin, or the base and the snapshot together	spec/PinLifecycle.tla	OneMovePerPR	n-none-onemove	-	checked
-C-0015-4h	ADR-0015 item 4; ADR-0013 item 7 (fix 4)	Each log entry is filed under the value it is about	spec/PinLifecycle.tla	LogFiledRight	n-none-log	m-nof4-log m-aswritten-log	checked
-C-0015-4i	ADR-0015 item 4; ADR-0013 item 7	No log entry changes once it is filed	spec/PinLifecycle.tla	LogAppendOnly	n-none-logonly	-	checked
-C-0015-4j	ADR-0015 item 4; ADR-0013 item 4	Every change upstream is eventually reported, under weak fairness of the weekly check	spec/PinLifecycle.tla	UpstreamReported	l-none-reported l-aswritten-reported	l-nofair-reported	checked
-C-0016-4a	ADR-0016 item 4	Each request gets at most one response, and nothing after it	spec/ProveRequests.tla	AtMostOneAnswer	n-answer n-safe-3 n-safe-3-shared	m-answercancel-answer m-latecancel-answer	checked
-C-0016-4b	ADR-0016 item 4	A success response needs a run that ended by itself and complete	spec/ProveRequests.tla	SuccessOnlyComplete	n-success n-safe-3 n-safe-3-shared	m-exitcode-success	checked
-C-0016-4c	ADR-0016 item 4; ADR-0006 item 2	The answer's scope is the request's scope	spec/ProveRequests.tla	-	-	-	abstracted
-C-0016-4d	ADR-0016 item 4	When a response is sent, no process the request started is still alive	spec/ProveRequests.tla	NoProcessOutlives	n-outlive n-safe-3 n-safe-3-shared	m-killone-outlive m-naive-outlive m-escape-outlive	checked
-C-0016-4e	ADR-0016 item 4	No two live processes write the same cache directory	spec/ProveRequests.tla	OneWriterPerCache	n-writer n-safe-3 n-safe-3-shared	m-nolock-writer m-killone-writer m-naive-writer m-escape-writer	checked
-C-0016-4f	ADR-0016 item 4; ADR-0006 item 3	Nothing is written into the project	spec/ProveRequests.tla	NothingInProject	n-project n-safe-3 n-safe-3-shared	m-defaultcache-project	checked
-C-0016-4g	ADR-0016 item 4	Every request is eventually answered or cancelled	spec/ProveRequests.tla	EveryRequestEnds	n-ends n-ends-shared	n-ends-nofair	checked
-C-0016-4h	ADR-0016 item 4	A request waiting for a cache eventually runs	spec/ProveRequests.tla	WaitingRuns	n-waits n-waits-shared	-	checked
-C-0016-h1	ADR-0016 History 2026.11.16	The server reaps every child a request started, not only tlapm	spec/ProveRequests.tla	AllReaped	n-reaped n-safe-3 n-safe-3-shared	m-noreap-reaped	checked
+claim	record	says	module	property	rows	breaks	results	grade
+C-0015-4a	ADR-0015 item 4; ADR-0014 item 1 (fix 1)	Every release's evidence was run on the image the release publishes	spec/PinLifecycle.tla	EvidenceFitsRelease	n-none-evidence	m-nof1-evidence m-aswritten-evidence	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4b	ADR-0015 item 4; ADR-0005 item 2 (fix 2)	A prover value is built only from its kept copy	spec/PinLifecycle.tla	BuildsFromKept	n-none-kept	m-nof2-kept m-aswritten-kept	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4c	ADR-0015 item 4; ADR-0013 item 8 (fix 3)	Every release can be rebuilt: each of its pins is still served, or is kept here	spec/PinLifecycle.tla	ReleasesRebuildable	n-none-rebuild	m-nof3-rebuild m-aswritten-rebuild	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4d	ADR-0015 item 4; ADR-0014 item 5	Every digest a project has ever pinned is in the registry, or was withdrawn with a record	spec/PinLifecycle.tla	CitationsResolve	n-none-citations	-	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4e	ADR-0015 item 4; ADR-0014 item 2	From its first publish on, a tag names one digest	spec/PinLifecycle.tla	TagsDoNotMove	n-none-tags	-	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4f	ADR-0015 item 4; ADR-0014 item 2	A release's version part fits the kind of pin it moved	spec/PinLifecycle.tla	VersionFitsMove	n-none-version	-	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4g	ADR-0015 item 4; ADR-0013 item 2	Every merged pull request moves one pin, or the base and the snapshot together	spec/PinLifecycle.tla	OneMovePerPR	n-none-onemove	-	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4h	ADR-0015 item 4; ADR-0013 item 7 (fix 4)	Each log entry is filed under the value it is about	spec/PinLifecycle.tla	LogFiledRight	n-none-log	m-nof4-log m-aswritten-log	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4i	ADR-0015 item 4; ADR-0013 item 7	No log entry changes once it is filed	spec/PinLifecycle.tla	LogAppendOnly	n-none-logonly	-	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0015-4j	ADR-0015 item 4; ADR-0013 item 4	Every change upstream is eventually reported, under weak fairness of the weekly check	spec/PinLifecycle.tla	UpstreamReported	l-none-reported l-aswritten-reported	l-nofair-reported	spec/PinLifecycle-results-2026.11.19.txt	checked
+C-0016-4a	ADR-0016 item 4	Each request gets at most one response, and nothing after it	spec/ProveRequests.tla	AtMostOneAnswer	n-answer n-safe-3 n-safe-3-shared	m-answercancel-answer m-latecancel-answer	spec/ProveRequests-results-2026.11.19.txt	checked
+C-0016-4b	ADR-0016 item 4	A success response needs a run that ended by itself and complete	spec/ProveRequests.tla	SuccessOnlyComplete	n-success n-safe-3 n-safe-3-shared	m-exitcode-success	spec/ProveRequests-results-2026.11.19.txt	checked
+C-0016-4c	ADR-0016 item 4; ADR-0006 item 2	The answer's scope is the request's scope	spec/ProveRequests.tla	-	-	-	-	-
+C-0016-4d	ADR-0016 item 4	When a response is sent, no process the request started is still alive	spec/ProveRequests.tla	NoProcessOutlives	n-outlive n-safe-3 n-safe-3-shared	m-killone-outlive m-naive-outlive m-escape-outlive	spec/ProveRequests-results-2026.11.19.txt	checked
+C-0016-4e	ADR-0016 item 4	No two live processes write the same cache directory	spec/ProveRequests.tla	OneWriterPerCache	n-writer n-safe-3 n-safe-3-shared	m-nolock-writer m-killone-writer m-naive-writer m-escape-writer	spec/ProveRequests-results-2026.11.19.txt	checked
+C-0016-4f	ADR-0016 item 4; ADR-0006 item 3	Nothing is written into the project	spec/ProveRequests.tla	NothingInProject	n-project n-safe-3 n-safe-3-shared	m-defaultcache-project	spec/ProveRequests-results-2026.11.19.txt	checked
+C-0016-4g	ADR-0016 item 4	Every request is eventually answered or cancelled	spec/ProveRequests.tla	EveryRequestEnds	n-ends n-ends-shared	n-ends-nofair	spec/ProveRequests-results-2026.11.19.txt	checked
+C-0016-4h	ADR-0016 item 4	A request waiting for a cache eventually runs	spec/ProveRequests.tla	WaitingRuns	n-waits n-waits-shared	-	spec/ProveRequests-results-2026.11.19.txt	checked
+C-0016-h1	ADR-0016 History 2026.11.16	The server reaps every child a request started, not only tlapm	spec/ProveRequests.tla	AllReaped	n-reaped n-safe-3 n-safe-3-shared	m-noreap-reaped	spec/ProveRequests-results-2026.11.19.txt	checked

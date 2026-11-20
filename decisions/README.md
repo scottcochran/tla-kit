@@ -3,7 +3,7 @@
 Architecture decision records, one file each, after the form of TOPAK's `decisions/`. ADR-0001 to ADR-0016 were
 drafted on 2026.11.15 from [PLAN.md](../PLAN.md) and [the founding session
 record](../derived/tla-kit-founding-session-2026.11.15.md), all as Proposed, and ADR-0017 on 2026.11.17. **All seventeen
-were accepted by the custodian, on 2026.11.15, 2026.11.16 and 2026.11.17.** ADR-0018 to ADR-0023 were drafted on 2026.11.20
+were accepted by the custodian, on 2026.11.15, 2026.11.16 and 2026.11.17.** ADR-0018 to ADR-0020 were drafted on 2026.11.20
 from [COUPLING.md](../COUPLING.md), all as Proposed, and none is accepted.
 The custodian chose the idea, the name and the spike. Every other choice was the assistant's, or is a recommendation the plan lists as owed. Nothing here is accepted
 until the custodian accepts it.
@@ -33,12 +33,9 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0015](ADR-0015.md) | The pin and release process is specified in TLA+, and checked by TLC before the records it covers are accepted | Custodian (that it is written); assistant (its scope) | Built | Accepted · 2026.11.15 |
 | [ADR-0016](ADR-0016.md) | The `prove` tool's requests, processes and cache are specified in TLA+ before the tool is built | Custodian (that it is written); assistant (its scope) | Built: the module, its 78 rows, the tool and item 7's tests | Accepted · 2026.11.16 |
 | [ADR-0017](ADR-0017.md) | cvc5 and ethos are built from copies kept here, in one release with their copyleft parts' source | Custodian (to keep the zips, and item 5); assistant (the form) | Built: `cvc5-1.4.0` kept, released in `v0.4.0`; the weekly comparison has not run in Actions yet | Accepted · 2026.11.17 |
-| [ADR-0018](ADR-0018.md) | tla-kit is the home of the method and of the coupling, not only of the image | Custodian (that the coupling lives here); assistant (the form) | Planned | Proposed · 2026.11.20 |
-| [ADR-0019](ADR-0019.md) | Claims are data: one table names, for each record item, the property and rows that check it | Assistant | Drafted in part: `spec/claims.tsv` | Proposed · 2026.11.20 |
-| [ADR-0020](ADR-0020.md) | The claims check reports each claim in sync, stale, missing or broken, and writes nothing | Assistant | Planned | Proposed · 2026.11.20 |
-| [ADR-0021](ADR-0021.md) | The claims check is a required check; stale claims scope the rerun; results name the image | Assistant | Planned | Proposed · 2026.11.20 |
-| [ADR-0022](ADR-0022.md) | The skills' source moves here, and is released with the image under one tag | Assistant | Planned | Proposed · 2026.11.20 |
-| [ADR-0023](ADR-0023.md) | The claims life cycle is specified in TLA+ before the check is built | Assistant | Planned | Proposed · 2026.11.20 |
+| [ADR-0018](ADR-0018.md) | tla-kit is the home of three independent skills, records, TLA+ and CI/CD, each enabled on its own and released with the image | Custodian (the coupling lives here; Q7, Q12); assistant (the form) | Planned | Proposed · 2026.11.20 |
+| [ADR-0019](ADR-0019.md) | Claims are data, and a check that writes nothing reports each one in sync, stale, missing or broken | Assistant | Drafted in part: `spec/claims.tsv` | Proposed · 2026.11.20 |
+| [ADR-0020](ADR-0020.md) | CI requires the claims check, reruns only stale claims, and names the image; the life cycle is specified in TLA+ first | Custodian (Q12); assistant | Planned | Proposed · 2026.11.20 |
 
 **Not recorded here.** `PLAN.md`'s D1, whether TOPAK moves `tools/TLAPS-PIN` to the image's Linux prover, is
 TOPAK's decision and is made there. So is the same question for gov-tla. ADR-0005 says what tla-kit provides

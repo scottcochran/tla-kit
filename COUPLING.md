@@ -155,8 +155,9 @@ that `IN SYNC` means the rows exist and pass, not that the property is the claim
 - **Results name the image**, by an `Image:` line the generators add, and a result made in another image is `STALE`.
 - **Evidence over consumers runs each consumer's claims check.**
 - **The CI/CD skill is not part of this** ⟨Q12⟩: it runs whatever checks a repository lists.
-- **Who accepted is not settled by any check.** A required check is a carrier's refusal; it does not show who merged,
-  and an assistant acting under the custodian's account looks the same to GitHub (TOPAK's comparison, SK-4).
+- **Who accepted is not settled by the claims check.** A required check is a carrier's refusal; it does not show who
+  merged, and an assistant acting under the custodian's account looks the same to GitHub (TOPAK's comparison, SK-4).
+  The signing part of the CI/CD skill (§4 step 7) is what tells the two apart, by a key the assistant does not hold.
 
 ### 3.5 What a repository takes
 
@@ -200,9 +201,23 @@ tla-kit decides the order ⟨Q7⟩; this is the one offered.
    `MISSING` and `BROKEN` each show on a fixture built to cause it.
 6. **CI.** *Done when* a pull request that edits one record reruns only that record's rows, one that breaks a row
    cannot merge, and results carry the `Image:` line.
-7. **The CI/CD skill**, first the part that carries a change (branch, commit, checks, push, pull request, what the
-   assistant never does), then signing and gate evidence once TOPAK's identity investigation (its ⟨K10⟩) reports.
-   *Done when* tla-kit's own pull requests follow it.
+7. **The CI/CD skill**, in two parts.
+   - **Carrying a change:** branch, commit, checks, push, pull request, and what the assistant never does. *Done
+     when* tla-kit's own pull requests follow it.
+   - **Signing**, with its own identity investigation; it no longer waits for TOPAK's. In order: an investigation,
+     published in `derived/`, of what an assistant session's git and GitHub credentials can do, tested on a
+     throwaway repository and never on a live one; a Proposed record and `spec/SigningGate.tla`, model-checked
+     before any code, in which the assistant holds the custodian's account but not the custodian's hardware-held
+     key; the skill's rules (which key signs what, the assistant's key listed as the assistant's in a tracked
+     allowed-signers file, an acceptance made as a tag signed locally with the custodian's key, and that the
+     assistant never signs as the custodian or edits that file); and a CI check that verifies every commit and tag
+     against the file and refuses a status change to Accepted, or a change to the file, without the custodian's
+     signature. *Done when* the module's properties hold (no accepted record without a custodian-signed tag; an
+     assistant's commit never verifies as the custodian's; a merge in GitHub's web interface never counts as an
+     acceptance) and each shortcut design breaks its own property; tla-kit accepts its next record by a signed tag;
+     and a test pull request carrying an assistant-signed acceptance is refused.
+
+   Gate evidence, ADR-0069's signed evidence in TOPAK's terms, is not part of this step.
 8. **The records skill**, drawn from tla-kit's `decisions/` form, carrying what TOPAK's comparison found in no
    external skill: a change smaller than a record, who decided what, conditions marked Met or Not met, and the
    missing reader stated. *Done when* it drafts a tla-kit record that passes the claims check.
@@ -269,8 +284,11 @@ components, a chain of authority from record to model to artifacts, and skills t
 5. CI's gate states its tier, carrier (its §4.3).
 6. Six records became three (its §4.9: every tier below the mechanism ends in the custodian reading something).
 
-**What stays with TOPAK:** its other twelve questions; the identity investigation (⟨K10⟩ there), on which the CI/CD
-skill's signing part waits; and the TOPAK records that take the skills from here.
+**What stays with TOPAK:** its other twelve questions; its own identity investigation (⟨K10⟩ there), which tla-kit's
+(§4 step 7) does not replace but which can start from it, since tla-kit's is done in general terms and its result is
+offered to TOPAK, not imposed; and the TOPAK records that take the skills from here. Until 2026.11.20 this note had
+the signing part waiting on TOPAK's investigation; it now runs its own, so that it is not blocked by another
+repository's schedule.
 
 ---
 
@@ -283,7 +301,10 @@ skill's signing part waits; and the TOPAK records that take the skills from here
   and TLA+ that is not the custodian's is worth more than any step in §4.
 - **Who wrote it.** tla-kit's records say most of their choices were the assistant's. The chain makes that visible
   (the **Chosen by** line), and does not change it.
-- **Who merged.** No check here tells the custodian's act from an agent's under the custodian's account (§3.4).
+- **Who merged.** The claims check does not tell the custodian's act from an agent's under the custodian's account
+  (§3.4). The signing part of §4 step 7 does, for acceptances, by a key the agent does not hold; it still tells keys
+  apart, not people, and an agent with the custodian's GitHub token can still merge. What step 7 changes is that such
+  a merge does not count as an acceptance, not that it cannot happen.
 - **Specifications, not code.** A claim is checked of a module. Whether the code does what the module says is a
   separate link (TOPAK's drift test and trace checks are one way).
 - **Small constants.** `checked` means every reachable state at the constants the row states. The table carries the

@@ -181,7 +181,8 @@ that misses a History row.
 
 ## 4. Order of work
 
-tla-kit decides the order ⟨Q7⟩; this is the one offered.
+tla-kit decides the order ⟨Q7⟩; this is the one offered. `PLAN.md` Phases 7 to 9 carry it, with evaluation suites
+for the three skills added, and where the two differ `PLAN.md` is the plan.
 
 1. **tla-kit's own claims table.** *Done when* every property of both row lists is claimed or marked, and every
    checked item in those records carries its id.

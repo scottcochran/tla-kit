@@ -405,6 +405,8 @@ check of a drawn graph's arrows against the citations. `server/lemma_graph.py`, 
 `tla-kit lemma-graph` and `server/test_lemma_graph.py` are built ahead of acceptance, as working output, and are in
 no release. It needs nothing from [`GRAPH-AND-DIAGRAMS.md`](GRAPH-AND-DIAGRAMS.md)'s two phases, and it is what a
 diagram of a proof module would be drawn from.
+[`LEMMA-GRAPH-BROWSER.md`](LEMMA-GRAPH-BROWSER.md) is a design note, not built, for drawing it as a browsable page
+after Lean's Blueprint.
 
 **Check that can fail:** `server/test_lemma_graph.py`, natively for the tables and in the image for the reader;
 thirteen faults planted in the script, one at a time, each failed it on 2026.11.22. **Not run:** the image was not

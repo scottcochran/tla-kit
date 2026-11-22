@@ -4,7 +4,9 @@ Architecture decision records, one file each, after the form of TOPAK's `decisio
 drafted on 2026.11.15 from [PLAN.md](../PLAN.md) and [the founding session
 record](../derived/tla-kit-founding-session-2026.11.15.md), all as Proposed, and ADR-0017 on 2026.11.17. **All seventeen
 were accepted by the custodian, on 2026.11.15, 2026.11.16 and 2026.11.17.** ADR-0018 to ADR-0020 were drafted on 2026.11.20
-from [COUPLING.md](../COUPLING.md), all as Proposed, and none is accepted.
+from [COUPLING.md](../COUPLING.md), all as Proposed, and none is accepted. ADR-0023 was drafted on 2026.11.22, at the
+custodian's request, as Proposed; ADR-0021 and ADR-0022 are the numbers
+[GRAPH-AND-DIAGRAMS.md](../GRAPH-AND-DIAGRAMS.md) names for two records not yet drafted.
 The custodian chose the idea, the name and the spike. Every other choice was the assistant's, or is a recommendation the plan lists as owed. Nothing here is accepted
 until the custodian accepts it.
 
@@ -36,6 +38,7 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0018](ADR-0018.md) | tla-kit is the home of three independent skills, records, TLA+ and CI/CD, each enabled on its own and released with the image | Custodian (the coupling lives here; Q7, Q12); assistant (the form) | Planned | Proposed · 2026.11.20 |
 | [ADR-0019](ADR-0019.md) | Claims are data, and a check that writes nothing reports each one in sync, stale, missing or broken | Assistant | Drafted in part: `spec/claims.tsv` | Proposed · 2026.11.20 |
 | [ADR-0020](ADR-0020.md) | CI requires the claims check, reruns only stale claims, and names the image; the life cycle is specified in TLA+ first | Custodian (Q12); assistant | Planned | Proposed · 2026.11.20 |
+| [ADR-0023](ADR-0023.md) | A path a record item did not take to a proof has a recorded reason, quoted from its source, and a tool reports it and never guesses one | Custodian (that it exists, and the reasons it tells apart); assistant (the form) | Built ahead of acceptance, as working output; in no release | Proposed · 2026.11.22 |
 
 **Not recorded here.** `PLAN.md`'s D1, whether TOPAK moves `tools/TLAPS-PIN` to the image's Linux prover, is
 TOPAK's decision and is made there. So is the same question for gov-tla. ADR-0005 says what tla-kit provides

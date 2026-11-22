@@ -1,12 +1,14 @@
 #!/bin/sh
 # tla-kit: the image's own commands under one name.
 #   tla-kit mcp         the MCP server over stdio, on the project mounted at /work (ADR-0008)
+#   tla-kit not-taken  why a record item does not reach a proof by a path it could have (ADR-0023); --help
 #   tla-kit info        what the image holds (tla-kit-info)
 #   tla-kit selftest    check the image against itself (tla-kit-selftest)
 set -eu
 case "${1:-}" in
   mcp)      shift; exec python3 -B /opt/tla-kit/server/tla_kit_mcp.py "$@" ;;
+  not-taken) shift; exec python3 -B /opt/tla-kit/server/not_taken.py "$@" ;;
   info)     shift; exec tla-kit-info "$@" ;;
   selftest) shift; exec tla-kit-selftest "$@" ;;
-  *)        echo "usage: tla-kit mcp | info [--json] | selftest" >&2; exit 2 ;;
+  *)        echo "usage: tla-kit mcp | not-taken [...] | info [--json] | selftest" >&2; exit 2 ;;
 esac

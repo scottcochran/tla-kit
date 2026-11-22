@@ -131,7 +131,7 @@ RUN --mount=type=bind,from=kept-cvc5,target=/kept \
 COPY bin/ /usr/local/bin/
 COPY vendor/writing-tla-specs-and-proofs/ /opt/tla-kit/skill/
 # The MCP server, standard library only (ADR-0008); started as `tla-kit mcp`.
-COPY server/tla_kit_mcp.py /opt/tla-kit/server/tla_kit_mcp.py
+COPY server/tla_kit_mcp.py server/not_taken.py /opt/tla-kit/server/
 # tla-kit's licences, and the notice of the third-party software in the image with the licence texts the TLAPS
 # tarball leaves out (ADR-0011 item 4; licenses/THIRD-PARTY.md).
 COPY LICENSE LICENSE-DOCS NOTICE /opt/tla-kit/

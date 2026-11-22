@@ -1,0 +1,55 @@
+# Paths not taken: why a record item does not reach a proof by a path it could have (ADR-0023, Proposed).
+# One row per reason, tab-separated. server/not_taken.py reads it against spec/claims.tsv (ADR-0019) and the records,
+# and the server's not_taken tool returns its report. Which paths are taken is in the claims table and is not
+# restated here; this table holds only reasons.
+#
+# Columns:
+#   id        a stable id, never reused: N-<record>-<n>
+#   from      where the path starts: a claim (C-0016-4c), a module (every claim of it), a record's item, or a record
+#   path      claim      a record item makes a claim (from a record or its item)
+#             property   the claim has an operator in a module
+#             checked    TLC checks it on every reachable state at a row's constants
+#             breaks     a row's counterexample shows the check is not vacuous
+#             proved     TLAPS proves it
+#             certified  every SMT step of that proof is checked by a second tool
+#             alternative  a design the record did not choose (from a record or its item)
+#   reason    design          someone decided against it, and the source says so
+#             dead-end        it was tried and did not work, and the source is the record of the attempt
+#             oversight       nobody decided: it was found missing on the date given, and still is
+#             deferred        it is meant to be taken later, and the source says when
+#             blocked         it waits on something outside the repository
+#             not-applicable  there is no such path for this item
+#             superseded      it was the path once, and a later decision replaced it
+#             other           none of these; why says what
+#   why       the reason in one line, as the source words it
+#   source    where the reason is written: a record (ADR-0015 item 3, ADR-0015 Alternatives, ADR-0016 History
+#             2026.11.16) or a file in the tree, named
+#   quote     words of the source that carry the reason. The script looks them up there, ignoring line breaks and
+#             emphasis marks, and reports the row BAD when they are gone
+#   by        who gave the reason. A reason the assistant gave is the assistant's until the custodian takes it
+#   date      when the reason was given, or for an oversight when it was found
+#   evidence  rows of a named results file that show what the path would cost, as <file>: row row; or -
+#
+# A path that is not taken and has no row here is reported UNEXPLAINED. That is a true answer and is not filled in
+# by guessing: at 2026.11.22 every ProveRequests claim's proved path is so. No record says why that module has no
+# TLAPS proof, where ADR-0015 says it of PinLifecycle.
+#
+# The six oversight rows are the finding of COUPLING.md section 4 step 1, classed by the assistant: the module's
+# header says five of the properties hold under every mutation by construction, which states the fact and decides
+# nothing. The custodian may class any of them design instead.
+id	from	path	reason	why	source	quote	by	date	evidence
+N-0015-1	spec/PinLifecycle.tla	proved	design	The records were Proposed and still moving, and a proof would be redone after each move, for properties TLC checks at small bounds. The record adds that once they are accepted and stable a proof would need a new record	ADR-0015 Alternatives	A TLAPS proof of the invariants. The records are Proposed and still moving	the assistant, in a record the custodian accepted	2026.11.15	-
+N-0015-2	C-0015-4d	breaks	oversight	No mutation removes the rule it rests on, so no row shows the check can fail. The module says it holds under every mutation by construction	spec/claims.tsv	have no breaking row: no mutation removes	the assistant, writing the claims table	2026.11.20	-
+N-0015-3	C-0015-4e	breaks	oversight	No mutation removes the rule it rests on, so no row shows the check can fail. The module says it holds under every mutation by construction	spec/claims.tsv	have no breaking row: no mutation removes	the assistant, writing the claims table	2026.11.20	-
+N-0015-4	C-0015-4f	breaks	oversight	No mutation removes the rule it rests on, so no row shows the check can fail. The module says it holds only because the custodian applies ADR-0013's kinds strictly, which the model does not test	spec/claims.tsv	have no breaking row: no mutation removes	the assistant, writing the claims table	2026.11.20	-
+N-0015-5	C-0015-4g	breaks	oversight	No mutation removes the rule it rests on, so no row shows the check can fail. The module says it holds under every mutation by construction	spec/claims.tsv	have no breaking row: no mutation removes	the assistant, writing the claims table	2026.11.20	-
+N-0015-6	C-0015-4i	breaks	oversight	No mutation removes the rule it rests on, so no row shows the check can fail. The module says it holds under every mutation by construction	spec/claims.tsv	have no breaking row: no mutation removes	the assistant, writing the claims table	2026.11.20	-
+N-0015-7	ADR-0015 item 5	alternative	superseded	The records as they stood before ADR-0015's four fixes. Each fix is now in its record, and the as-written rows show the four gaps the fixes close	spec/README.md	Each fix is now written in its record	the custodian, accepting the fixes with the records	2026.11.15	spec/PinLifecycle-results-2026.11.19.txt: m-aswritten-evidence m-aswritten-kept m-aswritten-rebuild m-aswritten-log
+N-0016-1	C-0016-4c	property	design	A request's scope is passed to tlapm as lines and comes back with the answer unchanged, so the module does not model it, though ADR-0016 item 4 lists it as a property. The server's tests exercise it	spec/ProveRequests.tla	The answer's scope being its request's holds by construction, at this abstraction	the assistant, in the module's header	2026.11.16	-
+N-0016-2	C-0016-4h	breaks	oversight	No mutation removes what it rests on, so no row shows the check can fail	spec/claims.tsv	and one ProveRequests claim (4h) have no breaking row	the assistant, writing the claims table	2026.11.20	-
+N-0016-3	ADR-0016 item 5	alternative	design	The naive design: one shared cache with no lock, and the kill sent to tlapm alone. The rows show a process outliving its request and two writers of one cache	ADR-0016 item 5	one shared cache with no lock, and the kill sent to tlapm alone	the assistant, in a record the custodian accepted	2026.11.15	spec/ProveRequests-results-2026.11.19.txt: m-naive-outlive m-naive-writer
+N-0016-4	ADR-0016 item 5	alternative	design	Looking for a backend that has left its process group. The server kills and waits for the group only; the rows show what that costs if a backend ever leaves	spec/README.md	The server kills and waits for the group only, and does not look for such a process	the assistant	2026.11.16	spec/ProveRequests-results-2026.11.19.txt: m-escape-outlive m-escape-writer
+N-0009-1	ADR-0009 item 5	alternative	dead-end	Driving tlapm_lsp in place of one tlapm per request. It was run against the same broken step: it drops the backends tried and their reasons, and writes its cache into the project	derived/tla-kit-prove-comparison-2026.11.16.md	writes its cache into the project, and it could not be moved	the custodian, on the assistant's comparison	2026.11.16	-
+N-0013-1	ADR-0013 item 5	claim	design	Time is not modelled: the weekly cadence and the 90-day refresh become fairness, not intervals	ADR-0015 item 3	Time is not modelled	the assistant, in a record the custodian accepted	2026.11.15	-
+N-0014-1	ADR-0014 item 4	claim	design	The attestation is left out of the model, with the scan and the SBOM: each adds something to a release, and none changes the order of anything	ADR-0015 item 3	Each adds something to a release, and none changes the order of anything	the assistant, in a record the custodian accepted	2026.11.15	-
+N-0014-2	ADR-0014 item 8	claim	design	An image is the tuple of its pin values. Whether two builds of the same pins give the same bytes is this item's own check, not the model's	ADR-0015 item 3	is ADR-0014 item 8's check, not the model's	the assistant, in a record the custodian accepted	2026.11.15	-

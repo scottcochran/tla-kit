@@ -411,6 +411,9 @@ suites added; where the two differ, this plan is the plan (ADR-0018 item 9).
    `vendor/` is removed, and ADR-0007 is superseded.
 3. **`spec/ClaimsSync.tla`**, rows and results, before any code (ADR-0020 item 5).
 4. **The claims check, `claims_check.py`, and the `claims` tool** (ADR-0019).
+   **Paths not taken** (ADR-0023, Proposed, added 2026.11.22) reads the same table: why a claim stops short of a
+   path it could take, each reason quoted from its source. Its script, its tool `not_taken`, its tests and
+   `spec/not-taken.tsv` are built ahead of acceptance, as working output, and are in no release.
 5. **CI** (ADR-0020): the claims check required, only stale claims rerun, and every result naming the image that
    made it.
 

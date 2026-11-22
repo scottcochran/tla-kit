@@ -38,6 +38,8 @@ SKILL = os.environ.get("TLA_KIT_SKILL") or os.path.join(os.path.dirname(HERE), "
 SCRIPTS = os.path.join(SKILL, "scripts")
 sys.path.insert(0, SCRIPTS)
 import tla_common as t  # noqa: E402  (the skill's library, ADR-0007)
+sys.path.insert(0, HERE)
+import not_taken  # noqa: E402  (paths not taken, ADR-0023; beside this file in the image and in a checkout)
 
 SERVER_NAME = "tla-kit"
 PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"]  # newest first; the first is the one it speaks
@@ -1034,6 +1036,24 @@ def tool_proof_sync(a):
             "command": "proof_sync.py " + " ".join(args), "output": tail(out, 80), "label": WORKING}
 
 
+def tool_not_taken(a):
+    """Paths not taken from a record item to a proof, and why: the reasons table against the claims table and the
+    records (ADR-0023). It reads the tree and writes nothing."""
+    paths = {}
+    for key, default, kind in (("claims", "spec/claims.tsv", "file"), ("table", "spec/not-taken.tsv", "any"),
+                               ("decisions", "decisions", "dir")):
+        paths[key] = rel(resolve(a.get(key) or default, kind=kind))
+    try:
+        rep = not_taken.build(project_root(), paths["claims"], paths["table"], paths["decisions"],
+                              claim=a.get("claim"), record=a.get("record"),
+                              item=str(a["item"]) if a.get("item") is not None else None, path=a.get("path"),
+                              reason=a.get("reason"), only_open=bool(a.get("open")))
+    except not_taken.TableError as e:
+        raise ToolError(str(e))
+    rep["label"] = WORKING
+    return rep
+
+
 # ---------------------------------------------------------------------------------------------------------------
 # Tool definitions
 
@@ -1133,6 +1153,24 @@ TOOLS = [
              "jobs": {"type": "integer"}, "only": {"type": "array", "items": {"type": "string"}},
              "dry_run": {"type": "boolean"}, "date": {"type": "string", "description": "YYYY.MM.DD"},
              "timeout": TIMEOUT}, ["rows"])),
+    ("not_taken", tool_not_taken, "Why a record item does not reach a proof by a path it could have. For each "
+     "claim of spec/claims.tsv it lists the five paths (property, checked, breaks, proved, certified) as TAKEN, "
+     "NOT TAKEN with the recorded reason (design, dead-end, oversight, deferred, blocked, not-applicable, superseded "
+     "or other), or UNEXPLAINED when spec/not-taken.tsv records none; with a record, also its items that make no "
+     "claim and the alternatives it did not choose. Every reason quotes its source, and a row whose words are no "
+     "longer there, or whose path has since been taken, is reported. It never guesses a reason. It reads the tree "
+     "and writes nothing. Working output.",
+     schema({"claim": {"type": "string", "description": "One claim, by id, e.g. C-0016-4c"},
+             "record": {"type": "string", "description": "One record, e.g. ADR-0016: its claims, its items and "
+                                                         "its alternatives"},
+             "item": {"type": "string", "description": "With record, one item of it, e.g. 5"},
+             "path": {"type": "string", "enum": not_taken.PATHS},
+             "reason": {"type": "string", "enum": not_taken.REASONS},
+             "open": {"type": "boolean", "description": "Only what is still owed: unexplained, oversight, "
+                                                        "deferred and blocked"},
+             "claims": {"type": "string", "description": "The claims table (default spec/claims.tsv)"},
+             "table": {"type": "string", "description": "The reasons table (default spec/not-taken.tsv)"},
+             "decisions": {"type": "string", "description": "The records' directory (default decisions)"}})),
 ]
 BY_NAME = {name: (fn, desc, sch) for name, fn, desc, sch in TOOLS}
 

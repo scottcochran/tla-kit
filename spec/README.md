@@ -11,7 +11,24 @@ results files.
 
 [`claims.tsv`](claims.tsv) names, for each record item that says something is checked, the property and the rows
 that check it, and marks the properties that are not claims (ADR-0019, Proposed; [COUPLING.md](../COUPLING.md)).
-Nothing reads it yet.
+The claims check is not built.
+
+[`not-taken.tsv`](not-taken.tsv) holds the reasons a claim stops short of a path it could take, from a property to a
+certified proof, and the alternatives a record did not choose (ADR-0023, Proposed). Each reason is `design`,
+`dead-end`, `oversight`, `deferred`, `blocked`, `not-applicable`, `superseded` or `other`, and quotes the record or
+file that gives it. `server/not_taken.py` reads it against the claims table and the records, and reports each path
+as taken, not taken with its reason, or `UNEXPLAINED`. It checks that every quote is still in its source, and it
+never supplies a reason. From the repository root:
+
+```sh
+python3 server/not_taken.py                      # every claim's paths
+python3 server/not_taken.py --claim C-0016-4c    # one claim
+python3 server/not_taken.py --record ADR-0016    # one record: its claims, its items with no claim, its alternatives
+python3 server/not_taken.py --open               # what is still owed: unexplained, oversight, deferred, blocked
+```
+
+On 2026.11.22, of 19 claims' 95 paths, 48 are taken, 17 are not taken with a reason (11 by design, 6 by oversight),
+22 follow from another, and 8 are unexplained: no record says why `ProveRequests` has no TLAPS proof.
 
 ## PinLifecycle
 

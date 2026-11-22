@@ -259,6 +259,12 @@ With `--cli --method tools/list` before `docker`, it lists the tools in the term
 | `flip_test` | The skill's flip test: each mutation's hypothesis flipped on a copy, and the proof must break where it should (Phase 4) |
 | `proof_sync` | The skill's sync check: every results file against the tree and the pins, and with `run` each stale proof re-checked (Phase 4) |
 
+On `main` after `v0.5.0`, and in no release yet, the server has a fifteenth tool:
+
+| Tool | Does |
+|---|---|
+| `not_taken` | Why a record item does not reach a proof by a path it could have: each path of each claim as taken, not taken with its recorded reason (design, dead end, oversight, deferred, blocked, not applicable, superseded or other), or `UNEXPLAINED`. Every reason quotes its source, and the tool never supplies one (ADR-0023, Proposed; [`spec/README.md`](spec/README.md)) |
+
 The proof tools follow the design of [marco6/tlapm-mcp](https://github.com/marco6/tlapm-mcp) (MIT), with the
 changes ADR-0009 names; none of its code is used. `prove` runs `tlapm` once per request, in a process group of its
 own that is killed whole on a timeout or a cancel, with a cache the server owns, one run per module at a time, and

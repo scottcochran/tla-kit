@@ -1,5 +1,6 @@
 # Every pull request is built and tested, and main merges only on a pass (ADR-0014 item 1). CI pushes nothing.
-#   records     the inventory against the Dockerfile and the README, and the vendored scripts against their pin
+#   records     the inventory against the Dockerfile and the README, the vendored scripts against their pin, and
+#               the paths-not-taken check on this repository's own tables (ADR-0023, Proposed)
 #   image       the image built as the release builds it, from the kept copies; its self-test; the MCP
 #               client test, every tool of the server against the fixture, and, when the change touches the
 #               server, the prove tool's tests (ADR-0016 item 7) and each tool compared with its command on
@@ -65,6 +66,10 @@ jobs:
           git init -q "$RUNNER_TEMP/upstream"
           git -C "$RUNNER_TEMP/upstream" fetch -q --depth 1 "$source" "$commit"
           python3 vendor/check.py --upstream "$RUNNER_TEMP/upstream"
+      - name: Paths not taken, its tests and this repository's own reasons table (ADR-0023, Proposed)
+        run: |
+          python3 server/test_not_taken.py
+          python3 server/not_taken.py | tee -a "$GITHUB_STEP_SUMMARY"
 
   image:
     needs: plan
@@ -90,6 +95,11 @@ jobs:
         run: >
           python3 server/test_mcp.py --
           docker run -i --rm --user "$(id -u):$(id -g)" -v {project}:/work tla-kit:ci tla-kit mcp
+      - name: The not_taken tool in the image, and the command on this repository (ADR-0023, Proposed)
+        run: |
+          python3 server/test_not_taken.py -- \
+            docker run -i --rm --user "$(id -u):$(id -g)" -v {project}:/work tla-kit:ci tla-kit mcp
+          docker run --rm --user "$(id -u):$(id -g)" -v "$PWD:/work" tla-kit:ci tla-kit not-taken --open
       - name: The prove tool, and ADR-0016 item 7's tests of spec/ProveRequests.tla's properties
         if: needs.plan.outputs.server == 'true'
         run: >

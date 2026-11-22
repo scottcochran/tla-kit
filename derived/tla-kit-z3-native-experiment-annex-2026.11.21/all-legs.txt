@@ -1,0 +1,122 @@
+TOPAK b556e52 2026-11-22T02:40:23Z
+=== A-z3-4.8.9-amd64-emulated start 2026-11-22T02:40:23Z
+Alone	263	263	7.0	SAME
+Anchor	40	40	1.2	SAME
+BreakGlass_A1	45	45	1.2	SAME
+BreakGlass	37	37	1.1	SAME
+Confinement_A1	503	503	17.0	SAME
+Confinement	502	502	17.5	SAME
+Correlator	455	455	18.4	SAME
+Coupling_live	31	31	1.2	SAME
+Coupling	320	320	7.1	SAME
+Emergency_live	160	160	2.9	SAME
+Emergency	373	373	6.5	SAME
+Federation	892	892	11.2	SAME
+FloorComposition	171	171	2.7	SAME
+FloorRouting	36	36	1.0	SAME
+Intent	677	677	9.3	SAME
+Labels	651	651	9.1	SAME
+Lease_A1	200	200	18.5	SAME
+Membership	495	495	10.2	SAME
+Mesh	1470	1470	113.1	SAME
+NonComposition_A1	96	96	1.8	SAME
+NonComposition	58	58	1.5	SAME
+Observers	65	65	1.3	SAME
+Operators	354	354	14.1	SAME
+Outstanding	1871	1871	38.1	SAME
+Peer	254	254	4.2	SAME
+PlaneClock	535	535	13.4	SAME
+Release	613	613	9.7	SAME
+RulesFloorNV_rev5	262	262	20.6	SAME
+RunConfinement	116	116	1.9	SAME
+RunCoupling	469	469	7.8	SAME
+RunSeats	147	147	2.3	SAME
+Seats	110	110	6.0	SAME
+ToolList	215	215	2.8	SAME
+Workflow_A1	1169	1169	67.8	SAME
+Workflow	1136	1136	59.3	SAME
+finished: 2026-11-22T02:49:02Z, total 516 s, exit 0
+wall 518 s, exit 0
+=== A-z3-4.8.9-amd64-emulated end 2026-11-22T02:49:02Z
+=== C-z3-5.4.1-arm64-native start 2026-11-22T02:49:02Z
+Alone	263	263	6.3	SAME
+Anchor	40	40	1.0	SAME
+BreakGlass_A1	45	45	0.9	SAME
+BreakGlass	37	37	1.0	SAME
+Confinement_A1	503	503	16.9	SAME
+Confinement	502	502	16.6	SAME
+Correlator	455	455	13.9	SAME
+Coupling_live	31	31	0.9	SAME
+Coupling	320	320	2.4	SAME
+Emergency_live	160	160	2.8	SAME
+Emergency	373	373	5.4	SAME
+Federation	892	892	8.4	SAME
+FloorComposition	171	171	2.2	SAME
+FloorRouting	36	36	0.9	SAME
+Intent	677	677	8.4	SAME
+Labels	651	651	8.4	SAME
+Lease_A1	200	200	18.1	SAME
+Membership	495	495	10.6	SAME
+Mesh	1470	1470	105.6	SAME
+NonComposition_A1	96	96	1.5	SAME
+NonComposition	58	58	1.0	SAME
+Observers	65	65	1.0	SAME
+Operators	354	354	8.6	SAME
+Outstanding	1871	1871	35.3	SAME
+Peer	254	254	3.7	SAME
+PlaneClock	535	535	12.4	SAME
+Release	613	613	8.3	SAME
+RulesFloorNV_rev5	262	262	20.4	SAME
+RunConfinement	116	116	1.4	SAME
+RunCoupling	469	469	3.3	SAME
+RunSeats	147	147	1.9	SAME
+Seats	110	110	5.8	SAME
+ToolList	215	215	2.1	SAME
+Workflow_A1	1169	1169	60.4	SAME
+Workflow	1136	1136	58.0	SAME
+finished: 2026-11-22T02:56:48Z, total 463 s, exit 0
+wall 464 s, exit 0
+=== C-z3-5.4.1-arm64-native end 2026-11-22T02:56:48Z
+=== B-z3-5.4.1-amd64-emulated start 2026-11-22T02:56:48Z
+Alone	263	263	6.6	SAME
+Anchor	40	40	1.3	SAME
+BreakGlass_A1	45	45	1.4	SAME
+BreakGlass	37	37	1.3	SAME
+Confinement_A1	503	503	17.7	SAME
+Confinement	502	502	18.3	SAME
+Correlator	455	455	16.1	SAME
+Coupling_live	31	31	1.2	SAME
+Coupling	320	320	3.3	SAME
+Emergency_live	160	160	3.1	SAME
+Emergency	373	373	6.8	SAME
+Federation	892	892	12.8	SAME
+FloorComposition	171	171	3.3	SAME
+FloorRouting	36	36	1.1	SAME
+Intent	677	677	10.5	SAME
+Labels	651	651	9.9	SAME
+Lease_A1	200	200	19.0	SAME
+Membership	495	495	10.6	SAME
+Mesh	1470	1470	113.1	SAME
+NonComposition_A1	96	96	2.0	SAME
+NonComposition	58	58	1.4	SAME
+Observers	65	65	1.4	SAME
+Operators	354	354	9.6	SAME
+Outstanding	1871	1871	35.8	SAME
+Peer	254	254	4.6	SAME
+PlaneClock	535	535	12.7	SAME
+Release	613	613	10.1	SAME
+RulesFloorNV_rev5	262	262	20.7	SAME
+RunConfinement	116	116	2.1	SAME
+RunCoupling	469	469	4.4	SAME
+RunSeats	147	147	2.6	SAME
+Seats	110	110	6.0	SAME
+ToolList	215	215	3.2	SAME
+Workflow_A1	1169	1169	63.5	SAME
+Workflow	1136	1136	60.3	SAME
+finished: 2026-11-22T03:05:16Z, total 505 s, exit 0
+wall 507 s, exit 0
+=== B-z3-5.4.1-amd64-emulated end 2026-11-22T03:05:17Z
+=== A0-pristine start 2026-11-22T03:05:17Z
+/private/tmp/claude-501/-Users-scott-dev-sandbox-tla-kit/90e76ea0-1116-4f6a-9c5c-54e6b0824870/scratchpad/harness/drive.sh: line 19: wrap[@]: unbound variable
+=== A0-pristine end 2026-11-22T03:05:17Z
+ALL DONE 2026-11-22T03:05:17Z

@@ -1,0 +1,4 @@
+prover: tlapm 9a52faf sha256 faa92f2606242ce2 on x86_64, 12 CPUs
+z3 at backends/bin: Z3 version 5.4.1 - 64 bit - build hashcode 145c0c51570a357cc558ce898ce77573ba9d4fbf; Z3_SERVER=z3srv-B-z3-5.4.1-amd64-emulated:7777
+started: 2026-11-22T02:56:51Z
+finished: 2026-11-22T03:05:16Z, total 505 s, exit 0

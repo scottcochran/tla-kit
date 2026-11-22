@@ -1,0 +1,2 @@
+leg A0-pristine sidecar z3srv:none () image tla-kit:9a52faf (sha256:ad31db45d0aae7d1a2da4777de3b5f77ba967027d372b4a6e24dd617a966031b) spec /Users/scott/dev/sandbox/TOPAK/spec modules: 
+wall 469 s, exit 0

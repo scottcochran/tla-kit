@@ -1,0 +1,4 @@
+prover: tlapm 9a52faf sha256 faa92f2606242ce2 on x86_64, 12 CPUs
+z3 at backends/bin: Z3 version 4.8.9 - 64 bit; Z3_SERVER=none
+started: 2026-11-22T03:06:07Z
+finished: 2026-11-22T03:13:54Z, total 468 s, exit 0

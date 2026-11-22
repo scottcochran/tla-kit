@@ -1,0 +1,11 @@
+# tla-kit experiment 2026.11.21: a Z3 server sidecar. Built with --platform and a build context holding bin/z3.
+ARG PLATFORM=linux/arm64
+FROM --platform=${PLATFORM} ubuntu:24.04
+RUN apt-get update && apt-get install -y --no-install-recommends python3 libstdc++6 libgomp1 \
+ && rm -rf /var/lib/apt/lists/*
+COPY z3 /opt/z3/bin/z3
+COPY z3server.py /opt/z3server.py
+RUN chmod 0755 /opt/z3/bin/z3 && /opt/z3/bin/z3 -version
+ENV Z3_BIN=/opt/z3/bin/z3
+EXPOSE 7777
+CMD ["python3", "-I", "/opt/z3server.py"]

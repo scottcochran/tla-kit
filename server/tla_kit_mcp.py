@@ -38,6 +38,8 @@ SKILL = os.environ.get("TLA_KIT_SKILL") or os.path.join(os.path.dirname(HERE), "
 SCRIPTS = os.path.join(SKILL, "scripts")
 sys.path.insert(0, SCRIPTS)
 import tla_common as t  # noqa: E402  (the skill's library, ADR-0007)
+sys.path.insert(0, HERE)
+import lemma_graph  # noqa: E402  (a proof module's lemma graph, ADR-0024; beside this file)
 
 SERVER_NAME = "tla-kit"
 PROTOCOL_VERSIONS = ["2025-06-18", "2025-03-26", "2024-11-05"]  # newest first; the first is the one it speaks
@@ -1034,6 +1036,28 @@ def tool_proof_sync(a):
             "command": "proof_sync.py " + " ".join(args), "output": tail(out, 80), "label": WORKING}
 
 
+def tool_lemma_graph(a):
+    """A proof module's facts and the citations between them, from SANY's export of a copy of the module, with the
+    readings table and a drawn graph's arrows checked against it (ADR-0024). It writes nothing."""
+    spec_dir, module = module_path(a["module"])
+    path = os.path.join(spec_dir, module + ".tla")
+    table = None
+    if a.get("readings"):
+        table = resolve(a["readings"])
+    elif os.path.isfile(os.path.join(project_root(), lemma_graph.READINGS)):
+        table = os.path.join(project_root(), lemma_graph.READINGS)
+    xml_text = export_xml(spec_dir, module, a.get("timeout", DEFAULT_TIMEOUT))
+    try:
+        rep = lemma_graph.build(xml_text, module, open(path, encoding="utf-8").read(), rel(path),
+                                t.module_chain(module, spec_dir), root=project_root(), readings=table,
+                                readings_label=rel(table) if table else None, arrows=a.get("arrows"),
+                                fact=a.get("fact"))
+    except lemma_graph.GraphError as e:
+        raise ToolError(str(e))
+    rep["label"] = WORKING
+    return rep
+
+
 # ---------------------------------------------------------------------------------------------------------------
 # Tool definitions
 
@@ -1133,6 +1157,23 @@ TOOLS = [
              "jobs": {"type": "integer"}, "only": {"type": "array", "items": {"type": "string"}},
              "dry_run": {"type": "boolean"}, "date": {"type": "string", "description": "YYYY.MM.DD"},
              "timeout": TIMEOUT}, ["rows"])),
+    ("lemma_graph", tool_lemma_graph, "A proof module's lemma graph, read from the text of its proofs with SANY's "
+     "XML exporter: each named assumption, lemma and theorem with what its proof cites after BY (facts of the "
+     "module, of other modules and the prover's backends), what it unfolds after DEF, what cites it, what it rests "
+     "on, and whether it has a leaf that is OMITTED or has no proof. It does not run the prover and does not say a "
+     "proof was accepted. With the readings table (spec/readings.tsv), each fact's reading as READ, STALE (the text "
+     "changed since) or UNREAD; it never supplies a reading. With arrows, a drawn graph compared with the "
+     "citations. It writes nothing. Working output.",
+     schema({"module": {"type": "string", "description": "The proof module, relative to the project root, e.g. "
+                                                         "spec/Counter_proof.tla"},
+             "fact": {"type": "string", "description": "One fact, with the facts it rests on"},
+             "readings": {"type": "string", "description": "The readings table (default spec/readings.tsv, when "
+                                                           "it is there)"},
+             "arrows": {"type": "array", "items": {"type": "array", "items": {"type": "string"}, "minItems": 2,
+                                                   "maxItems": 2},
+                        "description": "A drawn graph, as [from, to] pairs of fact names, to compare with the "
+                                       "citations"},
+             "timeout": TIMEOUT}, ["module"])),
 ]
 BY_NAME = {name: (fn, desc, sch) for name, fn, desc, sch in TOOLS}
 

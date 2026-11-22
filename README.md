@@ -259,6 +259,12 @@ With `--cli --method tools/list` before `docker`, it lists the tools in the term
 | `flip_test` | The skill's flip test: each mutation's hypothesis flipped on a copy, and the proof must break where it should (Phase 4) |
 | `proof_sync` | The skill's sync check: every results file against the tree and the pins, and with `run` each stale proof re-checked (Phase 4) |
 
+On `main` after `v0.5.0`, and in no release yet, the server has a fifteenth tool:
+
+| Tool | Does |
+|---|---|
+| `lemma_graph` | A proof module's lemma graph, read from the text of its proofs with SANY's XML exporter: each named assumption, lemma and theorem with what its proof cites after `BY`, what it unfolds after `DEF`, what cites it and what it rests on. It does not run the prover and does not say a proof was accepted. With a readings table (`spec/readings.tsv`), each fact's one-line reading as `READ`, `STALE` when the proof's text has changed since, or `UNREAD`; it never supplies one. Given the arrows of a drawn graph, it reports each that is not a citation and each citation not drawn. Also `tla-kit lemma-graph`. ADR-0024, Proposed |
+
 The proof tools follow the design of [marco6/tlapm-mcp](https://github.com/marco6/tlapm-mcp) (MIT), with the
 changes ADR-0009 names; none of its code is used. `prove` runs `tlapm` once per request, in a process group of its
 own that is killed whole on a timeout or a cancel, with a cache the server owns, one run per module at a time, and

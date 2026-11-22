@@ -64,7 +64,8 @@ ADR-0009. D1 is TOPAK's and has no record here. D7 is a check, and its outcome g
 
 This is the order in which the phases need the records. The Phase 1a and 1b rows were accepted on 2026.11.15,
 and so were ADR-0005, 0013 and 0014. ADR-0010, ADR-0006, ADR-0008, ADR-0009 and ADR-0016 were accepted on
-2026.11.16, and ADR-0012 and ADR-0017 on 2026.11.17. No record is Proposed.
+2026.11.16, and ADR-0012 and ADR-0017 on 2026.11.17. One record is Proposed: ADR-0024, drafted 2026.11.22, which
+no phase waits on (see *Outside the phases*, after Phase 6).
 
 | Before | Accept | Why then |
 |---|---|---|
@@ -395,6 +396,19 @@ Then, each on its own:
 - TLATeX, which needs a LaTeX installation.
 - A Linux arm64 `tlapm` built from source, for Apple Silicon without emulation. A second platform is a second
   binary and a second digest to pin.
+
+### Outside the phases: the lemma graph (ADR-0024, Proposed)
+
+Added 2026.11.22, at the custodian's request. A proof module's facts and the citations between them, read from
+SANY's XML export; a table of one-line readings, each pinned to the text of the proof it is a reading of; and a
+check of a drawn graph's arrows against the citations. `server/lemma_graph.py`, the server's `lemma_graph` tool,
+`tla-kit lemma-graph` and `server/test_lemma_graph.py` are built ahead of acceptance, as working output, and are in
+no release. It needs nothing from [`GRAPH-AND-DIAGRAMS.md`](GRAPH-AND-DIAGRAMS.md)'s two phases, and it is what a
+diagram of a proof module would be drawn from.
+
+**Check that can fail:** `server/test_lemma_graph.py`, natively for the tables and in the image for the reader;
+thirteen faults planted in the script, one at a time, each failed it on 2026.11.22. **Not run:** the image was not
+built in the session that wrote it, so the tool and the command inside the image are untested until CI runs.
 
 ## Risks
 

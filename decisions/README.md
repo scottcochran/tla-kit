@@ -4,6 +4,9 @@ Architecture decision records, one file each, after the form of TOPAK's `decisio
 drafted on 2026.11.15 from [PLAN.md](../PLAN.md) and [the founding session
 record](../derived/tla-kit-founding-session-2026.11.15.md), all as Proposed, and ADR-0017 on 2026.11.17. **All seventeen
 were accepted by the custodian, on 2026.11.15, 2026.11.16 and 2026.11.17.**
+ADR-0024 was drafted on 2026.11.22, at the custodian's request, as Proposed. The numbers between are spoken for and are
+not on `main`: ADR-0018 to ADR-0020 are on branch `adr-tla-cicd`, ADR-0021 and ADR-0022 are the two records
+[GRAPH-AND-DIAGRAMS.md](../GRAPH-AND-DIAGRAMS.md) names, and ADR-0023 is pull request #40's.
 The custodian chose the idea, the name and the spike. Every other choice was the assistant's, or is a recommendation the plan lists as owed. Nothing here is accepted
 until the custodian accepts it.
 
@@ -32,6 +35,7 @@ state is in its History rows, and the State column below follows them.
 | [ADR-0015](ADR-0015.md) | The pin and release process is specified in TLA+, and checked by TLC before the records it covers are accepted | Custodian (that it is written); assistant (its scope) | Built | Accepted · 2026.11.15 |
 | [ADR-0016](ADR-0016.md) | The `prove` tool's requests, processes and cache are specified in TLA+ before the tool is built | Custodian (that it is written); assistant (its scope) | Built: the module, its 78 rows, the tool and item 7's tests | Accepted · 2026.11.16 |
 | [ADR-0017](ADR-0017.md) | cvc5 and ethos are built from copies kept here, in one release with their copyleft parts' source | Custodian (to keep the zips, and item 5); assistant (the form) | Built: `cvc5-1.4.0` kept, released in `v0.4.0`; the weekly comparison has not run in Actions yet | Accepted · 2026.11.17 |
+| [ADR-0024](ADR-0024.md) | A proof module's lemma graph is read from the parser, a reading of a proof is a row pinned to the proof's text, and a tool reports both and never supplies a reading | Custodian (that it is tla-kit's, and a record of its own); assistant (the form) | Built ahead of acceptance, as working output; in no release | Proposed · 2026.11.22 |
 
 **Not recorded here.** `PLAN.md`'s D1, whether TOPAK moves `tools/TLAPS-PIN` to the image's Linux prover, is
 TOPAK's decision and is made there. So is the same question for gov-tla. ADR-0005 says what tla-kit provides

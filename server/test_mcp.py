@@ -97,9 +97,9 @@ def main(argv):
         c.send({"jsonrpc": "2.0", "method": "notifications/initialized"})
         check("ping", c.request("ping")["result"] == {})
         tools = [t["name"] for t in c.request("tools/list")["result"]["tools"]]
-        check("tools/list has the nine tools of Phase 3 and the five of Phase 4", sorted(tools) == sorted(
+        check("tools/list has the nine tools of Phase 3, the five of Phase 4 and lemma_graph", sorted(tools) == sorted(
             ["info", "parse", "symbols", "evaluate", "tlc_run", "simulate", "coverage", "state_graph", "tlc_rows",
-             "prove", "proof_check", "proof_results", "flip_test", "proof_sync"]), tools)
+             "prove", "proof_check", "proof_results", "flip_test", "proof_sync", "lemma_graph"]), tools)
         check("an unknown method is an error", c.request("nonesuch")["error"]["code"] == -32601)
 
         before = snapshot(project)
@@ -124,8 +124,13 @@ def main(argv):
             check("symbols: a proof module's theorems", not err and {"TypeInit", "NextBounded", "BoundedAlways",
                                                                       "SafeAlways", "MutNoLimitAllowsStep"} <= names,
                   text)
+            s, err, text = c.call("lemma_graph", {"module": "spec/Counter_proof.tla"})
+            check("lemma_graph: the fixture's citations (its own tests are test_lemma_graph.py)", not err
+                  and ["BoundedAlways", "SafeAlways"] in s["edges"] and len(s["edges"]) == 4
+                  and "working output" in s["label"], text)
         else:
-            print("skip  parse and symbols on a proof module: natively, TLAPM names no prover", flush=True)
+            print("skip  parse, symbols and lemma_graph on a proof module: natively, TLAPM names no prover",
+                  flush=True)
 
         s, err, text = c.call("symbols", {"module": "spec/Counter.tla"})
         ok = not err and [v["name"] for v in s["variables"]] == ["n", "over"] and \

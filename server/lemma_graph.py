@@ -18,6 +18,8 @@ of the file cannot be mistaken for one. For each fact it lists:
     unfolds      the definitions after DEF
     stated with  the project's definitions its statement names
     cited by     the facts of this module whose proofs name it
+    assumes      the assumptions it rests on: those its proof names, and those named by a fact below it
+    not followed the theorems of other modules it rests on, whose own assumptions are in those modules' reports
 
 and how its proof ends: its steps, and its leaves by kind (BY, OBVIOUS, OMITTED, or stated with no proof).
 
@@ -75,6 +77,9 @@ NOTES = [
     "file's.",
     "A reading is what a person wrote of a proof. READ says the proof's text has not changed since. Whether the "
     "reading is right is read by a person. UNREAD means none is recorded, and none is supplied.",
+    "An assumption is listed for a fact when its proof, or the proof of a fact below it in this module, names it. A "
+    "theorem cited from another module is not followed there: it is listed as not followed, and what it assumes is "
+    "in that module's report.",
 ]
 
 
@@ -311,7 +316,25 @@ def read(xml_text, module, source, project_modules=()):
             f["depth"] = 1 + max((depth.get(n, 0) for n in f["cites"]), default=-1)
             f["not_proved_below"] = [n for n in f["rests_on"] if unproved(by_name[n])]
         f["proved_in_text"] = not unproved(f)
+    for f in facts:
+        f["assumes"], f["not_followed"] = ([], []) if f["kind"] == "assumption" else assumed(f, by_name, module)
     return {"facts": facts, "definitions": definitions, "use_hide": use_hide}
+
+
+def assumed(fact, by_name, module):
+    """The named assumptions a fact rests on, as far as this module shows: the assumptions of this module among the
+    facts below it, and the assumptions of other modules that it, or any fact below it, names. And the edge of that:
+    the theorems of other modules it rests on, which are not followed, so what they assume is not listed here."""
+    below = [by_name[n] for n in fact["rests_on"]]
+    out = [{"name": b["name"], "module": module, "where": "module"} for b in below if b["kind"] == "assumption"]
+    beyond, seen = [], {(a["name"], a["module"]) for a in out}
+    for g in below + [fact]:
+        for e in g["elsewhere"]:
+            if (e["name"], e["module"]) not in seen:
+                seen.add((e["name"], e["module"]))
+                (out if e["kind"] == "assumption" else beyond).append(
+                    {"name": e["name"], "module": e["module"], "where": e["where"]})
+    return out, beyond
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -447,11 +470,18 @@ def build(xml_text, module, source, module_rel, project_modules=(), root=None, r
             backends.setdefault(b, []).append(label)
     rep["elsewhere"] = list(outside.values())
     rep["backends"] = [{"name": b, "cited_by": who} for b, who in backends.items()]
+    rested = {}
+    for f in facts:
+        for a in f["assumes"]:
+            rested.setdefault((a["name"], a["module"]), dict(a, rested_on_by=[]))["rested_on_by"].append(
+                f["name"] or f"(unnamed, line {f['line']})")
+    rep["assumptions"] = list(rested.values())
     rep["use_hide"] = graph["use_hide"]
     kinds = {k: sum(1 for f in facts if f["kind"] == k) for k in KINDS}
     rep["counts"] = {"facts": len(facts), "kinds": {k: v for k, v in kinds.items() if v},
                      "definitions": len(definitions), "citations": len(rep["edges"]),
-                     "uncited": len(rep["uncited"]), "not_proved_in_text": len(rep["not_proved_in_text"])}
+                     "uncited": len(rep["uncited"]), "not_proved_in_text": len(rep["not_proved_in_text"]),
+                     "assumptions_rested_on": len(rep["assumptions"])}
     if arrows is not None:
         rep["arrows"] = check_arrows(graph, arrows)
     if fact is not None:
@@ -476,7 +506,8 @@ def summary(rep):
     out = [f"{rep['module']}: {c['facts']} fact{'' if c['facts'] == 1 else 's'} ({kinds or 'none'}), "
            f"{c['definitions']} definition{'' if c['definitions'] == 1 else 's'}, {c['citations']} "
            f"citation{'' if c['citations'] == 1 else 's'} between them; {c['uncited']} cited by none; "
-           f"{c['not_proved_in_text']} not proved in the text."]
+           f"{c['not_proved_in_text']} not proved in the text; {c['assumptions_rested_on']} named "
+           f"assumption{'' if c['assumptions_rested_on'] == 1 else 's'} rested on."]
     r = rep["readings"]
     table = r["table"] or "no table"
     out.append(f"Readings ({table}): {r['read']} READ, {r['stale']} STALE, {r['unread']} UNREAD, {len(r['bad'])} BAD.")
@@ -544,6 +575,10 @@ def render(rep):
                 out.append(_wrap("also given", "; ".join(extra)))
             if f["unfolds"]:
                 out.append(_wrap("unfolds", ", ".join(f["unfolds"])))
+        if f["assumes"]:
+            out.append(_wrap("assumes", ", ".join(_assumption(a) for a in f["assumes"])))
+        if f["not_followed"]:
+            out.append(_wrap("not followed", ", ".join(_assumption(a) for a in f["not_followed"])))
         if f["name"]:
             out.append(_wrap("cited by", ", ".join(f["cited_by"]) or "no fact of this module"))
         if f["kind"] != "assumption" and not f["proved_in_text"]:
@@ -563,6 +598,12 @@ def render(rep):
             out.append(textwrap.fill(f"{e['name']} ({e['kind']} of {e['module']}, {e['where']}), by "
                                      + ", ".join(e["cited_by"]), width=112, initial_indent="  ",
                                      subsequent_indent="    ", break_long_words=False, break_on_hyphens=False))
+    if rep["assumptions"]:
+        out.append("Assumptions rested on, by the facts that name them and by every fact above those:")
+        for a in rep["assumptions"]:
+            out.append(textwrap.fill(f"{_assumption(a)}, by " + ", ".join(a["rested_on_by"]), width=112,
+                                     initial_indent="  ", subsequent_indent="    ", break_long_words=False,
+                                     break_on_hyphens=False))
     if rep["backends"]:
         out.append("Backends named: " + "; ".join(f"{b['name']} by {', '.join(b['cited_by'])}"
                                                   for b in rep["backends"]))
@@ -582,6 +623,10 @@ def render(rep):
     out.append("")
     out.append(rep["summary"])
     return "\n".join(out)
+
+
+def _assumption(a):
+    return a["name"] if a["where"] == "module" else f"{a['name']} (of {a['module']}, {a['where']})"
 
 
 def _reading_lines(item):

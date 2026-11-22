@@ -409,7 +409,7 @@ diagram of a proof module would be drawn from.
 after Lean's Blueprint.
 
 **Check that can fail:** `server/test_lemma_graph.py`, natively for the tables and in the image for the reader;
-thirteen faults planted in the script, one at a time, each failed it on 2026.11.22. **Not run:** the image was not
+sixteen faults planted in the script, one at a time, each failed it on 2026.11.22. **Not run:** the image was not
 built in the session that wrote it, so the tool and the command inside the image are untested until CI runs.
 
 ## Risks

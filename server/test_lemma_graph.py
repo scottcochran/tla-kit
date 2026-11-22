@@ -50,6 +50,10 @@ Two    == n' = n + 2
 Next   == One \\/ Two
 Spec   == Init /\\ [][Next]_vars
 Small  == n <= Max
+
+ASSUME MaxBig == Max > 1
+THEOREM MaxBound == Max > 0
+  BY MaxBig
 =============================================================================
 """
 # Each construct the reader tells apart appears once. SANY parses it. It is not offered as a proof the prover
@@ -122,12 +126,15 @@ LEMMA Having == TypeOK => n >= 0
 <1> HAVE TypeOK
 <1> QED
   BY DEF TypeOK
+
+LEMMA InvKept == Inv /\\ [Next]_vars => Inv'
+  BY InvNext, MaxBound
 =============================================================================
 """
 BROKEN = "---- MODULE Broken_proof ----\nEXTENDS Naturals\nLEMMA L == 1 + 1 = 2\n  BY Nowhere\n====\n"
 # What the reader must find in TALLY_PROOF: every arrow, from the cited fact to the fact whose proof cites it.
 EDGES = [["OneGrows", "StepGrows"], ["TwoGrows", "StepGrows"], ["StepGrows", "TypeNext"], ["TypeNext", "InvNext"],
-         ["MaxPositive", "InvNext"], ["InitType", "InvInit"]]
+         ["MaxPositive", "InvNext"], ["InitType", "InvInit"], ["InvNext", "InvKept"]]
 
 
 def check(name, cond, detail=""):
@@ -339,12 +346,12 @@ def reader(argv):
         check("every fact, in the module's order, the unnamed theorem among them",
               [f["name"] for f in s["facts"]] == ["MaxPositive", "InitType", "OneGrows", "TwoGrows", "StepGrows",
                                                   "TypeNext", "InvNext", "InvInit", "Safe", None, "Unused", "Stated",
-                                                  "Forms", "Having"],
+                                                  "Forms", "Having", "InvKept"],
               [f["name"] for f in s["facts"]])
         check("each fact's kind is the keyword it was written with",
               [f["kind"] for f in s["facts"]] == ["assumption", "lemma", "lemma", "lemma", "proposition", "lemma",
                                                   "lemma", "corollary", "theorem", "theorem", "lemma", "lemma",
-                                                  "lemma", "lemma"],
+                                                  "lemma", "lemma", "lemma"],
               [f["kind"] for f in s["facts"]])
         check("every citation, and no other", sorted(s["edges"]) == sorted(EDGES), s["edges"])
         f = facts["StepGrows"]
@@ -369,6 +376,24 @@ def reader(argv):
         check("what a fact rests on, in the module's order, and how deep",
               f["rests_on"] == ["MaxPositive", "OneGrows", "TwoGrows", "StepGrows", "TypeNext"] and f["depth"] == 3
               and facts["OneGrows"]["depth"] == 0, (f["rests_on"], f["depth"]))
+        own, far = ({"name": "MaxPositive", "module": "Tally_proof", "where": "module"},
+                    {"name": "MaxNat", "module": "Tally", "where": "project"})
+        check("the assumptions a fact names: this module's first, then another module's", f["assumes"] == [own, far],
+              f["assumes"])
+        check("the assumptions a fact rests on only through a fact below it",
+              facts["InvKept"]["assumes"] == [own, far] and facts["InvKept"]["cites"] == ["InvNext"]
+              and facts["InvKept"]["depth"] == 4, facts["InvKept"])
+        bound = {"name": "MaxBound", "module": "Tally", "where": "project"}
+        check("a theorem of another module is not followed: it is listed as that, and what it assumes is not",
+              facts["InvKept"]["not_followed"] == [bound] and facts["InvNext"]["not_followed"] == []
+              and facts["InvKept"]["elsewhere"] == [dict(bound, kind="theorem")]
+              and "MaxBig" not in json.dumps(s["assumptions"]), facts["InvKept"])
+        check("a fact that names none and rests on none assumes none, and an assumption assumes none",
+              facts["TypeNext"]["assumes"] == [] and facts["MaxPositive"]["assumes"] == [], facts["TypeNext"])
+        check("the module's assumptions, each with every fact that rests on it",
+              s["assumptions"] == [dict(own, rested_on_by=["InvNext", "InvKept"]),
+                                   dict(far, rested_on_by=["InvNext", "InvKept"])]
+              and s["counts"]["assumptions_rested_on"] == 2, s["assumptions"])
         check("the statement's definitions", facts["InvInit"]["stated_with"] == ["Init", "Inv"]
               and facts["Stated"]["stated_with"] == [], facts["InvInit"]["stated_with"])
         check("OMITTED and a statement with no proof are listed as not proved in the text",
@@ -381,15 +406,16 @@ def reader(argv):
               and facts["Having"]["leaves"] == {"by": 1, "obvious": 0, "omitted": 0, "none": 0}
               and facts["Forms"]["proved_in_text"] and facts["Having"]["proved_in_text"],
               (facts["Forms"], facts["Having"]))
-        check("the facts no fact cites", s["uncited"] == ["InvNext", "InvInit", "Safe", "Unused", "Stated", "Forms",
-                                                    "Having"],
+        check("the facts no fact cites", s["uncited"] == ["InvInit", "Safe", "Unused", "Stated", "Forms", "Having",
+                                                    "InvKept"],
               s["uncited"])
         defs = {d["name"]: d for d in s["definitions"]}
         check("the module's own definitions, with the statements and proofs that use each",
-              list(defs) == ["Grows", "Inv"] and defs["Inv"]["in_statements_of"] == ["InvNext", "InvInit", "Safe"]
+              list(defs) == ["Grows", "Inv"]
+              and defs["Inv"]["in_statements_of"] == ["InvNext", "InvInit", "Safe", "InvKept"]
               and defs["Grows"]["unfolded_by"] == ["OneGrows", "TwoGrows", "StepGrows", "TypeNext"], defs)
         check("with no table every lemma and theorem is UNREAD, and the assumption is not counted",
-              s["readings"] == {"table": None, "read": 0, "stale": 0, "unread": 12, "bad": []}
+              s["readings"] == {"table": None, "read": 0, "stale": 0, "unread": 13, "bad": []}
               and facts["MaxPositive"]["reading"]["status"] == "NONE", s["readings"])
         check("the pin is the pin of the fact's own lines",
               facts["OneGrows"]["pin"] == lg.pin_of(TALLY_PROOF.splitlines(), 13, 14)
@@ -420,7 +446,7 @@ def reader(argv):
         s2, err, text = c.call({"module": "spec/Tally_proof.tla"})
         f2 = {f["name"]: f for f in (s2 or {}).get("facts", [])}
         check("readings: the default table is found, and its rows are READ", not err and s2["exit"] == 0
-              and s2["readings"] == {"table": "spec/readings.tsv", "read": 3, "stale": 0, "unread": 10, "bad": []}
+              and s2["readings"] == {"table": "spec/readings.tsv", "read": 3, "stale": 0, "unread": 11, "bad": []}
               and f2["OneGrows"]["reading"]["reading"] == "A reading of OneGrows.", text)
         # The proof of TypeNext is changed, and nothing else: its reading is stale, and OneGrows's still stands.
         changed = TALLY_PROOF.replace("  BY <1>1, n \\in Nat DEF TypeOK, Grows", "  BY <1>1 DEF TypeOK, Grows")
@@ -463,6 +489,12 @@ def reader(argv):
             check("the skill's fixture: the specification's assumption is cited from elsewhere in the project",
                   not err and f3["NextBounded"]["elsewhere"] == [{"name": "LimitNat", "module": "Counter",
                                                                   "kind": "assumption", "where": "project"}], text)
+            limit = {"name": "LimitNat", "module": "Counter", "where": "project"}
+            check("the skill's fixture: its theorems rest on the specification's assumption through a lemma",
+                  not err and f3["NextBounded"]["assumes"] == [limit] and f3["BoundedAlways"]["assumes"] == [limit]
+                  and f3["SafeAlways"]["assumes"] == [limit] and f3["TypeNext"]["assumes"] == []
+                  and s3["assumptions"] == [dict(limit, rested_on_by=["NextBounded", "BoundedAlways",
+                                                                     "SafeAlways"])], text)
         else:
             print("skip  the skill's fixture: natively, neither TLAPM nor TLA_KIT_TLAPS_STDLIB names the prover's "
                   "library", flush=True)
@@ -479,7 +511,9 @@ def reader(argv):
             return p.returncode, p.stdout, p.stderr
         code, out, _ = run(["spec/Tally_proof.tla"])
         check("the command: exit 0, with the report's notes and its summary", code == 0
-              and "It does not say the prover accepted the proof" in out and "6 citations between them" in out, out)
+              and "It does not say the prover accepted the proof" in out and "7 citations between them" in out
+              and "2 named assumptions rested on" in out and "MaxNat (of Tally, project), by InvNext, InvKept" in out
+              and "  not followed MaxBound (of Tally, project)" in out, out)
         code, out, _ = run(["spec/Tally_proof.tla", "--json"])
         check("the command: --json is the tool's report", code == 0 and sorted(json.loads(out)["edges"]) ==
               sorted(EDGES), out)

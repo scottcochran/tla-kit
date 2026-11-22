@@ -1160,10 +1160,11 @@ TOOLS = [
     ("lemma_graph", tool_lemma_graph, "A proof module's lemma graph, read from the text of its proofs with SANY's "
      "XML exporter: each named assumption, lemma and theorem with what its proof cites after BY (facts of the "
      "module, of other modules and the prover's backends), what it unfolds after DEF, what cites it, what it rests "
-     "on, and whether it has a leaf that is OMITTED or has no proof. It does not run the prover and does not say a "
-     "proof was accepted. With the readings table (spec/readings.tsv), each fact's reading as READ, STALE (the text "
-     "changed since) or UNREAD; it never supplies a reading. With arrows, a drawn graph compared with the "
-     "citations. It writes nothing. Working output.",
+     "on, every named assumption below it, and whether it has a leaf that is OMITTED or has no proof. It does not "
+     "run the prover and does not say a proof was accepted; prove on a named theorem checks that theorem's own "
+     "obligations and not the lemmas it cites, which fact lists. With the readings table (spec/readings.tsv), "
+     "each fact's reading as READ, STALE (the text changed since) or UNREAD; it never supplies a reading. With "
+     "arrows, a drawn graph compared with the citations. It writes nothing. Working output.",
      schema({"module": {"type": "string", "description": "The proof module, relative to the project root, e.g. "
                                                          "spec/Counter_proof.tla"},
              "fact": {"type": "string", "description": "One fact, with the facts it rests on"},

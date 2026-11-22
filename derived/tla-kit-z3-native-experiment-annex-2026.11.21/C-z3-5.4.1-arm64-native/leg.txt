@@ -1,0 +1,2 @@
+leg C-z3-5.4.1-arm64-native sidecar z3srv:541-arm64 (arm64 sha256:f62aaf426038e97b72b258df577e7d4305b1b4b2867a56bc02feeb6177c6958c) image tla-kit:9a52faf (sha256:ad31db45d0aae7d1a2da4777de3b5f77ba967027d372b4a6e24dd617a966031b) spec /Users/scott/dev/sandbox/TOPAK/spec modules: 
+wall 464 s, exit 0

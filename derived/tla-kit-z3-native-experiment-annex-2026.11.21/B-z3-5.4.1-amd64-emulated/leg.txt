@@ -1,0 +1,2 @@
+leg B-z3-5.4.1-amd64-emulated sidecar z3srv:541-amd64 (amd64 sha256:227e3656e118a0ede9087acfb7c0695def8c57292c342d935e35aeb65020ea30) image tla-kit:9a52faf (sha256:ad31db45d0aae7d1a2da4777de3b5f77ba967027d372b4a6e24dd617a966031b) spec /Users/scott/dev/sandbox/TOPAK/spec modules: 
+wall 507 s, exit 0

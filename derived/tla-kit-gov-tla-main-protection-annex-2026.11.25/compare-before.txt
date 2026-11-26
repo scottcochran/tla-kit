@@ -1,0 +1,16 @@
+baseline scottcochran/TOPAK (2026-11-11)  vs  target scottcochran/gov-tla (public, 2026-11-26)
+
+DIFFERS:
+  security.security_and_analysis.dependabot_security_updates: baseline "disabled", target "enabled"
+
+NOT COMPARED (one side could not be read):
+  actions/permissions/workflow: unreadable on baseline; compare it by hand in each repository's Settings
+  actions/permissions: unreadable on baseline; compare it by hand in each repository's Settings
+  autolinks: unreadable on baseline; compare it by hand in each repository's Settings
+  collaborators: unreadable on baseline; compare it by hand in each repository's Settings
+  environments: unreadable on baseline; compare it by hand in each repository's Settings
+  hooks: unreadable on baseline; compare it by hand in each repository's Settings
+  pages: unreadable on baseline; compare it by hand in each repository's Settings
+  security.vulnerability_alerts: baseline null, target true
+  vulnerability-alerts: unreadable on baseline; compare it by hand in each repository's Settings
+exit 1

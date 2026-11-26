@@ -1,0 +1,15 @@
+# gov-tla main: the rules GitHub applies, after the change, read 2026-11-26 (UTC)
+$ gh api repos/scottcochran/gov-tla/rules/branches/main
+pull_request [ruleset #27444792]
+deletion [ruleset #27444793]
+non_fast_forward [ruleset #27444793]
+required_signatures [ruleset #27444793]
+pull_request [ruleset #27444793]
+required_status_checks [ruleset #27444794]
+
+$ gh api repos/scottcochran/gov-tla/rulesets/<id>   (name, enforcement, bypass actors, current_user_can_bypass for the custodian's token)
+#27444792 main: custodian review: enforcement=active bypass=[RepositoryRole#5:pull_request] current_user_can_bypass=pull_requests_only
+#27444793 main: integrity: enforcement=active bypass=[RepositoryRole#5:pull_request] current_user_can_bypass=pull_requests_only
+#27444794 main: required checks: enforcement=active bypass=[] current_user_can_bypass=never
+#27444795 tags: custodian creates: enforcement=active bypass=[RepositoryRole#5:always] current_user_can_bypass=always
+#27444796 tags: immutable: enforcement=active bypass=[] current_user_can_bypass=never

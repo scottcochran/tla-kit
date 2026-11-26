@@ -1,0 +1,15 @@
+# The same rulesets in tla-kit and TOPAK, read 2026-11-26 (UTC), unchanged by this work
+
+== scottcochran/tla-kit
+#27358779 main: custodian review: enforcement=active bypass=[RepositoryRole#5:always] rules=pull_request
+#27358780 main: integrity: enforcement=active bypass=[RepositoryRole#5:always] rules=deletion,non_fast_forward,required_signatures,pull_request
+#27358782 main: required checks: enforcement=active bypass=[] rules=required_status_checks checks=records,image,reproduce
+#27358783 tags: custodian creates: enforcement=active bypass=[RepositoryRole#5:always] rules=creation
+#27358785 tags: immutable: enforcement=active bypass=[] rules=update,deletion
+
+== scottcochran/TOPAK
+#24967568 main: custodian review: enforcement=active bypass=[RepositoryRole#5:always] rules=pull_request
+#24967464 main: integrity: enforcement=active bypass=[RepositoryRole#5:always] rules=deletion,non_fast_forward,required_signatures,pull_request
+#24967620 main: required checks: enforcement=disabled bypass=[] rules=required_status_checks checks=check-refs,frozen-files,verify-manifests,proof-sync,lean-sync,mechanism-tests,DCO
+#24967802 tags: custodian creates: enforcement=active bypass=[RepositoryRole#5:always] rules=creation
+#24967766 tags: immutable: enforcement=active bypass=[] rules=update,deletion

@@ -1,0 +1,15 @@
+# The check names gov-tla's workflows report, as required-status-check contexts
+
+$ gh api repos/scottcochran/gov-tla/commits/25b82ae/check-runs   (PR #17 head: no spec changed, tlc and proofs skipped)
+pins  app=github-actions app_id=15368 conclusion=success
+plan  app=github-actions app_id=15368 conclusion=success
+proofs  app=github-actions app_id=15368 conclusion=skipped
+regenerate  app=github-actions app_id=15368 conclusion=success
+tlc  app=github-actions app_id=15368 conclusion=skipped
+
+$ gh run view <checks run on ef8ef9a, push> --json jobs   (a spec changed: the matrix jobs ran, named per module)
+run 45739760088
+plan  conclusion=success
+pins  conclusion=success
+proofs (Elections)  conclusion=success
+tlc  conclusion=skipped

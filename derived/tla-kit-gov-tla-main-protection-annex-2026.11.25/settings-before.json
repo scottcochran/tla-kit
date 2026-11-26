@@ -1,0 +1,220 @@
+{
+  "source": "scottcochran/gov-tla",
+  "captured": "2026-11-26",
+  "visibility": "public",
+  "default_branch": "main",
+  "repo": {
+    "has_issues": false,
+    "has_projects": false,
+    "has_wiki": false,
+    "has_discussions": false,
+    "has_downloads": false,
+    "has_pull_requests": true,
+    "pull_request_creation_policy": "collaborators_only",
+    "is_template": false,
+    "allow_forking": true,
+    "web_commit_signoff_required": false,
+    "allow_merge_commit": true,
+    "allow_squash_merge": false,
+    "allow_rebase_merge": false,
+    "allow_auto_merge": false,
+    "allow_update_branch": false,
+    "delete_branch_on_merge": true,
+    "use_squash_pr_title_as_default": false,
+    "merge_commit_title": "MERGE_MESSAGE",
+    "merge_commit_message": "PR_TITLE",
+    "squash_merge_commit_title": "COMMIT_OR_PR_TITLE",
+    "squash_merge_commit_message": "COMMIT_MESSAGES"
+  },
+  "security": {
+    "private_vulnerability_reporting": true,
+    "vulnerability_alerts": true,
+    "code_scanning_default_setup": "not-configured",
+    "security_and_analysis": {
+      "secret_scanning": "disabled",
+      "secret_scanning_push_protection": "disabled",
+      "dependabot_security_updates": "enabled",
+      "secret_scanning_non_provider_patterns": "disabled",
+      "secret_scanning_validity_checks": "disabled"
+    }
+  },
+  "rulesets": [
+    {
+      "name": "main: custodian review",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "~DEFAULT_BRANCH"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 1,
+            "dismiss_stale_reviews_on_push": true,
+            "required_reviewers": [],
+            "require_code_owner_review": true,
+            "require_last_push_approval": true,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge"
+            ]
+          }
+        }
+      ],
+      "bypass_actors": [
+        {
+          "actor_id": 5,
+          "actor_type": "RepositoryRole",
+          "bypass_mode": "always"
+        }
+      ]
+    },
+    {
+      "name": "main: integrity",
+      "target": "branch",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "~DEFAULT_BRANCH"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "required_signatures"
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": true,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge"
+            ]
+          }
+        }
+      ],
+      "bypass_actors": [
+        {
+          "actor_id": 5,
+          "actor_type": "RepositoryRole",
+          "bypass_mode": "always"
+        }
+      ]
+    },
+    {
+      "name": "main: required checks",
+      "target": "branch",
+      "enforcement": "disabled",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "~DEFAULT_BRANCH"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "check-refs"
+              },
+              {
+                "context": "frozen-files"
+              },
+              {
+                "context": "verify-manifests"
+              },
+              {
+                "context": "proof-sync"
+              },
+              {
+                "context": "lean-sync"
+              },
+              {
+                "context": "mechanism-tests"
+              },
+              {
+                "context": "DCO"
+              }
+            ]
+          }
+        }
+      ],
+      "bypass_actors": []
+    },
+    {
+      "name": "tags: custodian creates",
+      "target": "tag",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "~ALL"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "creation"
+        }
+      ],
+      "bypass_actors": [
+        {
+          "actor_id": 5,
+          "actor_type": "RepositoryRole",
+          "bypass_mode": "always"
+        }
+      ]
+    },
+    {
+      "name": "tags: immutable",
+      "target": "tag",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "~ALL"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "update"
+        },
+        {
+          "type": "deletion"
+        }
+      ],
+      "bypass_actors": []
+    }
+  ],
+  "unreadable": []
+}

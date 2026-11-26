@@ -1,0 +1,20 @@
+baseline scottcochran/TOPAK (2026-11-11)  vs  target scottcochran/gov-tla (public, 2026-11-26)
+
+DIFFERS:
+  security.security_and_analysis.dependabot_security_updates: baseline "disabled", target "enabled"
+  ruleset 'main: custodian review'.bypass_actors: baseline [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always"}], target [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "pull_request"}]
+  ruleset 'main: integrity'.bypass_actors: baseline [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always"}], target [{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "pull_request"}]
+  ruleset 'main: required checks'.enforcement: baseline "disabled", target "active"
+  ruleset 'main: required checks'.rules: baseline [{"type": "required_status_checks", "parameters": {"strict_required_status_checks_policy": true, "do_not_enforce_on_create": false, "required_status_checks": [{"context": "check-refs"}, {"context": "frozen-files"}, {"context": "verify-manifests"}, {"context": "proof-sync"}, {"context": "lean-sync"}, {"context": "mechanism-tests"}, {"context": "DCO"}]}}], target [{"type": "required_status_checks", "parameters": {"strict_required_status_checks_policy": true, "do_not_enforce_on_create": false, "required_status_checks": [{"context": "plan", "integration_id": 15368}, {"context": "pins", "integration_id": 15368}, {"context": "regenerate", "integration_id": 15368}]}}]
+
+NOT COMPARED (one side could not be read):
+  actions/permissions/workflow: unreadable on baseline; compare it by hand in each repository's Settings
+  actions/permissions: unreadable on baseline; compare it by hand in each repository's Settings
+  autolinks: unreadable on baseline; compare it by hand in each repository's Settings
+  collaborators: unreadable on baseline; compare it by hand in each repository's Settings
+  environments: unreadable on baseline; compare it by hand in each repository's Settings
+  hooks: unreadable on baseline; compare it by hand in each repository's Settings
+  pages: unreadable on baseline; compare it by hand in each repository's Settings
+  security.vulnerability_alerts: baseline null, target true
+  vulnerability-alerts: unreadable on baseline; compare it by hand in each repository's Settings
+exit 1

@@ -97,9 +97,9 @@ def main(argv):
         c.send({"jsonrpc": "2.0", "method": "notifications/initialized"})
         check("ping", c.request("ping")["result"] == {})
         tools = [t["name"] for t in c.request("tools/list")["result"]["tools"]]
-        check("tools/list has the nine tools of Phase 3 and the five of Phase 4", sorted(tools) == sorted(
+        check("tools/list has the nine tools of Phase 3, the five of Phase 4 and not_taken", sorted(tools) == sorted(
             ["info", "parse", "symbols", "evaluate", "tlc_run", "simulate", "coverage", "state_graph", "tlc_rows",
-             "prove", "proof_check", "proof_results", "flip_test", "proof_sync"]), tools)
+             "prove", "proof_check", "proof_results", "flip_test", "proof_sync", "not_taken"]), tools)
         check("an unknown method is an error", c.request("nonesuch")["error"]["code"] == -32601)
 
         before = snapshot(project)
@@ -189,6 +189,10 @@ def main(argv):
         s, err, text = c.call("tlc_rows", {"rows": "spec/Counter-rows.txt", "jobs": 2, "dry_run": True})
         check("tlc_rows: dry run, every row as expected, nothing written", not err and s["exit"] == 0
               and s["summary"].startswith("11 rows: 11 as expected") and not s["results_files_written"], text)
+
+        s, err, text = c.call("not_taken", {})
+        check("not_taken: a project with no claims table is told so (its own tests are test_not_taken.py)",
+              err and "no file spec/claims.tsv" in text, text)
 
         check("no tool but tlc_rows wrote into the project (ADR-0006)", snapshot(project) == before,
               sorted(set(snapshot(project)) ^ set(before)))
